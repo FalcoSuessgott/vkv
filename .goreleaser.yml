@@ -1,0 +1,53 @@
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=0
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  -
+    binary: vkv
+    ldflags: -s -w -X main.version={{ .Version }}
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  -
+    builds:
+      - vkv
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      amd64: x86_64
+
+nfpms:
+  -
+    vendor: vkv
+    homepage:  https://github.com/FalcoSuessgott/vkv
+    maintainer: "Tom Morelly <tom-morelly@gmx.de"
+    description: "A general purpose golang CLI template for Github and Gitlab"
+    license: GPL-3.0
+    formats:
+      - apk
+      - deb
+      - rpm
+    bindir: /usr/local/bin
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^assets:"
+      - "^scripts:"

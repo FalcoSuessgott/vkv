@@ -1,0 +1,42 @@
+---
+image: tetafro/golang-gcc:1.15-alpine
+
+stages:
+  - lint
+  - build
+  - test
+  - release
+
+lint:
+  stage: lint
+  before_script:
+    - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.41.1
+  script:
+    - ./bin/golangci-lint run -c .golang-ci.yml
+  allow_failure: true
+
+build:
+  stage: build
+  script:
+    - go build
+
+test:
+    stage: test
+    script:
+      - go test -v -race "$(go list ./... | grep -v /vendor/)" -v -coverprofile=coverage.out
+      - go tool cover -func=coverage.out
+
+release:
+  stage: release
+  image:
+      name: goreleaser/goreleaser:v0.164.0
+      entrypoint: ["/bin/bash", "-c"]
+  only:
+    refs:
+      - tags
+  variables:
+    GITLAB_TOKEN: $GITLAB_TOKEN
+
+  script:
+    - cd "$CI_PROJECT_DIR"
+    - goreleaser release --rm-dist

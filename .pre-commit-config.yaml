@@ -1,0 +1,24 @@
+repos:
+  # golang pre commits
+  - repo: git://github.com/dnephin/pre-commit-golang
+    rev: master
+    hooks:
+      - id: go-fmt
+      - id: go-vet
+      - id: go-lint
+      - id: go-imports
+      - id: go-cyclo
+        args: [-over=15]
+      - id: no-go-testing
+      - id: golangci-lint
+        args: ["--skip-dirs=vendor -c .golang-ci.yml ."]
+      - id: go-critic
+      - id: go-unit-tests
+      - id: go-build
+      - id: go-mod-tidy
+
+  # gitlab ci lint
+  - repo: https://github.com/FalcoSuessgott/lint-gitlab-ci
+    rev: v0.0.4
+    hooks:
+      - id: gitlab-ci
