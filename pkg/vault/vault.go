@@ -15,6 +15,9 @@ type Vault struct {
 }
 
 // NewClient returns a new vault client wrapper.
+// VAULT_ADDR and VAULT_TOKEN are required
+// VAULT_SKIP_VERIFY is considered, if defined
+// reads the proxy configuration via HTTP_PROXY and HTTPS_PROXY
 func NewClient() (*Vault, error) {
 	client := &http.Client{}
 
@@ -31,6 +34,7 @@ func NewClient() (*Vault, error) {
 	_, skipVerify := os.LookupEnv("VAULT_SKIP_VERIFY")
 	if skipVerify {
 		client.Transport = &http.Transport{
+			Proxy:           http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
