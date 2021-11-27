@@ -50,30 +50,8 @@ func NewClient() (*Vault, error) {
 	return &Vault{c}, nil
 }
 
-func (v *Vault) ListPath(p string) ([]string, error) {
-	path := fmt.Sprintf("%s/metadata", p)
-
-	data, err := v.Client.Logical().List(path)
-	if err != nil {
-		return nil, err
-	}
-
-	if data == nil {
-		return nil, fmt.Errorf("no secrets found")
-	}
-
-	keys := []string{}
-
-	if data.Data != nil {
-		for _, k := range data.Data["keys"].([]interface{}) {
-			keys = append(keys, k.(string))
-		}
-	}
-
-	return keys, nil
-}
-
-func (v *Vault) ListSubPath(rootPath, subPath string) ([]string, error) {
+// ListPath returns all keys from vault kv secret path
+func (v *Vault) ListPath(rootPath, subPath string) ([]string, error) {
 	path := fmt.Sprintf("%s/metadata/%s", rootPath, subPath)
 
 	data, err := v.Client.Logical().List(path)
@@ -96,6 +74,7 @@ func (v *Vault) ListSubPath(rootPath, subPath string) ([]string, error) {
 	return keys, nil
 }
 
+// ReadSecrets returns a map with all secrets from a kv engine path
 func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, error) {
 	path := fmt.Sprintf("%s/data/%s", rootPath, subPath)
 
@@ -104,7 +83,7 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 		return nil, err
 	}
 
-	if data == nil {
+	if data.Data == nil {
 		return nil, fmt.Errorf("no secrets found")
 	}
 
