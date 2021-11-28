@@ -99,7 +99,7 @@ func TestValidateFlags(t *testing.T) {
 func TestPrint(t *testing.T) {
 	testCases := []struct {
 		name    string
-		s       Secrets
+		s       secrets
 		options *Options
 		output  string
 	}{
@@ -177,7 +177,7 @@ key_2	key
 func TestSort(t *testing.T) {
 	testCases := []struct {
 		name       string
-		s          Secrets
+		s          secrets
 		sortedKeys []string
 	}{
 		{
@@ -202,7 +202,7 @@ func TestSort(t *testing.T) {
 func TestToJson(t *testing.T) {
 	testCases := []struct {
 		name string
-		s    Secrets
+		s    secrets
 		json string
 	}{
 		{
@@ -237,7 +237,7 @@ func TestToJson(t *testing.T) {
 func TestToYAML(t *testing.T) {
 	testCases := []struct {
 		name string
-		s    Secrets
+		s    secrets
 		yaml string
 	}{
 		{

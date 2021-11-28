@@ -12,7 +12,6 @@ repos:
       - id: no-go-testing
       - id: golangci-lint
         args: ["--skip-dirs=vendor -c .golang-ci.yml ."]
-      - id: go-critic
       - id: go-unit-tests
       - id: go-build
       - id: go-mod-tidy

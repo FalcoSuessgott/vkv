@@ -16,22 +16,21 @@ import (
 )
 
 const (
-	DELIMITER       = "/"
-	SEPERATOR       = " "
-	NEW_LINE        = "\n"
-	MASK_CHAR       = "*"
-	DEFAULT_KV_PATH = "kv2"
+	delimiter     = "/"
+	seperator     = " "
+	newLine       = "\n"
+	maskChar      = "*"
+	defaultKVPath = "kv2"
 )
 
 var defaultWriter = os.Stdout
 
-// Secrets map containing all readable secrets.
 type (
-	Secrets map[string]interface{}
-	Keys    []string
+	secrets map[string]interface{}
+	keys    []string
 )
 
-// Options holds all available commandline options.
+// Options holds all available commandline options
 type Options struct {
 	rootPath    string
 	subPath     string
@@ -45,7 +44,7 @@ type Options struct {
 
 func defaultOptions() *Options {
 	return &Options{
-		rootPath:    DEFAULT_KV_PATH,
+		rootPath:    defaultKVPath,
 		showSecrets: false,
 		writer:      defaultWriter,
 	}
@@ -53,7 +52,7 @@ func defaultOptions() *Options {
 
 func newRootCmd(version string) *cobra.Command {
 	o := defaultOptions()
-	s := Secrets{}
+	s := secrets{}
 
 	cmd := &cobra.Command{
 		Use:           "vkv",
@@ -120,26 +119,26 @@ func Execute(version string) error {
 
 func (o *Options) validateFlags() error {
 	if o.json && o.yaml {
-		return fmt.Errorf("cannot specify both --to-json and --to-yaml\n")
+		return fmt.Errorf("cannot specify both --to-json and --to-yaml")
 	}
 
 	if o.onlyKeys && o.showSecrets {
-		return fmt.Errorf("cannot specify both --only-keys and --show-secrets\n")
+		return fmt.Errorf("cannot specify both --only-keys and --show-secrets")
 	}
 
 	if o.onlyPaths && o.showSecrets {
-		return fmt.Errorf("cannot specify both --only-paths and --show-secrets\n")
+		return fmt.Errorf("cannot specify both --only-paths and --show-secrets")
 	}
 
 	if o.onlyKeys && o.onlyPaths {
-		return fmt.Errorf("cannot specify both --only-keys and --only-paths\n")
+		return fmt.Errorf("cannot specify both --only-keys and --only-paths")
 	}
 	return nil
 }
 
-func (o *Options) evalModifyFlags(s Secrets) {
+func (o *Options) evalModifyFlags(s secrets) {
 	if o.onlyKeys {
-		s.onlyKeys()
+		s.onlykeys()
 	}
 
 	if o.onlyPaths {
@@ -151,14 +150,14 @@ func (o *Options) evalModifyFlags(s Secrets) {
 	}
 }
 
-func (s *Secrets) listRecursive(v *vault.Vault, rootPath, subPath string) {
+func (s *secrets) listRecursive(v *vault.Vault, rootPath, subPath string) {
 	keys, err := v.ListPath(rootPath, subPath)
 	if err != nil {
 		log.Fatalf("error listing secrets at %s/%s: %v.\n", rootPath, subPath, err)
 	}
 
 	for _, k := range keys {
-		if strings.HasSuffix(k, DELIMITER) {
+		if strings.HasSuffix(k, delimiter) {
 			s.listRecursive(v, rootPath, buildPath(subPath, k))
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, buildPath(subPath, k))
@@ -171,7 +170,7 @@ func (s *Secrets) listRecursive(v *vault.Vault, rootPath, subPath string) {
 	}
 }
 
-func (s Secrets) toJSON() string {
+func (s secrets) toJSON() string {
 	out, err := json.Marshal(s)
 	if err != nil {
 		log.Fatalf("error while marshalling map: %v\n", err)
@@ -180,7 +179,7 @@ func (s Secrets) toJSON() string {
 	return string(out)
 }
 
-func (s *Secrets) toYAML() string {
+func (s *secrets) toYAML() string {
 	out, err := yaml.JSONToYAML([]byte(s.toJSON()))
 	if err != nil {
 		log.Fatalf("error while marshalling from json: %v\n", err)
@@ -190,7 +189,7 @@ func (s *Secrets) toYAML() string {
 }
 
 func sortMapKeys(m map[string]interface{}) []string {
-	keys := make(Keys, 0, len(m))
+	keys := make(keys, 0, len(m))
 	for k := range m {
 		keys = append(keys, k)
 	}
@@ -200,27 +199,28 @@ func sortMapKeys(m map[string]interface{}) []string {
 	return keys
 }
 
-func (k Keys) Len() int {
+func (k keys) Len() int {
 	return len(k)
 }
 
-func (k Keys) Swap(i, j int) {
+func (k keys) Swap(i, j int) {
 	k[i], k[j] = k[j], k[i]
 }
 
-func (k Keys) Less(i, j int) bool {
-	k1 := strings.Replace(k[i], "/", "\x00", -1)
-	k2 := strings.Replace(k[j], "/", "\x00", -1)
+func (k keys) Less(i, j int) bool {
+	k1 := strings.ReplaceAll(k[i], "/", "\x00")
+	k2 := strings.ReplaceAll(k[j], "/", "\x00")
 
 	return k1 < k2
 }
 
-func (o *Options) print(s Secrets) {
+func (o *Options) print(s secrets) {
 	w := tabwriter.NewWriter(o.writer, 0, 8, 1, '\t', tabwriter.AlignRight)
 
-	fmt.Fprintf(w, "%s%s%s", o.rootPath, DELIMITER, NEW_LINE)
+	fmt.Fprintf(w, "%s%s%s", o.rootPath, delimiter, newLine)
 
 	for _, k := range sortMapKeys(s) {
+		// nolint
 		if o.onlyKeys {
 			fmt.Fprintf(w, "%s\t%v\n", k, printMap(s[k]))
 		} else if o.onlyPaths {
@@ -233,7 +233,7 @@ func (o *Options) print(s Secrets) {
 	w.Flush()
 }
 
-func (s Secrets) onlyKeys() {
+func (s secrets) onlykeys() {
 	for k := range s {
 		m, ok := s[k].(map[string]interface{})
 		if !ok {
@@ -246,13 +246,13 @@ func (s Secrets) onlyKeys() {
 	}
 }
 
-func (s Secrets) onlyPaths() {
+func (s secrets) onlyPaths() {
 	for k := range s {
 		s[k] = nil
 	}
 }
 
-func (s Secrets) maskSecrets() {
+func (s secrets) maskSecrets() {
 	for k := range s {
 		m, ok := s[k].(map[string]interface{})
 		if !ok {
@@ -261,7 +261,7 @@ func (s Secrets) maskSecrets() {
 
 		for k := range m {
 			secret := fmt.Sprintf("%v", m[k])
-			m[k] = strings.Repeat(MASK_CHAR, len(secret))
+			m[k] = strings.Repeat(maskChar, len(secret))
 		}
 	}
 }
@@ -270,7 +270,7 @@ func buildPath(elements ...string) string {
 	p := ""
 
 	for i, e := range elements {
-		e = strings.TrimSuffix(e, DELIMITER)
+		e = strings.TrimSuffix(e, delimiter)
 
 		if e == "" {
 			continue
@@ -279,11 +279,11 @@ func buildPath(elements ...string) string {
 		p += e
 
 		if i < len(elements) {
-			p += DELIMITER
+			p += delimiter
 		}
 	}
 
-	return strings.TrimSuffix(p, DELIMITER)
+	return strings.TrimSuffix(p, delimiter)
 }
 
 func printMap(m interface{}) string {
@@ -298,12 +298,12 @@ func printMap(m interface{}) string {
 		out += k
 
 		if secrets[k] == "" {
-			out += SEPERATOR
+			out += seperator
 		} else {
 			out += fmt.Sprintf("=%v ", secrets[k])
 		}
 
 	}
 
-	return strings.TrimSuffix(out, SEPERATOR)
+	return strings.TrimSuffix(out, seperator)
 }
