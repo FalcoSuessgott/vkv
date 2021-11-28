@@ -18,3 +18,5 @@ jobs:
         with:
           version: v1.43.0
           args: -c .golang-ci.yml
+        env:
+          GO111MODULES: off

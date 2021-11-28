@@ -16,3 +16,4 @@ linters:
     - wrapcheck
     - gochecknoglobals
     - varnamelen
+    - funlen

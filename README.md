@@ -31,7 +31,7 @@ Flags:
   -h, --help               help for vkv
       --only-keys          print only keys
       --only-paths         print only paths
-  -p, --root-path string   root path (default "kv2")
+  -p, --root-path string   root path (default "kv")
       --show-secrets       print out secrets
   -s, --sub-path string    sub path
   -j, --to-json            print secrets in json format
@@ -50,7 +50,7 @@ secret/sub/demo
 secret/sub/sub2/demo
 ```
 
-## list secrets `--root-paths | -p (default kv2)`
+## list secrets `--root-path | -p (default kv)`
 You can list all secrets recursively by running:
 
 ```bash
@@ -149,3 +149,10 @@ secret/sub/sub2/demo:
   password: password
   user: user
 ```
+
+# Acknowledgements / Similar tools
+`vkv` is inspired by:
+* https://github.com/jonasvinther/medusa
+
+Similar tools are:
+* https://github.com/kir4h/rvault
