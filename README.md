@@ -5,8 +5,11 @@
 
 ![img](assets/example.png)
 
+# Installation
+Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](https://github.com/FalcoSuessgott/vkv/releases) section.
+
 # Authentication
-`vkv` supports token based authentication. It is clear that you can only see the secrets that is allowed by your token policy.
+`vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.
 
 In order to authenticate to a Vault instance you have to export `VAULT_ADDR` and `VAULT_TOKEN`.
 
@@ -18,7 +21,7 @@ Furthermore you can export `VAULT_SKIP_VERIFY` for insecure HTTPS connection. Al
 
 # Usage
 ```bash
-go run main.go -h
+vkv -h
 recursively list secrets from Vaults KV2 engine
 
 Usage:
@@ -132,8 +135,11 @@ vkv --root-path secret --sub-path sub --show-secrets --to-json | jq .
 ## export to yaml  `--to-yaml | -y`
 Same applies for yaml:
 
-```yaml
+```bash
 vkv --root-path secret --sub-path sub --show-secrets --to-yaml
+```
+
+```yaml
 secret/sub/demo:
   foo: bar
   password: password

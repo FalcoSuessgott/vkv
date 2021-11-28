@@ -13,6 +13,7 @@ builds:
     goos:
       - linux
       - darwin
+      - windows
     goarch:
       - amd64
       - arm64
@@ -34,7 +35,7 @@ nfpms:
     vendor: vkv
     homepage:  https://github.com/FalcoSuessgott/vkv
     maintainer: "Tom Morelly <tom-morelly@gmx.de"
-    description: "A general purpose golang CLI template for Github and Gitlab"
+    description: "recursively list secrets from Vaults KV2 engine"
     license: GPL-3.0
     formats:
       - apk
