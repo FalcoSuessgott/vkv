@@ -4,7 +4,15 @@ linters-settings:
 linters:
   enable-all: true
   disable:
+    - scopelint
+    - maligned
+    - interfacer
+    - golint
     - testpackage
     - forbidigo
     - paralleltest
     - exhaustivestruct
+    - goerr113
+    - wrapcheck
+    - gochecknoglobals
+    - varnamelen

@@ -59,3 +59,21 @@ docker-run:
 pre-commit:	## run pre-commit hooks
 	pre-commit run
 
+
+vault: export VAULT_ADDR = http://127.0.0.1:8200
+vault: export VAULT_SKIP_VERIFY = true
+vault: export VAULT_TOKEN = root
+
+.PHONY: vault
+vault:
+	echo hallo
+	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
+	vault secrets enable kv
+	vault kv put secret/demo foo=bar
+	vault kv put secret/sub sub=password
+	vault kv put secret/sub/demo foo=bar user=user password=password
+	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
+
+.PHONY: kill
+kill:
+	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
