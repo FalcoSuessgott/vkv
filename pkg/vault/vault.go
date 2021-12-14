@@ -62,9 +62,15 @@ func NewClient() (*Vault, error) {
 
 	c.SetToken(vaultToken)
 
+	vaultNamespace, ok := os.LookupEnv("VAULT_NAMESPACE")
+	if ok {
+		c.SetNamespace(vaultNamespace)
+	}
+
 	return &Vault{Client: c, Secrets: make(map[string]interface{})}, nil
 }
 
+// ListRecursive returns secrets to a path recursive.
 func (v *Vault) ListRecursive(rootPath, subPath string) error {
 	keys, err := v.ListSecrets(rootPath, subPath)
 	if err != nil {
