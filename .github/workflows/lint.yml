@@ -17,6 +17,6 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: v1.43.0
-          args: -c .golang-ci.yml
+          args: -c .golang-ci.yml -v --timeout=5m
         env:
           GO111MODULES: off
