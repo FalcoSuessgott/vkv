@@ -13,13 +13,19 @@ Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](htt
 # Authentication
 `vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.
 
+## Required Environment Variables
 In order to authenticate to a Vault instance you have to export `VAULT_ADDR` and `VAULT_TOKEN`.
 
 ```bash
 VAULT_ADDR="http://127.0.0.1:8200" VAULT_TOKEN="root" vkv
 ```
 
-Furthermore you can export `VAULT_SKIP_VERIFY` for insecure HTTPS connection. Also `vkv` respects `HTTP_PROXY` and `HTTPS_PROXY` environment variables.
+## Optional  Environment Variables
+Furthermore you can export:
+
+* `VAULT_NAMESPACE` for namespace login
+* `VAULT_SKIP_VERIFY` for insecure HTTPS connection
+* `HTTP_PROXY` and `HTTPS_PROXY` for proxy connections.
 
 # Usage
 ```bash
