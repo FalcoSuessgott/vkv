@@ -8,8 +8,25 @@ import (
 	"github.com/ghodss/yaml"
 )
 
+const (
+	delimiter = "/"
+)
+
+// Keys type for receiving all keys of a map.
 type Keys []string
 
+// SplitPath splits a given path by / and returns the first element and the joined rest paths.
+func SplitPath(path string) (string, string) {
+	parts := strings.Split(path, delimiter)
+
+	if len(parts) >= 2 {
+		return parts[0], strings.Join(parts[1:], delimiter)
+	}
+
+	return strings.Join(parts, delimiter), ""
+}
+
+// ToJSON marshalls a given map to json.
 func ToJSON(m map[string]interface{}) ([]byte, error) {
 	out, err := json.Marshal(m)
 	if err != nil {
@@ -19,6 +36,7 @@ func ToJSON(m map[string]interface{}) ([]byte, error) {
 	return out, nil
 }
 
+// ToYAML marshalls a given map to yaml.
 func ToYAML(m map[string]interface{}) ([]byte, error) {
 	out, err := yaml.Marshal(m)
 	if err != nil {
@@ -28,6 +46,7 @@ func ToYAML(m map[string]interface{}) ([]byte, error) {
 	return out, nil
 }
 
+// SortMapKeys sorts the keys of a map.
 func SortMapKeys(m map[string]interface{}) []string {
 	keys := make(Keys, 0, len(m))
 	for k := range m {
@@ -39,14 +58,17 @@ func SortMapKeys(m map[string]interface{}) []string {
 	return keys
 }
 
+// Len returns the length of Keys.
 func (k Keys) Len() int {
 	return len(k)
 }
 
+// Swap swaps keys alphabetically.
 func (k Keys) Swap(i, j int) {
 	k[i], k[j] = k[j], k[i]
 }
 
+// Less compares keys alphabetically.
 func (k Keys) Less(i, j int) bool {
 	k1 := strings.ReplaceAll(k[i], "/", "\x00")
 	k2 := strings.ReplaceAll(k[j], "/", "\x00")

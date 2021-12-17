@@ -162,7 +162,7 @@ func (v *Vault) EnableKV2Engine(rootPath string) error {
 		"type": "kv",
 		"options": map[string]interface{}{
 			"path":    rootPath,
-			"version": 2, //nolint: gomnd
+			"version": 2,
 		},
 	}
 
