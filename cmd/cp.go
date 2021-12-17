@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -60,22 +62,52 @@ func newCPCmd() *cobra.Command {
 
 			// create dest path if necessary
 			if err := destC.EnableKV2Engine(o.destPath); err != nil {
-				return err
+				log.Println(err)
 			}
 
+			// fetch secrets on dest path and inform user if secrets are going to be overwritten
+			// evaluate if merging to secrets is possible
+			// prompt user to perform action with showing the result
+
+			// test this
 			fmt.Printf("copying from Path: %s and Namespace: %s to Path: %s Namespace: %s\n", o.srcPath, o.srcNamespace, o.destPath, o.destNamespace)
-			printer := printer.NewPrinter(srcC.Secrets)
+			srcPrinter := printer.NewPrinter(srcC.Secrets)
 
-			if err := printer.Out(); err != nil {
+			if err := srcPrinter.Out(); err != nil {
 				return err
 			}
+
 			// create dest path if necessary
 			// inform user in case of overwriting
 			// write src to dest
-			s, d := utils.SplitPath(o.srcPath)
-			if err := destC.WriteSecrets(s, d, srcC.Secrets); err != nil {
+
+			fmt.Println()
+			// s, _ := utils.SplitPath(o.srcPath)
+
+			for k, v := range srcC.Secrets {
+				if k == o.srcPath {
+					continue
+				}
+
+				newPath := strings.Join(strings.Split(k, "/")[1:], "/")
+
+				if err := destC.WriteSecrets(o.destPath, newPath, v.(map[string]interface{})); err != nil {
+					return err
+				}
+			}
+
+			if err := destC.ListRecursive(utils.SplitPath(o.destPath)); err != nil {
 				return err
 			}
+
+			destPrinter := printer.NewPrinter(destC.Secrets)
+
+			fmt.Println()
+			if err := destPrinter.Out(); err != nil {
+				return err
+			}
+
+			destC.DisableKV2Engine(o.destPath)
 
 			return nil
 		},
@@ -111,7 +143,6 @@ func newClient(namespace string) (*vault.Vault, error) {
 		if vC, err = vault.NewNamespacedClient(namespace); err != nil {
 			return nil, err
 		}
-
 	}
 
 	if e != nil {
