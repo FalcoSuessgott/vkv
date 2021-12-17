@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
+	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
 )
@@ -16,8 +17,7 @@ var defaultWriter = os.Stdout
 
 // Options holds all available commandline options.
 type Options struct {
-	rootPath    string
-	subPath     string
+	path        string
 	writer      io.Writer
 	onlyKeys    bool
 	onlyPaths   bool
@@ -29,7 +29,7 @@ type Options struct {
 
 func defaultOptions() *Options {
 	return &Options{
-		rootPath:    defaultKVPath,
+		path:        defaultKVPath,
 		showSecrets: false,
 		writer:      defaultWriter,
 	}
@@ -59,7 +59,7 @@ func newRootCmd(version string) *cobra.Command {
 				return err
 			}
 
-			if err := v.ListRecursive(o.rootPath, o.subPath); err != nil {
+			if err := v.ListRecursive(utils.SplitPath(o.path)); err != nil {
 				return err
 			}
 
@@ -80,8 +80,7 @@ func newRootCmd(version string) *cobra.Command {
 	}
 
 	// Input
-	cmd.Flags().StringVarP(&o.rootPath, "root-path", "p", o.rootPath, "root path")
-	cmd.Flags().StringVarP(&o.subPath, "sub-path", "s", o.subPath, "sub path")
+	cmd.Flags().StringVarP(&o.path, "path", "p", o.path, "path")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "print only keys")

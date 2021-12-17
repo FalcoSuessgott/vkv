@@ -29,40 +29,49 @@ Furthermore you can export:
 
 # Usage
 ```bash
-vkv -h
+$> vkv -h
 recursively list secrets from Vaults KV2 engine
 
 Usage:
   vkv [flags]
 
 Flags:
-  -h, --help               help for vkv
-      --only-keys          print only keys
-      --only-paths         print only paths
-  -p, --root-path string   root path (default "kv")
-      --show-secrets       print out secrets
-  -s, --sub-path string    sub path
-  -j, --to-json            print secrets in json format
-  -y, --to-yaml            print secrets in yaml format
-  -v, --version            display version
+  -h, --help           help for vkv
+      --only-keys      print only keys
+      --only-paths     print only paths
+  -p, --path string    path (default "kv")
+      --show-secrets   print out secrets
+  -j, --to-json        print secrets in json format
+  -y, --to-yaml        print secrets in yaml format
+  -v, --version        display version
 ```
 
 # Walkthrough
-Image we have the following KV2 structure, enabled at path `secret`:
+Imagine you have the following KV2 structure mounted at path `secret/`:
 
 ```
 secret/
-secret/demo
-secret/sub
-secret/sub/demo
-secret/sub/sub2/demo
+  demo
+    foo=bar
+  sub
+    sub=passw0rd
+
+  sub/demo
+    foo=bar
+    password=passw0rd
+    user=user
+    
+  sub/sub2/demo
+    foo=bar
+    password=passw0rd
+    user=user
 ```
 
-## list secrets `--root-path | -p (default kv)`
+### list secrets `--path | -p (default "kv")`
 You can list all secrets recursively by running:
 
 ```bash
-vkv --root-path secret
+vkv --path secret
 secret/
 secret/demo             foo=***
 secret/sub              sub=********
@@ -70,11 +79,19 @@ secret/sub/demo         foo=*** password=******** user=****
 secret/sub/sub2/demo    foo=*** password=******** user=****
 ```
 
-## list only paths `--only-paths`
+You can specifiy specific subpaths:
+
+```bash
+vkv --path secret/sub/sub2
+secret/
+secret/sub/sub2/demo    foo=*** password=******** user=****
+```
+
+### list only paths `--only-paths`
 We can receive only the paths by running
 
 ```bash
-vkv  --root-path secret --only-paths
+vkv  -p secret --only-paths
 secret/
 secret/demo
 secret/sub
@@ -82,11 +99,11 @@ secret/sub/demo
 secret/sub/sub2/demo
 ```
 
-## list only secret keys  `--only-keys`
+### list only secret keys  `--only-keys`
 If we want to know just the keys in every directory we can run
 
 ```bash
-vkv --root-path secret --only-keys
+vkv -p secret --only-keys
 secret/
 secret/demo             foo
 secret/sub              sub
@@ -94,23 +111,13 @@ secret/sub/demo         foo password user
 secret/sub/sub2/demo    foo password user
 ```
 
-## list from a sub directory `--sub-path | -s`
-We can get the secrets of a certain sub path, by running
-
-```bash
-vkv  --root-path secret --sub-path sub --only-keys
-secret/sub/
-secret/sub/demo         foo password user
-secret/sub/sub2/demo    foo password user
-```
-
-## show secrets  `--show-secrets`
+### show secrets  `--show-secrets`
 Per default secret values are masked. Using `--show-secrets` shows the secrets. **Use with Caution**
 
 We can get the secrets of a certain sub path, by running
 
 ```bash
-vkv --root-path secret --show-secrets
+vkv -p secret --show-secrets
 secret/
 secret/demo             foo=bar
 secret/sub              sub=password
@@ -118,11 +125,11 @@ secret/sub/demo         foo=bar password=password user=user
 secret/sub/sub2/demo    foo=bar password=password user=user
 ```
 
-## export to json `--to-json | -j`
+### export to json `--to-json | -j`
 You can combine all flags and export the result to json by running:
 
 ```bash
-vkv --root-path secret --sub-path sub --show-secrets --to-json | jq .
+vkv -p secret --sub-path sub --show-secrets --to-json | jq .
 ```
 
 ```json
@@ -140,11 +147,11 @@ vkv --root-path secret --sub-path sub --show-secrets --to-json | jq .
 }
 ```
 
-## export to yaml  `--to-yaml | -y`
+### export to yaml  `--to-yaml | -y`
 Same applies for yaml:
 
 ```bash
-vkv --root-path secret --sub-path sub --show-secrets --to-yaml
+vkv --path secret --sub-path sub --show-secrets --to-yaml
 ```
 
 ```yaml
