@@ -70,6 +70,48 @@ func NewClient() (*Vault, error) {
 	return &Vault{Client: c, Secrets: make(map[string]interface{})}, nil
 }
 
+// NewNamespacedClient returns a new vault client for a specific namespace.
+// VAULT_ADDR and VAULT_TOKEN are required
+// VAULT_SKIP_VERIFY is considered, if defined
+// reads the proxy configuration via HTTP_PROXY and HTTPS_PROXY.
+func NewNamespacedClient(namespace string) (*Vault, error) {
+	client := &http.Client{}
+
+	vaultAddr, ok := os.LookupEnv("VAULT_ADDR")
+	if !ok {
+		return nil, fmt.Errorf("VAULT_ADDR required but not set")
+	}
+
+	vaultToken, ok := os.LookupEnv("VAULT_TOKEN")
+	if !ok {
+		return nil, fmt.Errorf("VAULT_TOKEN required but not set")
+	}
+
+	_, skipVerify := os.LookupEnv("VAULT_SKIP_VERIFY")
+	if skipVerify {
+		client.Transport = &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			//nolint: gosec
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
+
+	config := &api.Config{
+		Address:    vaultAddr,
+		HttpClient: client,
+	}
+
+	c, err := api.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+
+	c.SetToken(vaultToken)
+	c.SetNamespace(namespace)
+
+	return &Vault{Client: c, Secrets: make(map[string]interface{})}, nil
+}
+
 // ListRecursive returns secrets to a path recursive.
 func (v *Vault) ListRecursive(rootPath, subPath string) error {
 	keys, err := v.ListSecrets(rootPath, subPath)

@@ -9,17 +9,17 @@ import (
 func TestValidateFlags(t *testing.T) {
 	testCases := []struct {
 		name    string
-		options *Options
+		options *lsOptions
 		err     bool
 	}{
 		{
 			name:    "test: valid options",
-			options: defaultOptions(),
+			options: defaultLsOptions(),
 		},
 		{
 			name: "test: yaml and json",
 			err:  true,
-			options: &Options{
+			options: &lsOptions{
 				json: true,
 				yaml: true,
 			},
@@ -27,7 +27,7 @@ func TestValidateFlags(t *testing.T) {
 		{
 			name: "test: only keys and only paths",
 			err:  true,
-			options: &Options{
+			options: &lsOptions{
 				onlyKeys:  true,
 				onlyPaths: true,
 			},
@@ -35,7 +35,7 @@ func TestValidateFlags(t *testing.T) {
 		{
 			name: "test: only keys and show secrets ",
 			err:  true,
-			options: &Options{
+			options: &lsOptions{
 				onlyKeys:    true,
 				showSecrets: true,
 			},
@@ -43,7 +43,7 @@ func TestValidateFlags(t *testing.T) {
 		{
 			name: "test: only paths and show secrets ",
 			err:  true,
-			options: &Options{
+			options: &lsOptions{
 				onlyPaths:   true,
 				showSecrets: true,
 			},
