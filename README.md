@@ -53,6 +53,7 @@ Imagine you have the following KV2 structure mounted at path `secret/`:
 secret/
   demo
     foo=bar
+    
   sub
     sub=passw0rd
 
@@ -60,7 +61,7 @@ secret/
     foo=bar
     password=passw0rd
     user=user
-    
+
   sub/sub2/demo
     foo=bar
     password=passw0rd
