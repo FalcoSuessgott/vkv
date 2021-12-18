@@ -17,7 +17,7 @@ var defaultWriter = os.Stdout
 
 // Options holds all available commandline options.
 type Options struct {
-	path        string
+	paths       []string
 	writer      io.Writer
 	onlyKeys    bool
 	onlyPaths   bool
@@ -29,7 +29,7 @@ type Options struct {
 
 func defaultOptions() *Options {
 	return &Options{
-		path:        defaultKVPath,
+		paths:       []string{defaultKVPath},
 		showSecrets: false,
 		writer:      defaultWriter,
 	}
@@ -59,8 +59,10 @@ func newRootCmd(version string) *cobra.Command {
 				return err
 			}
 
-			if err := v.ListRecursive(utils.SplitPath(o.path)); err != nil {
-				return err
+			for _, p := range o.paths {
+				if err := v.ListRecursive(utils.SplitPath(p)); err != nil {
+					return err
+				}
 			}
 
 			printer := printer.NewPrinter(v.Secrets,
@@ -80,7 +82,7 @@ func newRootCmd(version string) *cobra.Command {
 	}
 
 	// Input
-	cmd.Flags().StringVarP(&o.path, "path", "p", o.path, "path")
+	cmd.Flags().StringSliceVarP(&o.paths, "path", "p", o.paths, "engine paths")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "print only keys")
