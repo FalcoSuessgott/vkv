@@ -87,7 +87,7 @@ secret/sub/sub2/demo
         user=****
 ```
 
-You can specifiy specific subpaths:
+You can also specifiy a specific subpaths:
 
 ```bash
 vkv --path secret/sub/sub2
@@ -97,6 +97,26 @@ secret/sub/sub2/demo
         user=****
 ```
 
+and list as much paths as you want:
+
+```bash
+# comma separated and no spaces!
+vkv -p secret,secret2
+secret/demo
+        foo=***
+secret/sub
+        sub=********
+secret/sub/demo
+        foo=***
+        password=********
+        user=****
+secret/sub/sub2/demo
+        foo=***
+        password=********
+        user=****
+secret2/demo
+        user=********
+```
 ### list only paths `--only-paths`
 We can receive only the paths by running
 
