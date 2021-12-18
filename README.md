@@ -117,6 +117,25 @@ secret/sub/sub2/demo
 secret2/demo
         user=********
 ```
+
+for arbitrary secrets like json or xml data the maximum length of secrets being shown is 12, this can be configured by `--max-password-length` or `-m`:
+
+```bash
+vkv -p secret -m 5
+secret/demo
+        foo=***
+secret/sub
+        sub=*****
+secret/sub/demo
+        foo=***
+        password=*****
+        user=****
+secret/sub/sub2/demo
+        foo=***
+        password=*****
+        user=****
+```
+
 ### list only paths `--only-paths`
 We can receive only the paths by running
 

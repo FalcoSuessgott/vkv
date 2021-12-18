@@ -17,24 +17,27 @@ var defaultWriter = os.Stdout
 
 // Options holds all available commandline options.
 type Options struct {
-	paths       []string
-	writer      io.Writer
-	onlyKeys    bool
-	onlyPaths   bool
-	showSecrets bool
-	json        bool
-	yaml        bool
-	version     bool
+	paths          []string
+	writer         io.Writer
+	onlyKeys       bool
+	onlyPaths      bool
+	showSecrets    bool
+	passwordLength int
+	json           bool
+	yaml           bool
+	version        bool
 }
 
 func defaultOptions() *Options {
 	return &Options{
-		paths:       []string{defaultKVPath},
-		showSecrets: false,
-		writer:      defaultWriter,
+		paths:          []string{defaultKVPath},
+		showSecrets:    false,
+		writer:         defaultWriter,
+		passwordLength: printer.MaxPasswordLength,
 	}
 }
 
+//nolint: lll
 func newRootCmd(version string) *cobra.Command {
 	o := defaultOptions()
 
@@ -68,6 +71,7 @@ func newRootCmd(version string) *cobra.Command {
 			printer := printer.NewPrinter(v.Secrets,
 				printer.OnlyKeys(o.onlyKeys),
 				printer.OnlyPaths(o.onlyPaths),
+				printer.CustomPasswordLength(o.passwordLength),
 				printer.ShowSecrets(o.showSecrets),
 				printer.ToJSON(o.json),
 				printer.ToYAML(o.yaml),
@@ -88,6 +92,7 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "print only keys")
 	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "print only paths")
 	cmd.Flags().BoolVar(&o.showSecrets, "show-secrets", o.showSecrets, "print out secrets")
+	cmd.Flags().IntVarP(&o.passwordLength, "max-password-length", "m", o.passwordLength, "maximum length of passwords while printing")
 
 	// Output format
 	cmd.Flags().BoolVarP(&o.json, "to-json", "j", o.json, "print secrets in json format")

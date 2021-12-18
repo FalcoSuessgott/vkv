@@ -95,6 +95,40 @@ key_2
 `,
 		},
 		{
+			name: "test: max password length",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				CustomPasswordLength(3),
+				ShowSecrets(false),
+			},
+			output: `key_1
+	key=***
+	user=***
+key_2
+	key=**
+`,
+		},
+		{
+			name: "test: max password length",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				CustomPasswordLength(MaxPasswordLength),
+				ShowSecrets(false),
+			},
+			output: `key_1
+	key=*****
+	user=********
+key_2
+	key=**
+`,
+		},
+		{
 			name: "test: only keys",
 			s: map[string]interface{}{
 				"key_1": map[string]interface{}{"key": "value", "user": "password"},

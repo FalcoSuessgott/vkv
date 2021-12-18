@@ -12,7 +12,9 @@ import (
 type outputFormat int
 
 const (
-	maskChar = "*"
+	// MaxPasswordLength maximum length of passwords.
+	MaxPasswordLength = 12
+	maskChar          = "*"
 
 	yaml outputFormat = iota
 	json
@@ -25,11 +27,12 @@ type Option func(*Printer)
 
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
-	secrets   map[string]interface{}
-	format    outputFormat
-	writer    io.Writer
-	onlyKeys  bool
-	onlyPaths bool
+	secrets        map[string]interface{}
+	passwordLength int
+	format         outputFormat
+	writer         io.Writer
+	onlyKeys       bool
+	onlyPaths      bool
 }
 
 // OnlyKeys flag for only showing secrets keys.
@@ -77,6 +80,13 @@ func WithWriter(w io.Writer) Option {
 	}
 }
 
+// CustomPasswordLength option for trimming down the output of secrets.
+func CustomPasswordLength(length int) Option {
+	return func(p *Printer) {
+		p.passwordLength = length
+	}
+}
+
 // ShowSecrets flag for unmasking secrets in output.
 func ShowSecrets(b bool) Option {
 	return func(p *Printer) {
@@ -89,8 +99,9 @@ func ShowSecrets(b bool) Option {
 // NewPrinter return a new printer struct.
 func NewPrinter(m map[string]interface{}, opts ...Option) *Printer {
 	p := &Printer{
-		secrets: m,
-		writer:  defaultWriter,
+		secrets:        m,
+		writer:         defaultWriter,
+		passwordLength: MaxPasswordLength,
 	}
 
 	for _, opt := range opts {
@@ -155,7 +166,11 @@ func (p *Printer) maskSecrets() {
 
 		for k := range m {
 			secret := fmt.Sprintf("%v", m[k])
-			m[k] = strings.Repeat(maskChar, len(secret))
+			if len(secret) > p.passwordLength {
+				m[k] = strings.Repeat(maskChar, p.passwordLength -2 ) + ".."
+			} else {
+				m[k] = strings.Repeat(maskChar, len(secret))
+			}
 		}
 	}
 }
