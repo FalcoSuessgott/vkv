@@ -309,7 +309,6 @@ func (s *VaultSuite) TestListRecursive() {
 				},
 			},
 			expected: map[string]interface{}{
-				"kv": "",
 				"kv/subpath/sub": map[string]interface{}{
 					"user":  "password",
 					"user1": "password",

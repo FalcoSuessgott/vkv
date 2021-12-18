@@ -53,7 +53,7 @@ Imagine you have the following KV2 structure mounted at path `secret/`:
 secret/
   demo
     foo=bar
-    
+
   sub
     sub=passw0rd
 
@@ -73,19 +73,28 @@ You can list all secrets recursively by running:
 
 ```bash
 vkv --path secret
-secret/
-secret/demo             foo=***
-secret/sub              sub=********
-secret/sub/demo         foo=*** password=******** user=****
-secret/sub/sub2/demo    foo=*** password=******** user=****
+secret/demo
+        foo=***
+secret/sub
+        sub=********
+secret/sub/demo
+        foo=***
+        password=********
+        user=****
+secret/sub/sub2/demo
+        foo=***
+        password=********
+        user=****
 ```
 
 You can specifiy specific subpaths:
 
 ```bash
 vkv --path secret/sub/sub2
-secret/
-secret/sub/sub2/demo    foo=*** password=******** user=****
+secret/sub/sub2/demo
+        foo=***
+        password=********
+        user=****
 ```
 
 ### list only paths `--only-paths`
@@ -93,7 +102,6 @@ We can receive only the paths by running
 
 ```bash
 vkv  -p secret --only-paths
-secret/
 secret/demo
 secret/sub
 secret/sub/demo
@@ -105,11 +113,18 @@ If we want to know just the keys in every directory we can run
 
 ```bash
 vkv -p secret --only-keys
-secret/
-secret/demo             foo
-secret/sub              sub
-secret/sub/demo         foo password user
-secret/sub/sub2/demo    foo password user
+secret/demo
+        foo
+secret/sub
+        sub
+secret/sub/demo
+        foo
+        password
+        user
+secret/sub/sub2/demo
+        foo
+        password
+        user
 ```
 
 ### show secrets  `--show-secrets`
@@ -119,11 +134,18 @@ We can get the secrets of a certain sub path, by running
 
 ```bash
 vkv -p secret --show-secrets
-secret/
-secret/demo             foo=bar
-secret/sub              sub=password
-secret/sub/demo         foo=bar password=password user=user
-secret/sub/sub2/demo    foo=bar password=password user=user
+secret/demo
+        foo=bar
+secret/sub
+        sub=password
+secret/sub/demo
+        foo=bar
+        password=password
+        user=user
+secret/sub/sub2/demo
+        foo=bar
+        password=password
+        user=user
 ```
 
 ### export to json `--to-json | -j`
@@ -135,6 +157,12 @@ vkv -p secret --sub-path sub --show-secrets --to-json | jq .
 
 ```json
 {
+  "secret/demo": {
+    "foo": "bar"
+  },
+  "secret/sub": {
+    "sub": "password"
+  },
   "secret/sub/demo": {
     "foo": "bar",
     "password": "password",
@@ -156,6 +184,10 @@ vkv --path secret --sub-path sub --show-secrets --to-yaml
 ```
 
 ```yaml
+secret/demo:
+  foo: bar
+secret/sub:
+  sub: password
 secret/sub/demo:
   foo: bar
   password: password

@@ -5,23 +5,17 @@ import (
 	"io"
 	"os"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
-type OutputFormat int
+type outputFormat int
 
 const (
-	separator = " "
-	maskChar  = "*"
-	tabChar   = '\t'
-	minWidth  = 0
-	tabWidth  = 8
-	padding   = 1
+	maskChar = "*"
 
-	YAML OutputFormat = iota
-	JSON
+	yaml outputFormat = iota
+	json
 )
 
 var defaultWriter = os.Stdout
@@ -32,9 +26,8 @@ type Option func(*Printer)
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
 	secrets   map[string]interface{}
-	format    OutputFormat
+	format    outputFormat
 	writer    io.Writer
-	tabWriter *tabwriter.Writer
 	onlyKeys  bool
 	onlyPaths bool
 }
@@ -43,6 +36,7 @@ type Printer struct {
 func OnlyKeys(b bool) Option {
 	return func(p *Printer) {
 		if b {
+			p.onlyKeys = true
 			p.printOnlykeys()
 		}
 	}
@@ -52,6 +46,7 @@ func OnlyKeys(b bool) Option {
 func OnlyPaths(b bool) Option {
 	return func(p *Printer) {
 		if b {
+			p.onlyPaths = true
 			p.printOnlyPaths()
 		}
 	}
@@ -61,7 +56,7 @@ func OnlyPaths(b bool) Option {
 func ToYAML(b bool) Option {
 	return func(p *Printer) {
 		if b {
-			p.format = YAML
+			p.format = yaml
 		}
 	}
 }
@@ -70,13 +65,13 @@ func ToYAML(b bool) Option {
 func ToJSON(b bool) Option {
 	return func(p *Printer) {
 		if b {
-			p.format = JSON
+			p.format = json
 		}
 	}
 }
 
 // WithWriter option for passing a custom io.Writer.
-func WithWiter(w io.Writer) Option {
+func WithWriter(w io.Writer) Option {
 	return func(p *Printer) {
 		p.writer = w
 	}
@@ -102,21 +97,20 @@ func NewPrinter(m map[string]interface{}, opts ...Option) *Printer {
 		opt(p)
 	}
 
-	p.tabWriter = tabwriter.NewWriter(p.writer, minWidth, tabWidth, padding, tabChar, tabwriter.AlignRight)
-
 	return p
 }
 
+// Out prints out the secrets according all configured options.
 func (p *Printer) Out() error {
 	switch p.format {
-	case YAML:
+	case yaml:
 		out, err := utils.ToYAML(p.secrets)
 		if err != nil {
 			return err
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
-	case JSON:
+	case json:
 		out, err := utils.ToJSON(p.secrets)
 		if err != nil {
 			return err
@@ -125,17 +119,9 @@ func (p *Printer) Out() error {
 		fmt.Fprintf(p.writer, "%s", string(out))
 	default:
 		for _, k := range utils.SortMapKeys(p.secrets) {
-			// nolint
-			if p.onlyKeys {
-				fmt.Fprintf(p.tabWriter, "%s\t%v\n", k, printMap(p.secrets[k]))
-			} else if p.onlyPaths {
-				fmt.Fprintf(p.tabWriter, "%s\n", k)
-			} else {
-				fmt.Fprintf(p.tabWriter, "%s\t%v\n", k, printMap(p.secrets[k]))
-			}
+			fmt.Fprintf(p.writer, "%s\n", k)
+			p.printSecrets(p.secrets[k])
 		}
-
-		p.tabWriter.Flush()
 	}
 
 	return nil
@@ -174,23 +160,17 @@ func (p *Printer) maskSecrets() {
 	}
 }
 
-func printMap(m interface{}) string {
-	out := ""
+func (p *Printer) printSecrets(s interface{}) {
+	m, ok := s.(map[string]interface{})
+	if ok {
+		for _, k := range utils.SortMapKeys(m) {
+			if p.onlyKeys {
+				fmt.Fprintf(p.writer, "\t%s\n", k)
+			}
 
-	secrets, ok := m.(map[string]interface{})
-	if !ok {
-		return ""
-	}
-
-	for _, k := range utils.SortMapKeys(secrets) {
-		out += k
-
-		if secrets[k] == "" {
-			out += separator
-		} else {
-			out += fmt.Sprintf("=%v ", secrets[k])
+			if !p.onlyKeys && !p.onlyPaths {
+				fmt.Fprintf(p.writer, "\t%s=%v\n", k, m[k])
+			}
 		}
 	}
-
-	return strings.TrimSuffix(out, separator)
 }
