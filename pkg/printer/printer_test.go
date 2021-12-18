@@ -7,6 +7,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestMaskSecrets(t *testing.T) {
+	testCases := []struct {
+		name   string
+		input  map[string]interface{}
+		output map[string]interface{}
+	}{
+		{
+			name: "test: normal secrets",
+			input: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+			},
+			output: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "*****", "user": "********"},
+			},
+		},
+		{
+			name: "test: default opions",
+			input: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": 12, "user": false},
+			},
+			output: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "**", "user": "*****"},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		p := NewPrinter(tc.input)
+		p.maskSecrets()
+
+		assert.Equal(t, tc.output, p.secrets, tc.name)
+	}
+}
+
 func TestPrint(t *testing.T) {
 	testCases := []struct {
 		name   string
@@ -23,8 +57,11 @@ func TestPrint(t *testing.T) {
 			opts: []Option{
 				ShowSecrets(false),
 			},
-			output: `key_1	key=***** user=********
-key_2	key=**
+			output: `key_1
+	key=*****
+	user=********
+key_2
+	key=**
 `,
 		},
 		{
@@ -36,25 +73,27 @@ key_2	key=**
 			opts: []Option{
 				ShowSecrets(true),
 			},
-			output: `key_1	key=value user=password
-key_2	key=12
+			output: `key_1
+	key=value
+	user=password
+key_2
+	key=12
 `,
 		},
-		// unable to ignore tabs here...
-		// 		{
-		// 			name: "test: only paths",
-		// 			s: map[string]interface{}{
-		// 				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-		// 				"key_2": map[string]interface{}{"key": 12},
-		// 			},
-		// 			opts: []Option{
-		// 				OnlyPaths(true),
-		// 				ShowSecrets(true),
-		// 			},
-		// 			output: `key_1
-		// key_2
-		// `,
-		// 		},
+		{
+			name: "test: only paths",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				OnlyPaths(true),
+				ShowSecrets(true),
+			},
+			output: `key_1
+key_2
+`,
+		},
 		{
 			name: "test: only keys",
 			s: map[string]interface{}{
@@ -65,8 +104,11 @@ key_2	key=12
 				OnlyKeys(true),
 				ShowSecrets(true),
 			},
-			output: `key_1	key user
-key_2	key
+			output: `key_1
+	key
+	user
+key_2
+	key
 `,
 		},
 		{
@@ -121,7 +163,7 @@ key_2	key
 
 	for _, tc := range testCases {
 		var b bytes.Buffer
-		tc.opts = append(tc.opts, WithWiter(&b))
+		tc.opts = append(tc.opts, WithWriter(&b))
 
 		p := NewPrinter(tc.s, tc.opts...)
 		assert.NoError(t, p.Out())

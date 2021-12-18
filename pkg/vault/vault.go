@@ -92,8 +92,6 @@ func (v *Vault) ListRecursive(rootPath, subPath string) error {
 		}
 	}
 
-	v.Secrets[rootPath] = ""
-
 	return nil
 }
 
@@ -138,8 +136,7 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 		}
 	}
 
-	// return nil, fmt.Errorf("cannot return secrets")
-	return data.Data, nil
+	return nil, fmt.Errorf("no secrets found")
 }
 
 // WriteSecrets writes kv secrets to a specified path.
