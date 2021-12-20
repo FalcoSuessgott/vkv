@@ -22,6 +22,7 @@ type Options struct {
 	onlyKeys       bool
 	onlyPaths      bool
 	showSecrets    bool
+	showMetadata bool
 	passwordLength int
 	json           bool
 	yaml           bool
@@ -68,16 +69,17 @@ func newRootCmd(version string) *cobra.Command {
 				}
 			}
 
-			printer := printer.NewPrinter(v.Secrets,
+			printer := printer.NewPrinter(
 				printer.OnlyKeys(o.onlyKeys),
 				printer.OnlyPaths(o.onlyPaths),
 				printer.CustomPasswordLength(o.passwordLength),
+				printer.ShowMetadata(o.showMetadata),
 				printer.ShowSecrets(o.showSecrets),
 				printer.ToJSON(o.json),
 				printer.ToYAML(o.yaml),
 			)
 
-			if err := printer.Out(); err != nil {
+			if err := printer.Out(v.Secrets); err != nil {
 				return err
 			}
 
@@ -92,6 +94,7 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "print only keys")
 	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "print only paths")
 	cmd.Flags().BoolVar(&o.showSecrets, "show-secrets", o.showSecrets, "print out secrets")
+	cmd.Flags().BoolVar(&o.showMetadata, "show-metadata", o.showMetadata, "print out secrets including its metadata")
 	cmd.Flags().IntVarP(&o.passwordLength, "max-password-length", "m", o.passwordLength, "maximum length of passwords while printing")
 
 	// Output format
@@ -123,6 +126,10 @@ func (o *Options) validateFlags() error {
 
 	if o.onlyPaths && o.showSecrets {
 		return fmt.Errorf("cannot specify both --only-paths and --show-secrets")
+	}
+
+	if o.showMetadata && (o.onlyKeys || o.onlyPaths){
+		return fmt.Errorf("cannot specify --show-metadata in conjunction with --only-keys or --only-paths")
 	}
 
 	if o.onlyKeys && o.onlyPaths {

@@ -27,8 +27,8 @@ func SplitPath(path string) (string, string) {
 }
 
 // ToJSON marshalls a given map to json.
-func ToJSON(m map[string]interface{}) ([]byte, error) {
-	out, err := json.Marshal(m)
+func ToJSON(i interface{}) ([]byte, error) {
+	out, err := json.Marshal(i)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,8 @@ func ToJSON(m map[string]interface{}) ([]byte, error) {
 }
 
 // ToYAML marshalls a given map to yaml.
-func ToYAML(m map[string]interface{}) ([]byte, error) {
-	out, err := yaml.Marshal(m)
+func ToYAML(i interface{}) ([]byte, error) {
+	out, err := yaml.Marshal(i)
 	if err != nil {
 		return nil, err
 	}

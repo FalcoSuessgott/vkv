@@ -2,6 +2,7 @@ package vault
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -18,10 +19,25 @@ const (
 	listSecretsPath      = "%s/metadata/%s"
 )
 
+// Metadata holds all metadata of a secret.
+type Metadata struct {
+	Metadata map[string]interface{}
+	CreatedTime string
+	DeletionTime string
+	Destroyed bool
+	Version json.Number
+}
+
+// Secret holds the actual secrets and its metadata.
+type Secret struct {
+	Entries map[string]interface{}
+	Metadata *Metadata
+}
+
 // Vault represents a vault struct used for reading and writing secrets.
 type Vault struct {
 	Client  *api.Client
-	Secrets map[string]interface{}
+	Secrets map[string]*Secret
 }
 
 // NewClient returns a new vault client wrapper.
@@ -67,7 +83,7 @@ func NewClient() (*Vault, error) {
 		c.SetNamespace(vaultNamespace)
 	}
 
-	return &Vault{Client: c, Secrets: make(map[string]interface{})}, nil
+	return &Vault{Client: c, Secrets: make(map[string]*Secret)}, nil
 }
 
 // ListRecursive returns secrets to a path recursive.
@@ -120,7 +136,7 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 }
 
 // ReadSecrets returns a map with all secrets from a kv engine path.
-func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, error) {
+func (v *Vault) ReadSecrets(rootPath, subPath string) (*Secret, error) {
 	data, err := v.Client.Logical().Read(fmt.Sprintf(readWriteSecretsPath, rootPath, subPath))
 	if err != nil {
 		return nil, err
@@ -131,13 +147,30 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 	}
 
 	if d, ok := data.Data["data"]; ok {
-		if m, ok := d.(map[string]interface{}); ok {
-			return m, nil
+		fmt.Printf("%#v\n", data.Data)
+
+		metadata := data.Data["metadata"].(map[string]interface{})
+
+		s := &Secret{
+			Entries: d.(map[string]interface{}),
+			Metadata: &Metadata{
+				CreatedTime: metadata["created_time"].(string),
+				DeletionTime: metadata["deletion_time"].(string),
+				Destroyed: metadata["destroyed"].(bool),
+				Version: metadata["version"].(json.Number),
+			},
 		}
+
+		if m, ok := metadata["custom_metadata"].(map[string]interface{}); ok {
+			s.Metadata.Metadata = m
+		}
+
+		return s, nil
 	}
 
 	return nil, fmt.Errorf("no secrets found")
 }
+
 
 // WriteSecrets writes kv secrets to a specified path.
 func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interface{}) error {

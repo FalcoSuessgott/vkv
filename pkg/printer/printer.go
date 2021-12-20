@@ -5,13 +5,21 @@ import (
 	"io"
 	"os"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 )
 
 type outputFormat int
 
 const (
+	separator = " "
+	tabChar   = '\t'
+	minWidth  = 0
+	tabWidth  = 8
+	padding   = 1
+
 	// MaxPasswordLength maximum length of passwords.
 	MaxPasswordLength = 12
 	maskChar          = "*"
@@ -27,10 +35,14 @@ type Option func(*Printer)
 
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
-	secrets        map[string]interface{}
 	passwordLength int
 	format         outputFormat
+
 	writer         io.Writer
+	tabWriter *tabwriter.Writer
+
+	showSecrets bool
+	showMetadata bool
 	onlyKeys       bool
 	onlyPaths      bool
 }
@@ -38,20 +50,14 @@ type Printer struct {
 // OnlyKeys flag for only showing secrets keys.
 func OnlyKeys(b bool) Option {
 	return func(p *Printer) {
-		if b {
-			p.onlyKeys = true
-			p.printOnlykeys()
-		}
+		p.onlyKeys = b
 	}
 }
 
 // OnlyPaths flag for only printing kv paths.
 func OnlyPaths(b bool) Option {
 	return func(p *Printer) {
-		if b {
-			p.onlyPaths = true
-			p.printOnlyPaths()
-		}
+		p.onlyPaths = b
 	}
 }
 
@@ -90,16 +96,20 @@ func CustomPasswordLength(length int) Option {
 // ShowSecrets flag for unmasking secrets in output.
 func ShowSecrets(b bool) Option {
 	return func(p *Printer) {
-		if !b {
-			p.maskSecrets()
-		}
+		p.showSecrets = b
+	}
+}
+
+// ShowMetadata flag for unmasking secrets in output.
+func ShowMetadata(b bool) Option {
+	return func(p *Printer) {
+		p.showMetadata = b
 	}
 }
 
 // NewPrinter return a new printer struct.
-func NewPrinter(m map[string]interface{}, opts ...Option) *Printer {
+func NewPrinter(opts ...Option) *Printer {
 	p := &Printer{
-		secrets:        m,
 		writer:         defaultWriter,
 		passwordLength: MaxPasswordLength,
 	}
@@ -108,84 +118,103 @@ func NewPrinter(m map[string]interface{}, opts ...Option) *Printer {
 		opt(p)
 	}
 
+	p.tabWriter = tabwriter.NewWriter(p.writer, minWidth, tabWidth, padding, tabChar, tabwriter.AlignRight)
+
 	return p
 }
 
 // Out prints out the secrets according all configured options.
-func (p *Printer) Out() error {
+func (p *Printer) Out(s map[string]*vault.Secret) error {
+	if p.onlyKeys {
+		p.printOnlyKeys(s)
+	}
+
+	if p.onlyPaths {
+		p.printOnlyPaths(s)
+	}
+
+	if !p.showSecrets {
+		p.maskSecrets(s)
+	}
+
 	switch p.format {
 	case yaml:
-		out, err := utils.ToYAML(p.secrets)
+		out, err := utils.ToYAML(s)
 		if err != nil {
 			return err
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
 	case json:
-		out, err := utils.ToJSON(p.secrets)
+		out, err := utils.ToJSON(s)
 		if err != nil {
 			return err
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
 	default:
-		for _, k := range utils.SortMapKeys(p.secrets) {
-			fmt.Fprintf(p.writer, "%s\n", k)
-			p.printSecrets(p.secrets[k])
+		for k, v := range s {
+			fmt.Fprintf(p.tabWriter, "%s\n", k)
+			p.printSecrets(v)
 		}
 	}
 
 	return nil
 }
 
-func (p *Printer) printOnlykeys() {
-	for k := range p.secrets {
-		m, ok := p.secrets[k].(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		for k := range m {
-			m[k] = ""
+func (p *Printer) printOnlyKeys(secrets map[string]*vault.Secret) {
+	for k := range secrets {
+		for i := range secrets[k].Entries {
+			secrets[k].Entries[i] = ""
 		}
 	}
 }
 
-func (p *Printer) printOnlyPaths() {
-	for k := range p.secrets {
-		p.secrets[k] = nil
+func (p *Printer) printOnlyPaths(secrets map[string]*vault.Secret) {
+	for k := range secrets {
+		secrets[k].Entries[k] = nil
 	}
 }
 
-func (p *Printer) maskSecrets() {
-	for k := range p.secrets {
-		m, ok := p.secrets[k].(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		for k := range m {
-			secret := fmt.Sprintf("%v", m[k])
+func (p *Printer) maskSecrets(secrets map[string]*vault.Secret) {
+	for k := range secrets {
+		for i := range secrets[k].Entries {
+			secret := fmt.Sprintf("%v", secrets[k].Entries[i])
 			if len(secret) > p.passwordLength {
-				m[k] = strings.Repeat(maskChar, p.passwordLength -2 ) + ".."
+				secrets[k].Entries[i] = strings.Repeat(maskChar, p.passwordLength -2 ) + ".."
 			} else {
-				m[k] = strings.Repeat(maskChar, len(secret))
+				secrets[k].Entries[i] = strings.Repeat(maskChar, len(secret))
 			}
 		}
 	}
 }
 
-func (p *Printer) printSecrets(s interface{}) {
-	m, ok := s.(map[string]interface{})
-	if ok {
-		for _, k := range utils.SortMapKeys(m) {
-			if p.onlyKeys {
-				fmt.Fprintf(p.writer, "\t%s\n", k)
-			}
+func (p *Printer) printSecrets(s *vault.Secret) {
+	for k, v := range  s.Entries {
+		if p.onlyKeys {
+			fmt.Fprintf(p.writer, "\t%s\n", k)
+		}
 
-			if !p.onlyKeys && !p.onlyPaths {
-				fmt.Fprintf(p.writer, "\t%s=%v\n", k, m[k])
-			}
+		if p.showMetadata {
+			fmt.Fprintf(p.tabWriter, "\t%s=%v%s\n", k, v, p.printMetadata(s.Metadata))
+		}
+
+		if (!p.onlyKeys && !p.onlyPaths) && !p.showMetadata {
+			fmt.Fprintf(p.writer, "\t%s=%v\n", k, v)
 		}
 	}
+}
+
+func (p *Printer) printMetadata(m *vault.Metadata) string{
+	s := ""
+
+	s += fmt.Sprintf("\tversion: %s", m.Version)
+	s += "\tcustom_metadata: "
+
+	for k, v := range m.Metadata {
+		s += fmt.Sprintf("%s=%v ", k, v)
+	}
+
+
+	return s
 }
