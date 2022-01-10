@@ -3,9 +3,13 @@
 [![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) [![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) [![Go Reference](https://pkg.go.dev/badge/github.com/FalcoSuessgott/vkv.svg)](https://pkg.go.dev/github.com/FalcoSuessgott/vkv) [![codecov](https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg?token=UYVZ8LTA45)](https://codecov.io/gh/FalcoSuessgott/vkv)
 
 
-> recursively list secrets from Vaults KV2 engine
+> interact with secrets from Vaults KV engine
 
 ![img](assets/example.png)
+
+# Features
+* list secrets recurvisely
+* export secrets from a KV path as environment variables
 
 # Installation
 Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](https://github.com/FalcoSuessgott/vkv/releases) section.
@@ -30,20 +34,28 @@ Furthermore you can export:
 # Usage
 ```bash
 $> vkv -h
-recursively list secrets from Vaults KV2 engine
+interact with secrets from Vaults KV engine
 
 Usage:
   vkv [flags]
+  vkv [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  export      export secrets as env vars from Vaults KV2 engine
+  help        Help about any command
 
 Flags:
   -h, --help           help for vkv
       --only-keys      print only keys
       --only-paths     print only paths
-  -p, --path string    path (default "kv")
+  -p, --path strings   engine paths (default [kv])
       --show-secrets   print out secrets
   -j, --to-json        print secrets in json format
   -y, --to-yaml        print secrets in yaml format
   -v, --version        display version
+
+Use "vkv [command] --help" for more information about a command.
 ```
 
 # Walkthrough
@@ -216,6 +228,22 @@ secret/sub/sub2/demo:
   foo: bar
   password: password
   user: user
+```
+
+### export secrets and their values as environment variables
+```bash
+$> vkv export -p secret/sub/demo
+export foo="bar"
+export password="password"
+export user="user"
+```
+
+You can then use `eval` to source the output from `vkv`:
+
+```bash
+eval $(./vkv export -p secret/sub/demo)
+echo $user
+user
 ```
 
 # Acknowledgements / Similar tools

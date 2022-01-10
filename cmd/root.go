@@ -40,7 +40,7 @@ func newRootCmd(version string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:           "vkv",
-		Short:         "recursively list secrets from Vaults KV2 engine",
+		Short:         "interact with secrets from Vaults KV engine",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -95,6 +95,7 @@ func newRootCmd(version string) *cobra.Command {
 
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
 
+	cmd.AddCommand(newExportCmd())
 	return cmd
 }
 
