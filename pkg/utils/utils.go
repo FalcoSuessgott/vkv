@@ -17,13 +17,25 @@ type Keys []string
 
 // SplitPath splits a given path by / and returns the first element and the joined rest paths.
 func SplitPath(path string) (string, string) {
-	parts := strings.Split(path, delimiter)
+	parts := removeEmptyElements(strings.Split(path, delimiter))
 
 	if len(parts) >= 2 {
 		return parts[0], strings.Join(parts[1:], delimiter)
 	}
 
 	return strings.Join(parts, delimiter), ""
+}
+
+func removeEmptyElements(s []string) []string {
+	r := []string{}
+
+	for _, e := range s {
+		if e != "" {
+			r = append(r, e)
+		}
+	}
+
+	return r
 }
 
 // ToJSON marshalls a given map to json.
