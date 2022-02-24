@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -262,7 +262,7 @@ func (s *VaultSuite) TestListSecrets() {
 		for k, v := range tc.secrets {
 			m, ok := v.(map[string]interface{})
 			if ok {
-				assert.NoError(s.Suite.T(), s.v.WriteSecrets(tc.rootPath, filepath.Join(tc.subPath, k), m))
+				assert.NoError(s.Suite.T(), s.v.WriteSecrets(tc.rootPath, path.Join(tc.subPath, k), m))
 			} else {
 				fmt.Println("no")
 			}
@@ -337,7 +337,7 @@ func (s *VaultSuite) TestListRecursive() {
 
 		for k, v := range tc.secrets {
 			if m, ok := v.(map[string]interface{}); ok {
-				assert.NoError(s.Suite.T(), s.v.WriteSecrets(tc.rootPath, filepath.Join(tc.subPath, k), m))
+				assert.NoError(s.Suite.T(), s.v.WriteSecrets(tc.rootPath, path.Join(tc.subPath, k), m))
 			}
 		}
 

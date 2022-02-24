@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
+	"path"
 	"strings"
 
+	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/hashicorp/vault/api"
 )
 
@@ -78,17 +79,17 @@ func (v *Vault) ListRecursive(rootPath, subPath string) error {
 	}
 
 	for _, k := range keys {
-		if strings.HasSuffix(k, "/") {
-			if err := v.ListRecursive(rootPath, filepath.Join(subPath, k)); err != nil {
+		if strings.HasSuffix(k, utils.Delimiter) {
+			if err := v.ListRecursive(rootPath, path.Join(subPath, k)); err != nil {
 				return err
 			}
 		} else {
-			secrets, err := v.ReadSecrets(rootPath, filepath.Join(subPath, k))
+			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
 			if err != nil {
 				return err
 			}
 
-			v.Secrets[filepath.Join(rootPath, subPath, k)] = secrets
+			v.Secrets[path.Join(rootPath, subPath, k)] = secrets
 		}
 	}
 
