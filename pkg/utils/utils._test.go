@@ -6,6 +6,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestRemoveEmptyElements(t *testing.T) {
+	testCases := []struct {
+		name     string
+		parts    []string
+		expected []string
+	}{
+		{
+			name:     "test: root path",
+			parts:    []string{"", "", "1", "2", "", "3"},
+			expected: []string{"1", "2", "3"},
+		},
+		{
+			name:     "test: root path",
+			parts:    []string{"1", "2", "3"},
+			expected: []string{"1", "2", "3"},
+		},
+		{
+			name:     "test: root path",
+			parts:    []string{"1", "", "3"},
+			expected: []string{"1", "3"},
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expected, removeEmptyElements(tc.parts), tc.name)
+	}
+}
+
 func TestSplitPath(t *testing.T) {
 	testCases := []struct {
 		name            string
