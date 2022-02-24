@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	delimiter = "/"
+	// Delimiter / delimiter for splitting a path.
+	Delimiter = "/"
 )
 
 // Keys type for receiving all keys of a map.
@@ -17,13 +18,13 @@ type Keys []string
 
 // SplitPath splits a given path by / and returns the first element and the joined rest paths.
 func SplitPath(path string) (string, string) {
-	parts := removeEmptyElements(strings.Split(path, delimiter))
+	parts := removeEmptyElements(strings.Split(path, Delimiter))
 
 	if len(parts) >= 2 {
-		return parts[0], strings.Join(parts[1:], delimiter)
+		return parts[0], strings.Join(parts[1:], Delimiter)
 	}
 
-	return strings.Join(parts, delimiter), ""
+	return strings.Join(parts, Delimiter), ""
 }
 
 func removeEmptyElements(s []string) []string {
