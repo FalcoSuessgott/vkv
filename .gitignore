@@ -12,3 +12,4 @@ coverage.out
 /dist
 .envrc
 format.yaml
+.DS_Store
