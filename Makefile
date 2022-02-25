@@ -10,6 +10,10 @@ help: ## list makefile targets
 build: ## build golang binary
 	@go build -ldflags "-X main.version=$(shell git describe --abbrev=0 --tags)" -o $(projectname)
 
+.PHONY: dist
+dist: ## make all packages
+	goreleaser --snapshot --rm-dist --skip-publish --skip-validate
+
 .PHONY: install
 install: ## install golang binary
 	@go install -ldflags "-X main.version=$(shell git describe --abbrev=0 --tags)"
