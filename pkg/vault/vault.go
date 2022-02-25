@@ -97,7 +97,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string) error {
 
 // ListSecrets returns all keys from vault kv secret path.
 func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
-	data, err := v.Client.Logical().List(fmt.Sprintf(listSecretsPath, rootPath, subPath))
+	data, err := v.Client.Logical().List(fmt.Sprintf(listSecretsPath, rootPath, strings.ReplaceAll(subPath, "\\", "/")))
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 
 // ReadSecrets returns a map with all secrets from a kv engine path.
 func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(readWriteSecretsPath, rootPath, subPath))
+	data, err := v.Client.Logical().Read(fmt.Sprintf(readWriteSecretsPath, rootPath, strings.ReplaceAll(subPath, "\\", "/")))
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interf
 		"data": secrets,
 	}
 
-	_, err := v.Client.Logical().Write(fmt.Sprintf(readWriteSecretsPath, rootPath, subPath), options)
+	_, err := v.Client.Logical().Write(fmt.Sprintf(readWriteSecretsPath, rootPath, strings.ReplaceAll(subPath, "\\", "/")), options)
 	if err != nil {
 		return err
 	}
