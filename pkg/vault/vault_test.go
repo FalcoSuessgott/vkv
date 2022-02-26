@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -360,8 +361,12 @@ func TestVaultSuite(t *testing.T) {
 	vs := new(VaultSuite)
 	vs.ctx = context.Background()
 
-	suite.Run(t, vs)
+	// github actions doenst offer the docker sock, which we need
+	// to run this test suite
+	if runtime.GOOS == "linux" {
+		suite.Run(t, vs)
 
-	//nolint: errcheck
-	defer vs.vc.Terminate(vs.ctx)
+		//nolint: errcheck
+		defer vs.vc.Terminate(vs.ctx)
+	}
 }
