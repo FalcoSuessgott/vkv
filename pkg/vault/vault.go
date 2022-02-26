@@ -79,6 +79,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string) error {
 		secrets, e := v.ReadSecrets(rootPath, subPath)
 		if e == nil {
 			v.Secrets[path.Join(rootPath, subPath)] = secrets
+
 			return nil
 		}
 
@@ -111,7 +112,7 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 	}
 
 	if data == nil {
-		return nil, fmt.Errorf("no secrets found")
+		return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
 	}
 
 	if data.Data != nil {
@@ -124,7 +125,7 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 		return keys, nil
 	}
 
-	return nil, fmt.Errorf("no secrets found")
+	return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
 }
 
 // ReadSecrets returns a map with all secrets from a kv engine path.
@@ -135,7 +136,7 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 	}
 
 	if data == nil {
-		return nil, fmt.Errorf("no secrets found")
+		return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
 	}
 
 	if d, ok := data.Data["data"]; ok {
@@ -144,7 +145,7 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 		}
 	}
 
-	return nil, fmt.Errorf("no secrets found")
+	return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
 }
 
 // WriteSecrets writes kv secrets to a specified path.
