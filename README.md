@@ -17,7 +17,13 @@ Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](htt
 In order to authenticate to a Vault instance you have to export `VAULT_ADDR` and `VAULT_TOKEN`.
 
 ```bash
-VAULT_ADDR="http://127.0.0.1:8200" VAULT_TOKEN="root" vkv
+# on linux/macos
+VAULT_ADDR="http://127.0.0.1:8200" VAULT_TOKEN="s.XXX" vkv -p <kv-path>
+
+# on windows
+SET VAULT_ADDR=http://127.0.0.1:8200
+SET VAULT_TOKEN=s.XXX
+vkv.exe -p <kv-path>
 ```
 
 ## Optional  Environment Variables
