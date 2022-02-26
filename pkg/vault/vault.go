@@ -75,6 +75,13 @@ func NewClient() (*Vault, error) {
 func (v *Vault) ListRecursive(rootPath, subPath string) error {
 	keys, err := v.ListSecrets(rootPath, subPath)
 	if err != nil {
+		// no sub directories in here, but lets check for normal kv pairs then..
+		secrets, e := v.ReadSecrets(rootPath, subPath)
+		if e == nil {
+			v.Secrets[path.Join(rootPath, subPath)] = secrets
+			return nil
+		}
+
 		return err
 	}
 
