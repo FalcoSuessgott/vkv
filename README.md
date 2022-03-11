@@ -26,7 +26,7 @@ SET VAULT_TOKEN=s.XXX
 vkv.exe -p <kv-path>
 ```
 
-## Optional  Environment Variables
+## Optional Environment Variables
 Furthermore you can export:
 
 * `VAULT_NAMESPACE` for namespace login
@@ -42,15 +42,23 @@ Usage:
   vkv [flags]
 
 Flags:
-  -h, --help           help for vkv
-      --only-keys      print only keys
-      --only-paths     print only paths
-  -p, --path string    path (default "kv")
-      --show-secrets   print out secrets
-  -j, --to-json        print secrets in json format
-  -y, --to-yaml        print secrets in yaml format
-  -v, --version        display version
+  -h, --help                   help for vkv
+  -m, --max-value-length int   maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH) (default 12)
+      --only-keys              print only keys
+      --only-paths             print only paths
+  -p, --path strings           kv engine paths (comma separated to define multiple paths) (default [kv])
+      --show-secrets           print out values
+  -j, --to-json                print entries in json format
+  -y, --to-yaml                print entries in yaml format
+  -v, --version                display version
 ```
+
+## Configuration
+You can control some of the output behaviour either by using commandline flags or environment variables.
+
+So far `vkv` accepts the following environment variables:
+
+* `VKV_MAX_VALUE_LENGTH` (default `12`): maximum length of a single value (useful if large values, like arbitrary json is stored in Vault)
 
 # Walkthrough
 Imagine you have the following KV2 structure mounted at path `secret/`:

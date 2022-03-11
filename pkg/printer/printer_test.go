@@ -9,12 +9,14 @@ import (
 
 func TestMaskSecrets(t *testing.T) {
 	testCases := []struct {
-		name   string
-		input  map[string]interface{}
-		output map[string]interface{}
+		name    string
+		options []Option
+		input   map[string]interface{}
+		output  map[string]interface{}
 	}{
 		{
-			name: "test: normal secrets",
+			name:    "test: normal secrets",
+			options: nil,
 			input: map[string]interface{}{
 				"key_1": map[string]interface{}{"key": "value", "user": "password"},
 			},
@@ -23,7 +25,8 @@ func TestMaskSecrets(t *testing.T) {
 			},
 		},
 		{
-			name: "test: default opions",
+			name:    "test: default opions",
+			options: nil,
 			input: map[string]interface{}{
 				"key_1": map[string]interface{}{"key": 12, "user": false},
 			},
@@ -31,10 +34,21 @@ func TestMaskSecrets(t *testing.T) {
 				"key_1": map[string]interface{}{"key": "**", "user": "*****"},
 			},
 		},
+		{
+			name:    "test: hit password length",
+			options: []Option{CustomValueLength(3)},
+			input: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": 12, "user": "12345"},
+			},
+			output: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "**", "user": "***"},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
-		p := NewPrinter(tc.input)
+		p := NewPrinter(tc.input, tc.options...)
+
 		p.maskSecrets()
 
 		assert.Equal(t, tc.output, p.secrets, tc.name)

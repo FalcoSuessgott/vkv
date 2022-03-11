@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -11,27 +12,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const defaultKVPath = "kv"
+const (
+	defaultKVPath        = "kv"
+	maxValueLengthEnvVar = "VKV_MAX_VALUE_LENGTH"
+)
 
 var defaultWriter = os.Stdout
 
 // Options holds all available commandline options.
 type Options struct {
-	paths       []string
-	writer      io.Writer
-	onlyKeys    bool
-	onlyPaths   bool
-	showSecrets bool
-	json        bool
-	yaml        bool
-	version     bool
+	paths          []string
+	writer         io.Writer
+	onlyKeys       bool
+	onlyPaths      bool
+	showSecrets    bool
+	json           bool
+	yaml           bool
+	version        bool
+	maxValueLength int
 }
 
 func defaultOptions() *Options {
 	return &Options{
-		paths:       []string{defaultKVPath},
-		showSecrets: false,
-		writer:      defaultWriter,
+		paths:          []string{defaultKVPath},
+		showSecrets:    false,
+		writer:         defaultWriter,
+		maxValueLength: printer.MaxValueLength,
 	}
 }
 
@@ -68,6 +74,7 @@ func newRootCmd(version string) *cobra.Command {
 			printer := printer.NewPrinter(v.Secrets,
 				printer.OnlyKeys(o.onlyKeys),
 				printer.OnlyPaths(o.onlyPaths),
+				printer.CustomValueLength(o.maxValueLength),
 				printer.ShowSecrets(o.showSecrets),
 				printer.ToJSON(o.json),
 				printer.ToYAML(o.yaml),
@@ -82,16 +89,18 @@ func newRootCmd(version string) *cobra.Command {
 	}
 
 	// Input
-	cmd.Flags().StringSliceVarP(&o.paths, "path", "p", o.paths, "engine paths")
+	cmd.Flags().StringSliceVarP(&o.paths, "path", "p", o.paths, "kv engine paths (comma separated to define multiple paths)")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "print only keys")
 	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "print only paths")
-	cmd.Flags().BoolVar(&o.showSecrets, "show-secrets", o.showSecrets, "print out secrets")
+	cmd.Flags().BoolVar(&o.showSecrets, "show-secrets", o.showSecrets, "print out values")
 
 	// Output format
-	cmd.Flags().BoolVarP(&o.json, "to-json", "j", o.json, "print secrets in json format")
-	cmd.Flags().BoolVarP(&o.yaml, "to-yaml", "y", o.json, "print secrets in yaml format")
+	cmd.Flags().BoolVarP(&o.json, "to-json", "j", o.json, "print entries in json format")
+	cmd.Flags().BoolVarP(&o.yaml, "to-yaml", "y", o.json, "print entries in yaml format")
+	cmd.Flags().IntVarP(&o.maxValueLength, "max-value-length", "m",
+		o.maxValueLength, "maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH)")
 
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
 
@@ -107,6 +116,7 @@ func Execute(version string) error {
 	return nil
 }
 
+//nolint: cyclop
 func (o *Options) validateFlags() error {
 	if o.json && o.yaml {
 		return fmt.Errorf("cannot specify both --to-json and --to-yaml")
@@ -122,6 +132,11 @@ func (o *Options) validateFlags() error {
 
 	if o.onlyKeys && o.onlyPaths {
 		return fmt.Errorf("cannot specify both --only-keys and --only-paths")
+	}
+
+	// -m flag precedes VKV_MAX_PASSWORD_LENGTH, so we check if the flag has been provided
+	if v, ok := os.LookupEnv(maxValueLengthEnvVar); ok && o.maxValueLength == printer.MaxValueLength {
+		o.maxValueLength, _ = strconv.Atoi(v)
 	}
 
 	return nil
