@@ -29,6 +29,7 @@ type Options struct {
 	json           bool
 	yaml           bool
 	version        bool
+	export         bool
 	maxValueLength int
 }
 
@@ -76,6 +77,7 @@ func newRootCmd(version string) *cobra.Command {
 				printer.OnlyPaths(o.onlyPaths),
 				printer.CustomValueLength(o.maxValueLength),
 				printer.ShowSecrets(o.showSecrets),
+				printer.ToExportFormat(o.export),
 				printer.ToJSON(o.json),
 				printer.ToYAML(o.yaml),
 			)
@@ -95,13 +97,14 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "print only keys")
 	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "print only paths")
 	cmd.Flags().BoolVar(&o.showSecrets, "show-secrets", o.showSecrets, "print out values")
+	cmd.Flags().IntVarP(&o.maxValueLength, "max-value-length", "m",
+		o.maxValueLength, "maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH)")
 
 	// Output format
 	cmd.Flags().BoolVarP(&o.json, "to-json", "j", o.json, "print entries in json format")
 	cmd.Flags().BoolVarP(&o.yaml, "to-yaml", "y", o.json, "print entries in yaml format")
-	cmd.Flags().IntVarP(&o.maxValueLength, "max-value-length", "m",
-		o.maxValueLength, "maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH)")
-
+	cmd.Flags().BoolVarP(&o.export, "export", "e", o.export,
+		"print out key-value entries in \"key=value\" format for shell env var exporting")
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
 
 	return cmd
@@ -132,6 +135,10 @@ func (o *Options) validateFlags() error {
 
 	if o.onlyKeys && o.onlyPaths {
 		return fmt.Errorf("cannot specify both --only-keys and --only-paths")
+	}
+
+	if o.export && (o.yaml || o.json || o.showSecrets || o.onlyPaths || o.onlyKeys) {
+		return fmt.Errorf("cannot specify any other flag with --export")
 	}
 
 	// -m flag precedes VKV_MAX_PASSWORD_LENGTH, so we check if the flag has been provided

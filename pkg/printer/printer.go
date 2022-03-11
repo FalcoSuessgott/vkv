@@ -19,6 +19,7 @@ const (
 
 	yaml outputFormat = iota
 	json
+	export
 )
 
 var defaultWriter = os.Stdout
@@ -33,6 +34,7 @@ type Printer struct {
 	writer      io.Writer
 	onlyKeys    bool
 	onlyPaths   bool
+	showSecrets bool
 	valueLength int
 }
 
@@ -81,6 +83,14 @@ func ToJSON(b bool) Option {
 	}
 }
 
+// ToExportFormat option for printing out variables so they can be exported into the shell.
+func ToExportFormat(b bool) Option {
+	return func(p *Printer) {
+		p.format = export
+		p.showSecrets = true
+	}
+}
+
 // WithWriter option for passing a custom io.Writer.
 func WithWriter(w io.Writer) Option {
 	return func(p *Printer) {
@@ -91,9 +101,7 @@ func WithWriter(w io.Writer) Option {
 // ShowSecrets flag for unmasking secrets in output.
 func ShowSecrets(b bool) Option {
 	return func(p *Printer) {
-		if !b {
-			p.maskSecrets()
-		}
+		p.showSecrets = b
 	}
 }
 
@@ -107,6 +115,10 @@ func NewPrinter(m map[string]interface{}, opts ...Option) *Printer {
 
 	for _, opt := range opts {
 		opt(p)
+	}
+
+	if !p.showSecrets {
+		p.maskSecrets()
 	}
 
 	return p
@@ -129,6 +141,12 @@ func (p *Printer) Out() error {
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
+	case export:
+		for _, s := range utils.SortMapKeys(p.secrets) {
+			for k, v := range p.secrets[s].(map[string]interface{}) {
+				fmt.Fprintf(p.writer, "export %s=%v\n", k, v)
+			}
+		}
 	default:
 		for _, k := range utils.SortMapKeys(p.secrets) {
 			fmt.Fprintf(p.writer, "%s\n", k)

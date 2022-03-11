@@ -173,6 +173,25 @@ key_2
 			},
 			output: "key_1:\n  key: \"\"\n  user: \"\"\nkey_2:\n  key: \"\"\n",
 		},
+		{
+			name: "test: export format",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				ToExportFormat(true),
+			},
+			output: "export key=value\nexport user=password\nexport key=12\n",
+		},
+		{
+			name: "test: empty export",
+			s:    map[string]interface{}{},
+			opts: []Option{
+				ToExportFormat(true),
+			},
+			output: "",
+		},
 	}
 
 	for _, tc := range testCases {

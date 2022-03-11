@@ -48,6 +48,30 @@ func TestValidateFlags(t *testing.T) {
 				showSecrets: true,
 			},
 		},
+		{
+			name: "test: export 1",
+			err:  true,
+			options: &Options{
+				export:      true,
+				showSecrets: true,
+			},
+		},
+		{
+			name: "test: export 2",
+			err:  true,
+			options: &Options{
+				export: true,
+				json:   true,
+			},
+		},
+		{
+			name: "test: export 2",
+			err:  true,
+			options: &Options{
+				export: true,
+				yaml:   true,
+			},
+		},
 	}
 
 	for _, tc := range testCases {
