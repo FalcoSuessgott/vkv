@@ -7,8 +7,6 @@ repos:
       - id: go-vet
       - id: go-lint
       - id: go-imports
-      - id: go-cyclo
-        args: [-over=15]
       - id: no-go-testing
       - id: golangci-lint
         args: ["--skip-dirs=vendor -c .golang-ci.yml ."]

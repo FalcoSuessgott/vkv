@@ -54,6 +54,7 @@ Usage:
   vkv [flags]
 
 Flags:
+  -e, --export                 print out key-value entries in "key=value" format for shell env var exporting
   -h, --help                   help for vkv
   -m, --max-value-length int   maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH) (default 12)
       --only-keys              print only keys
@@ -192,6 +193,26 @@ secret/sub/sub2/demo
         foo=bar
         password=password
         user=user
+```
+
+### export to export format `--export | -e`
+You can print out the entries in `export key=value` format for further processing:
+
+```bash
+vkv --path secret/sub/sub2
+        export foo=secret1
+        export password=secret2
+        export user=secret3
+```
+
+You can then use `eval` to source those env vars:
+
+```bash
+echo $foo
+"" # emptry
+eval $(vkv --export --path secret/sub/sub2)
+echo $foo
+"secret1"
 ```
 
 ### export to json `--to-json | -j`
