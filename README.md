@@ -3,12 +3,24 @@
 [![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) [![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) [![Go Reference](https://pkg.go.dev/badge/github.com/FalcoSuessgott/vkv.svg)](https://pkg.go.dev/github.com/FalcoSuessgott/vkv) [![codecov](https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg?token=UYVZ8LTA45)](https://codecov.io/gh/FalcoSuessgott/vkv)
 
 
-> recursively list secrets from Vaults KV2 engine
-
 ![img](assets/example.png)
+
+# Description
+`vkv` recursively list you all key-value entries from Vaults KV2 secret engine
 
 # Installation
 Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](https://github.com/FalcoSuessgott/vkv/releases) section.
+
+# Compatibility Matrix
+### supportd OS
+* `Windows`
+* `MacOS`
+* `Ubuntu`
+
+### supported Vault Versions
+* `v1.8.0`
+* `v1.9.0`
+* `latest`
 
 # Authentication
 `vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.

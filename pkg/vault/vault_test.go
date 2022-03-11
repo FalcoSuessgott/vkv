@@ -15,6 +15,8 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
+var vaultVersion = "latest"
+
 type VaultContainer struct {
 	testcontainers.Container
 	URI string
@@ -28,8 +30,12 @@ type VaultSuite struct {
 }
 
 func spinUpVault(ctx context.Context) (*VaultContainer, error) {
+	if v, ok := os.LookupEnv("VAULT_VERSION"); ok {
+		vaultVersion = v
+	}
+
 	req := testcontainers.ContainerRequest{
-		Image:        "hashicorp/vault:1.9.0",
+		Image:        fmt.Sprintf("hashicorp/vault:%s", vaultVersion),
 		ExposedPorts: []string{"8200/tcp"},
 		WaitingFor:   wait.ForListeningPort("8200/tcp"),
 		Cmd:          []string{"server", "-dev", "-dev-root-token-id", "root"},
