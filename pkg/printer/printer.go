@@ -86,8 +86,10 @@ func ToJSON(b bool) Option {
 // ToExportFormat option for printing out variables so they can be exported into the shell.
 func ToExportFormat(b bool) Option {
 	return func(p *Printer) {
-		p.format = export
-		p.showSecrets = true
+		if b {
+			p.format = export
+			p.showSecrets = true
+		}
 	}
 }
 
@@ -101,7 +103,9 @@ func WithWriter(w io.Writer) Option {
 // ShowSecrets flag for unmasking secrets in output.
 func ShowSecrets(b bool) Option {
 	return func(p *Printer) {
-		p.showSecrets = b
+		if b {
+			p.showSecrets = b
+		}
 	}
 }
 
@@ -186,7 +190,7 @@ func (p *Printer) maskSecrets() {
 		for k := range m {
 			secret := fmt.Sprintf("%v", m[k])
 
-			if len(secret) > p.valueLength {
+			if len(secret) > p.valueLength && p.valueLength != -1 {
 				m[k] = strings.Repeat(maskChar, p.valueLength)
 			} else {
 				m[k] = strings.Repeat(maskChar, len(secret))

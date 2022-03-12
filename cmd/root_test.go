@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"os"
 	"testing"
 
+	"github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,24 +38,24 @@ func TestValidateFlags(t *testing.T) {
 			name: "test: only keys and show secrets ",
 			err:  true,
 			options: &Options{
-				onlyKeys:    true,
-				showSecrets: true,
+				onlyKeys:   true,
+				showValues: true,
 			},
 		},
 		{
 			name: "test: only paths and show secrets ",
 			err:  true,
 			options: &Options{
-				onlyPaths:   true,
-				showSecrets: true,
+				onlyPaths:  true,
+				showValues: true,
 			},
 		},
 		{
 			name: "test: export 1",
 			err:  true,
 			options: &Options{
-				export:      true,
-				showSecrets: true,
+				export:     true,
+				showValues: true,
 			},
 		},
 		{
@@ -84,5 +86,78 @@ func TestValidateFlags(t *testing.T) {
 		}
 
 		assert.NoError(t, err)
+	}
+}
+
+func TestMaxValueLength(t *testing.T) {
+	testCases := []struct {
+		name           string
+		opts           *Options
+		maxValueLength string
+		expected       int
+		err            bool
+	}{
+		{
+			name:           "no env set no flag defined",
+			opts:           defaultOptions(),
+			maxValueLength: "",
+			expected:       printer.MaxValueLength,
+		},
+		{
+			name:           "env set no flag defined",
+			opts:           defaultOptions(),
+			maxValueLength: "2",
+			expected:       2,
+		},
+		{
+			name: "env set and flag defined",
+			opts: &Options{
+				maxValueLength: 23,
+			},
+			maxValueLength: "2",
+			expected:       23,
+		},
+		{
+			name: "no env set and flag defined",
+			opts: &Options{
+				maxValueLength: 23,
+			},
+			maxValueLength: "",
+			expected:       23,
+		},
+		{
+			name: "no env set and flag defined",
+			opts: &Options{
+				maxValueLength: 23,
+			},
+			maxValueLength: "",
+			expected:       23,
+		},
+		{
+			name:           "invalid env",
+			opts:           defaultOptions(),
+			maxValueLength: "invalid",
+			err:            true,
+		},
+		{
+			name:           "length off",
+			opts:           defaultOptions(),
+			maxValueLength: "-1",
+			expected:       -1,
+		},
+	}
+
+	for _, tc := range testCases {
+		if tc.maxValueLength != "" {
+			os.Setenv(maxValueLengthEnvVar, tc.maxValueLength)
+		}
+
+		err := tc.opts.validateFlags()
+		if !tc.err {
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expected, tc.opts.maxValueLength, tc.name)
+		} else {
+			assert.Error(t, err)
+		}
 	}
 }
