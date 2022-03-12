@@ -113,7 +113,7 @@ func TestToJson(t *testing.T) {
 				"key_1": "value",
 				"key_2": 12,
 			},
-			json: []byte("{\"key_1\":\"value\",\"key_2\":12}"),
+			json: []byte("{\n\t\"key_1\": \"value\",\n\t\"key_2\": 12\n}"),
 		},
 		{
 			name: "test: empty map",
@@ -127,7 +127,7 @@ func TestToJson(t *testing.T) {
 				"key_2": 12,
 				"key_3": map[string]interface{}{"foo": "bar", "user": "password"},
 			},
-			json: []byte("{\"key_1\":\"value\",\"key_2\":12,\"key_3\":{\"foo\":\"bar\",\"user\":\"password\"}}"),
+			json: []byte("{\n\t\"key_1\": \"value\",\n\t\"key_2\": 12,\n\t\"key_3\": {\n\t\t\"foo\": \"bar\",\n\t\t\"user\": \"password\"\n\t}\n}"),
 		},
 	}
 
@@ -137,7 +137,7 @@ func TestToJson(t *testing.T) {
 		if tc.err {
 			assert.Error(t, err)
 		} else {
-			assert.Equal(t, tc.json, out, tc.name)
+			assert.Equal(t, string(tc.json), string(out), tc.name)
 		}
 	}
 }

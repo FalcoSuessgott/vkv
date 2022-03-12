@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/olekukonko/tablewriter"
 )
 
 type outputFormat int
@@ -20,6 +21,7 @@ const (
 	yaml outputFormat = iota
 	json
 	export
+	markdown
 )
 
 var defaultWriter = os.Stdout
@@ -50,7 +52,6 @@ func OnlyKeys(b bool) Option {
 	return func(p *Printer) {
 		if b {
 			p.onlyKeys = true
-			p.printOnlykeys()
 		}
 	}
 }
@@ -60,7 +61,15 @@ func OnlyPaths(b bool) Option {
 	return func(p *Printer) {
 		if b {
 			p.onlyPaths = true
-			p.printOnlyPaths()
+		}
+	}
+}
+
+// ToMarkdown outputformat to yaml.
+func ToMarkdown(b bool) Option {
+	return func(p *Printer) {
+		if b {
+			p.format = markdown
 		}
 	}
 }
@@ -104,7 +113,7 @@ func WithWriter(w io.Writer) Option {
 func ShowSecrets(b bool) Option {
 	return func(p *Printer) {
 		if b {
-			p.showSecrets = b
+			p.showSecrets = true
 		}
 	}
 }
@@ -125,10 +134,19 @@ func NewPrinter(m map[string]interface{}, opts ...Option) *Printer {
 		p.maskSecrets()
 	}
 
+	if p.onlyPaths {
+		p.printOnlyPaths()
+	}
+
+	if p.onlyKeys {
+		p.printOnlykeys()
+	}
+
 	return p
 }
 
 // Out prints out the secrets according all configured options.
+//nolint:cyclop
 func (p *Printer) Out() error {
 	switch p.format {
 	case yaml:
@@ -147,10 +165,25 @@ func (p *Printer) Out() error {
 		fmt.Fprintf(p.writer, "%s", string(out))
 	case export:
 		for _, s := range utils.SortMapKeys(p.secrets) {
-			for k, v := range p.secrets[s].(map[string]interface{}) {
-				fmt.Fprintf(p.writer, "export %s=%v\n", k, v)
+			for _, k := range utils.SortMapKeys(p.secrets[s].(map[string]interface{})) {
+				fmt.Fprintf(p.writer, "export %s=%v\n", k, p.secrets[s].(map[string]interface{})[k])
 			}
 		}
+	case markdown:
+		headers, data := p.buildMarkdownTable()
+
+		table := tablewriter.NewWriter(p.writer)
+		table.SetHeader(headers)
+		table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+		table.SetCenterSeparator("|")
+		table.AppendBulk(data)
+
+		// only merge cell for paths column
+		if headers[0] == "paths" {
+			table.SetAutoMergeCellsByColumnIndex([]int{0})
+		}
+
+		table.Render()
 	default:
 		for _, k := range utils.SortMapKeys(p.secrets) {
 			fmt.Fprintf(p.writer, "%s\n", k)
@@ -159,6 +192,34 @@ func (p *Printer) Out() error {
 	}
 
 	return nil
+}
+
+func (p *Printer) buildMarkdownTable() ([]string, [][]string) {
+	data := [][]string{}
+	headers := []string{}
+
+	for _, s := range utils.SortMapKeys(p.secrets) {
+		//nolint: gocritic
+		if p.onlyPaths {
+			headers = []string{"paths"}
+
+			data = append(data, []string{s})
+		} else if p.onlyKeys {
+			headers = []string{"paths", "keys"}
+
+			for _, k := range utils.SortMapKeys(p.secrets[s].(map[string]interface{})) {
+				data = append(data, []string{s, k})
+			}
+		} else {
+			headers = []string{"paths", "keys", "values"}
+
+			for _, k := range utils.SortMapKeys(p.secrets[s].(map[string]interface{})) {
+				data = append(data, []string{s, k, fmt.Sprintf("%v", p.secrets[s].(map[string]interface{})[k])})
+			}
+		}
+	}
+
+	return headers, data
 }
 
 func (p *Printer) printOnlykeys() {
