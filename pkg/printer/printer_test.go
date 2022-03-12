@@ -135,7 +135,7 @@ key_2
 				ToJSON(true),
 				ShowSecrets(true),
 			},
-			output: "{\"key_1\":{\"key\":\"value\",\"user\":\"password\"},\"key_2\":{\"key\":12}}",
+			output: "{\n\t\"key_1\": {\n\t\t\"key\": \"value\",\n\t\t\"user\": \"password\"\n\t},\n\t\"key_2\": {\n\t\t\"key\": 12\n\t}\n}",
 		},
 		{
 			name: "test: normal map to json only keys",
@@ -147,7 +147,7 @@ key_2
 				ToJSON(true),
 				OnlyKeys(true),
 			},
-			output: "{\"key_1\":{\"key\":\"\",\"user\":\"\"},\"key_2\":{\"key\":\"\"}}",
+			output: "{\n\t\"key_1\": {\n\t\t\"key\": \"\",\n\t\t\"user\": \"\"\n\t},\n\t\"key_2\": {\n\t\t\"key\": \"\"\n\t}\n}",
 		},
 		{
 			name: "test: normal map to yaml",
@@ -192,6 +192,28 @@ key_2
 			},
 			output: "",
 		},
+		{
+			name: "test: markdown",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				ToMarkdown(true),
+			},
+			output: "| PATHS | KEYS |  VALUES  |\n|-------|------|----------|\n| key_1 | key  | *****    |\n|       | user | ******** |\n| key_2 | key  | **       |\n",
+		},
+		{
+			name: "test: markdown",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				ToMarkdown(true),
+			},
+			output: "| PATHS | KEYS |  VALUES  |\n|-------|------|----------|\n| key_1 | key  | *****    |\n|       | user | ******** |\n| key_2 | key  | **       |\n",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -202,5 +224,56 @@ key_2
 		assert.NoError(t, p.Out())
 
 		assert.Equal(t, tc.output, b.String(), tc.name)
+	}
+}
+
+func TestMarkdownHeader(t *testing.T) {
+	testCases := []struct {
+		name     string
+		s        map[string]interface{}
+		opts     []Option
+		expected []string
+	}{
+		{
+			name: "default",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts:     []Option{},
+			expected: []string{"paths", "keys", "values"},
+		},
+		{
+			name: "only paths",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				OnlyPaths(true),
+			},
+			expected: []string{"paths"},
+		},
+		{
+			name: "only keys",
+			s: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": 12},
+			},
+			opts: []Option{
+				OnlyKeys(true),
+			},
+			expected: []string{"paths", "keys"},
+		},
+	}
+
+	for _, tc := range testCases {
+		var b bytes.Buffer
+		tc.opts = append(tc.opts, WithWriter(&b))
+
+		p := NewPrinter(tc.s, tc.opts...)
+		headers, _ := p.buildMarkdownTable()
+
+		assert.Equal(t, tc.expected, headers, tc.name)
 	}
 }

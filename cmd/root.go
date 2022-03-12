@@ -28,6 +28,7 @@ type Options struct {
 	showValues     bool
 	json           bool
 	yaml           bool
+	markdown       bool
 	version        bool
 	export         bool
 	maxValueLength int
@@ -81,6 +82,7 @@ func newRootCmd(version string) *cobra.Command {
 				printer.ToExportFormat(o.export),
 				printer.ToJSON(o.json),
 				printer.ToYAML(o.yaml),
+				printer.ToMarkdown(o.markdown),
 			)
 
 			if err := printer.Out(); err != nil {
@@ -99,11 +101,12 @@ func newRootCmd(version string) *cobra.Command {
 	// Modify
 	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "show only keys")
 	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "show only paths")
-	cmd.Flags().BoolVar(&o.showValues, "show-values", o.showValues, "show only values")
+	cmd.Flags().BoolVar(&o.showValues, "show-values", o.showValues, "dont mask values")
 	cmd.Flags().IntVar(&o.maxValueLength, "max-value-length", o.maxValueLength,
-		"maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH)")
+		"maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH). \"-1\" for disabling")
 
 	// Output format
+	cmd.Flags().BoolVarP(&o.markdown, "markdown", "m", o.markdown, "print entries in markdown table format")
 	cmd.Flags().BoolVarP(&o.json, "json", "j", o.json, "print entries in json format")
 	cmd.Flags().BoolVarP(&o.yaml, "yaml", "y", o.json, "print entries in yaml format")
 	cmd.Flags().BoolVarP(&o.export, "export", "e", o.export,
@@ -125,8 +128,20 @@ func Execute(version string) error {
 
 //nolint: cyclop
 func (o *Options) validateFlags() error {
-	if o.json && o.yaml {
-		return fmt.Errorf("cannot specify both --to-json and --to-yaml")
+	if o.json && (o.markdown || o.yaml || o.export) {
+		return fmt.Errorf("cannot specify json with any other format")
+	}
+
+	if o.yaml && (o.markdown || o.yaml || o.export) {
+		return fmt.Errorf("cannot specify yaml with any other format")
+	}
+
+	if o.export && (o.yaml || o.json || o.showValues || o.onlyPaths || o.onlyKeys) {
+		return fmt.Errorf("cannot specify export with any other flag")
+	}
+
+	if o.markdown && (o.json || o.yaml || o.export) {
+		return fmt.Errorf("cannot specify markdown with any other format")
 	}
 
 	if o.onlyKeys && o.showValues {
@@ -139,10 +154,6 @@ func (o *Options) validateFlags() error {
 
 	if o.onlyKeys && o.onlyPaths {
 		return fmt.Errorf("cannot specify both --only-keys and --only-paths")
-	}
-
-	if o.export && (o.yaml || o.json || o.showValues || o.onlyPaths || o.onlyKeys) {
-		return fmt.Errorf("cannot specify any other flag with --export")
 	}
 
 	// -m flag precedes VKV_MAX_PASSWORD_LENGTH, so we check if the flag has been provided

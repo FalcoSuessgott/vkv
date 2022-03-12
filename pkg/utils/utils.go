@@ -41,7 +41,7 @@ func removeEmptyElements(s []string) []string {
 
 // ToJSON marshalls a given map to json.
 func ToJSON(m map[string]interface{}) ([]byte, error) {
-	out, err := json.Marshal(m)
+	out, err := json.MarshalIndent(m, "", "\t")
 	if err != nil {
 		return nil, err
 	}

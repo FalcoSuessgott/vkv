@@ -1,6 +1,6 @@
 linters-settings:
   lll:
-    line-length: 130
+    line-length: 180
 linters:
   enable-all: true
   disable:
