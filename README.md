@@ -11,16 +11,7 @@
 # Installation
 Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](https://github.com/FalcoSuessgott/vkv/releases) section.
 
-# Compatibility Matrix
-### supportd OS
-* `Windows`
-* `MacOS`
-* `Ubuntu`
-
-### supported Vault Versions
-* `v1.8.0`
-* `v1.9.0`
-* `latest`
+`vkv` is being tested on `Windows`, `MacOS` and `Ubuntu` and also against Vault Version < `v1.8.0` (but it also may work with lower versions).
 
 # Authentication
 `vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.
@@ -54,16 +45,16 @@ Usage:
   vkv [flags]
 
 Flags:
-  -e, --export                 print out key-value entries in "key=value" format for shell env var exporting
-  -h, --help                   help for vkv
-  -m, --max-value-length int   maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH) (default 12)
-      --only-keys              print only keys
-      --only-paths             print only paths
   -p, --path strings           kv engine paths (comma separated to define multiple paths) (default [kv])
-      --show-secrets           print out values
-  -j, --to-json                print entries in json format
-  -y, --to-yaml                print entries in yaml format
+      --only-keys              show only keys
+      --only-paths             show only paths
+      --show-values            show only values
+      --max-value-length int   maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH) (default 12)
+  -j, --json                   print entries in json format
+  -y, --yaml                   print entries in yaml format
+  -e, --export                 print entries in export format (export "key=value")
   -v, --version                display version
+  -h, --help                   help for vkv
 ```
 
 ## Configuration
@@ -71,7 +62,7 @@ You can control some of the output behaviour either by using commandline flags o
 
 So far `vkv` accepts the following environment variables:
 
-* `VKV_MAX_VALUE_LENGTH` (default `12`): maximum length of a single value (useful if large values, like arbitrary json is stored in Vault)
+* `VKV_MAX_VALUE_LENGTH` (default `12`): maximum length of a single value (useful if large values, like arbitrary json is stored in Vault). Set to `-1` to avoid trimming the length of the values.
 
 # Walkthrough
 Imagine you have the following KV2 structure mounted at path `secret/`:
@@ -174,13 +165,13 @@ secret/sub/sub2/demo
         user
 ```
 
-### show secrets  `--show-secrets`
-Per default secret values are masked. Using `--show-secrets` shows the secrets. **Use with Caution**
+### show values  `--show-values`
+Per default values are masked. Using `--show-values` shows the values. **Use with Caution**
 
 We can get the secrets of a certain sub path, by running
 
 ```bash
-vkv -p secret --show-secrets
+vkv -p secret --show-values
 secret/demo
         foo=bar
 secret/sub
@@ -215,11 +206,11 @@ echo $foo
 "secret1"
 ```
 
-### export to json `--to-json | -j`
+### export to json `--json | -j`
 You can combine all flags and export the result to json by running:
 
 ```bash
-vkv -p secret --sub-path sub --show-secrets --to-json | jq .
+vkv -p secret --sub-path sub --show-secrets --json | jq .
 ```
 
 ```json
@@ -243,11 +234,11 @@ vkv -p secret --sub-path sub --show-secrets --to-json | jq .
 }
 ```
 
-### export to yaml  `--to-yaml | -y`
+### export to yaml  `--yaml | -y`
 Same applies for yaml:
 
 ```bash
-vkv --path secret --sub-path sub --show-secrets --to-yaml
+vkv --path secret --sub-path sub --show-secrets --yaml
 ```
 
 ```yaml

@@ -25,7 +25,7 @@ type Options struct {
 	writer         io.Writer
 	onlyKeys       bool
 	onlyPaths      bool
-	showSecrets    bool
+	showValues     bool
 	json           bool
 	yaml           bool
 	version        bool
@@ -36,7 +36,7 @@ type Options struct {
 func defaultOptions() *Options {
 	return &Options{
 		paths:          []string{defaultKVPath},
-		showSecrets:    false,
+		showValues:     false,
 		writer:         defaultWriter,
 		maxValueLength: printer.MaxValueLength,
 	}
@@ -50,6 +50,7 @@ func newRootCmd(version string) *cobra.Command {
 		Short:         "recursively list secrets from Vaults KV2 engine",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if o.version {
 				fmt.Printf("vkv %s\n", version)
@@ -76,7 +77,7 @@ func newRootCmd(version string) *cobra.Command {
 				printer.OnlyKeys(o.onlyKeys),
 				printer.OnlyPaths(o.onlyPaths),
 				printer.CustomValueLength(o.maxValueLength),
-				printer.ShowSecrets(o.showSecrets),
+				printer.ShowSecrets(o.showValues),
 				printer.ToExportFormat(o.export),
 				printer.ToJSON(o.json),
 				printer.ToYAML(o.yaml),
@@ -90,21 +91,24 @@ func newRootCmd(version string) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().SortFlags = false
+
 	// Input
 	cmd.Flags().StringSliceVarP(&o.paths, "path", "p", o.paths, "kv engine paths (comma separated to define multiple paths)")
 
 	// Modify
-	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "print only keys")
-	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "print only paths")
-	cmd.Flags().BoolVar(&o.showSecrets, "show-secrets", o.showSecrets, "print out values")
-	cmd.Flags().IntVarP(&o.maxValueLength, "max-value-length", "m",
-		o.maxValueLength, "maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH)")
+	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "show only keys")
+	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "show only paths")
+	cmd.Flags().BoolVar(&o.showValues, "show-values", o.showValues, "show only values")
+	cmd.Flags().IntVar(&o.maxValueLength, "max-value-length", o.maxValueLength,
+		"maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH)")
 
 	// Output format
-	cmd.Flags().BoolVarP(&o.json, "to-json", "j", o.json, "print entries in json format")
-	cmd.Flags().BoolVarP(&o.yaml, "to-yaml", "y", o.json, "print entries in yaml format")
+	cmd.Flags().BoolVarP(&o.json, "json", "j", o.json, "print entries in json format")
+	cmd.Flags().BoolVarP(&o.yaml, "yaml", "y", o.json, "print entries in yaml format")
 	cmd.Flags().BoolVarP(&o.export, "export", "e", o.export,
-		"print out key-value entries in \"key=value\" format for shell env var exporting")
+		"print entries in export format (export \"key=value\")")
+
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
 
 	return cmd
@@ -125,25 +129,30 @@ func (o *Options) validateFlags() error {
 		return fmt.Errorf("cannot specify both --to-json and --to-yaml")
 	}
 
-	if o.onlyKeys && o.showSecrets {
-		return fmt.Errorf("cannot specify both --only-keys and --show-secrets")
+	if o.onlyKeys && o.showValues {
+		return fmt.Errorf("cannot specify both --only-keys and --show-values")
 	}
 
-	if o.onlyPaths && o.showSecrets {
-		return fmt.Errorf("cannot specify both --only-paths and --show-secrets")
+	if o.onlyPaths && o.showValues {
+		return fmt.Errorf("cannot specify both --only-paths and --show-values")
 	}
 
 	if o.onlyKeys && o.onlyPaths {
 		return fmt.Errorf("cannot specify both --only-keys and --only-paths")
 	}
 
-	if o.export && (o.yaml || o.json || o.showSecrets || o.onlyPaths || o.onlyKeys) {
+	if o.export && (o.yaml || o.json || o.showValues || o.onlyPaths || o.onlyKeys) {
 		return fmt.Errorf("cannot specify any other flag with --export")
 	}
 
 	// -m flag precedes VKV_MAX_PASSWORD_LENGTH, so we check if the flag has been provided
 	if v, ok := os.LookupEnv(maxValueLengthEnvVar); ok && o.maxValueLength == printer.MaxValueLength {
-		o.maxValueLength, _ = strconv.Atoi(v)
+		l, err := strconv.Atoi(v)
+		if err != nil {
+			return fmt.Errorf("invalid value \"%v\" for %s", v, maxValueLengthEnvVar)
+		}
+
+		o.maxValueLength = l
 	}
 
 	return nil
