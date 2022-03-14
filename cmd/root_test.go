@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"os"
 	"testing"
 
@@ -10,67 +11,53 @@ import (
 
 func TestValidateFlags(t *testing.T) {
 	testCases := []struct {
-		name    string
-		options *Options
-		err     bool
+		name string
+		args []string
+		err  bool
 	}{
-		{
-			name:    "test: valid options",
-			options: defaultOptions(),
-		},
 		{
 			name: "test: yaml and json",
 			err:  true,
-			options: &Options{
-				json: true,
-				yaml: true,
-			},
+			args: []string{"--json", "--yaml"},
 		},
 		{
 			name: "test: only keys and only paths",
 			err:  true,
-			options: &Options{
-				onlyKeys:  true,
-				onlyPaths: true,
-			},
+			args: []string{"--only-keys", "--only-paths"},
 		},
 		{
 			name: "test: only keys and show secrets ",
 			err:  true,
-			options: &Options{
-				onlyKeys:   true,
-				showValues: true,
-			},
+			args: []string{"--only-keys", "--show-values"},
 		},
 		{
 			name: "test: only paths and show secrets ",
 			err:  true,
-			options: &Options{
-				onlyPaths:  true,
-				showValues: true,
-			},
+			args: []string{"--only-paths", "--show-values"},
 		},
 		{
 			name: "test: export 2",
 			err:  true,
-			options: &Options{
-				export: true,
-				json:   true,
-			},
+			args: []string{"--json", "--markdown"},
 		},
 		{
 			name: "test: export 2",
 			err:  true,
-			options: &Options{
-				export: true,
-				yaml:   true,
-			},
+			args: []string{"--json", "--yaml"},
 		},
 	}
 
 	for _, tc := range testCases {
-		err := tc.options.validateFlags()
+		c := newRootCmd("")
+		b := bytes.NewBufferString("")
 
+		c.SetArgs(tc.args)
+		c.SetOut(b)
+
+		os.Setenv("VAULT_ADDR", "")
+		os.Setenv("VAULT_TOKEN", "")
+
+		err := c.Execute()
 		if tc.err {
 			assert.Error(t, err, tc.name)
 
