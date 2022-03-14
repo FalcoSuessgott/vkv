@@ -51,14 +51,6 @@ func TestValidateFlags(t *testing.T) {
 			},
 		},
 		{
-			name: "test: export 1",
-			err:  true,
-			options: &Options{
-				export:     true,
-				showValues: true,
-			},
-		},
-		{
 			name: "test: export 2",
 			err:  true,
 			options: &Options{
@@ -80,12 +72,12 @@ func TestValidateFlags(t *testing.T) {
 		err := tc.options.validateFlags()
 
 		if tc.err {
-			assert.Error(t, err)
+			assert.Error(t, err, tc.name)
 
 			continue
 		}
 
-		assert.NoError(t, err)
+		assert.NoError(t, err, tc.name)
 	}
 }
 

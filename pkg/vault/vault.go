@@ -1,9 +1,7 @@
 package vault
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -30,9 +28,7 @@ type Vault struct {
 // VAULT_SKIP_VERIFY is considered, if defined
 // reads the proxy configuration via HTTP_PROXY and HTTPS_PROXY.
 func NewClient() (*Vault, error) {
-	client := &http.Client{}
-
-	vaultAddr, ok := os.LookupEnv("VAULT_ADDR")
+	_, ok := os.LookupEnv("VAULT_ADDR")
 	if !ok {
 		return nil, fmt.Errorf("VAULT_ADDR required but not set")
 	}
@@ -42,18 +38,9 @@ func NewClient() (*Vault, error) {
 		return nil, fmt.Errorf("VAULT_TOKEN required but not set")
 	}
 
-	_, skipVerify := os.LookupEnv("VAULT_SKIP_VERIFY")
-	if skipVerify {
-		client.Transport = &http.Transport{
-			Proxy: http.ProxyFromEnvironment,
-			//nolint: gosec
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	}
-
-	config := &api.Config{
-		Address:    vaultAddr,
-		HttpClient: client,
+	config := api.DefaultConfig()
+	if err := config.ReadEnvironment(); err != nil {
+		return nil, err
 	}
 
 	c, err := api.NewClient(config)

@@ -17,7 +17,11 @@ const (
 	maxValueLengthEnvVar = "VKV_MAX_VALUE_LENGTH"
 )
 
-var defaultWriter = os.Stdout
+var (
+	defaultWriter             = os.Stdout
+	errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
+	errMultipleOutputFormats  = fmt.Errorf("specified multiple output formats, only one is allowed")
+)
 
 // Options holds all available commandline options.
 type Options struct {
@@ -128,32 +132,12 @@ func Execute(version string) error {
 
 //nolint: cyclop
 func (o *Options) validateFlags() error {
-	if o.json && (o.markdown || o.yaml || o.export) {
-		return fmt.Errorf("cannot specify json with any other format")
-	}
-
-	if o.yaml && (o.markdown || o.yaml || o.export) {
-		return fmt.Errorf("cannot specify yaml with any other format")
-	}
-
-	if o.export && (o.yaml || o.json || o.showValues || o.onlyPaths || o.onlyKeys) {
-		return fmt.Errorf("cannot specify export with any other flag")
-	}
-
-	if o.markdown && (o.json || o.yaml || o.export) {
-		return fmt.Errorf("cannot specify markdown with any other format")
-	}
-
-	if o.onlyKeys && o.showValues {
-		return fmt.Errorf("cannot specify both --only-keys and --show-values")
-	}
-
-	if o.onlyPaths && o.showValues {
-		return fmt.Errorf("cannot specify both --only-paths and --show-values")
-	}
-
-	if o.onlyKeys && o.onlyPaths {
-		return fmt.Errorf("cannot specify both --only-keys and --only-paths")
+	switch {
+	case o.json && (o.markdown || o.yaml || o.export), o.yaml && (o.markdown || o.json || o.export),
+		o.export && (o.markdown || o.json || o.yaml), o.markdown && (o.json || o.yaml || o.export):
+		return errMultipleOutputFormats
+	case (o.onlyKeys && o.showValues), (o.onlyPaths && o.showValues), (o.onlyKeys && o.onlyPaths):
+		return errInvalidFlagCombination
 	}
 
 	// -m flag precedes VKV_MAX_PASSWORD_LENGTH, so we check if the flag has been provided

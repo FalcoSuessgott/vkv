@@ -37,8 +37,7 @@ Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](htt
 # Authentication
 `vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.
 
-### Required Environment Variables
-In order to authenticate to a Vault instance you have to export `VAULT_ADDR` and `VAULT_TOKEN`.
+All of vaults [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) are supported. In order to authenticate to a Vault instance you have to set atleast `VAULT_ADDR` and `VAULT_TOKEN`:
 
 ```bash
 # on linux/macos
@@ -49,13 +48,6 @@ SET VAULT_ADDR=http://127.0.0.1:8200
 SET VAULT_TOKEN=s.XXX
 vkv.exe -p <kv-path>
 ```
-
-### Optional Environment Variables
-Furthermore you can export:
-
-* `VAULT_NAMESPACE` for namespace login
-* `VAULT_SKIP_VERIFY` for insecure HTTPS connection
-* `HTTP_PROXY` and `HTTPS_PROXY` for proxy connections.
 
 # Examples
 Imagine you have the following KV2 structure mounted at path `secret/`:
