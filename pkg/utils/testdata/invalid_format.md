@@ -1,0 +1,5 @@
+{
+	"kv/secret": {
+		"password": "passw0rd",
+		"username": "username"
+}

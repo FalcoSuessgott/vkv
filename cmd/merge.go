@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -12,10 +13,13 @@ import (
 type mergeOptions struct {
 	srcNamespace, destNamespace string
 	srcPath, destPath           string
+	writer                      io.Writer
 }
 
 func defaultMergeptions() *mergeOptions {
-	return &mergeOptions{}
+	return &mergeOptions{
+		writer: defaultWriter,
+	}
 }
 
 func mergeCmd() *cobra.Command {
@@ -62,8 +66,6 @@ func mergeCmd() *cobra.Command {
 			return nil
 		},
 	}
-
-	cmd.Flags().SortFlags = false
 
 	// Input
 	cmd.Flags().StringVar(&o.srcNamespace, "src-namespace", o.srcNamespace, "source namespace")

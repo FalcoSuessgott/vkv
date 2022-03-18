@@ -2,7 +2,9 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"os"
 	"path"
 	"sort"
 	"strings"
@@ -18,6 +20,40 @@ const (
 
 // Keys type for receiving all keys of a map.
 type Keys []string
+
+// FileExists returns true if a file exists.
+func FileExists(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
+// ReadFile returns the content of the given file.
+func ReadFile(path string) ([]byte, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
+}
+
+// JSONorYAML returns true if the content is json.
+func JSONorYAML(content []byte) (interface{}, bool, error) {
+	var b interface{}
+
+	if err := json.Unmarshal(content, &b); err == nil {
+		return b, true, nil
+	}
+
+	if err := yaml.Unmarshal(content, &b); err == nil {
+		return b, false, nil
+	}
+
+	return nil, false, fmt.Errorf("file is neither json nor yaml")
+}
 
 // SplitPath splits a given path by / and returns the first element and the joined rest paths.
 func SplitPath(path string) (string, string) {

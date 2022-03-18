@@ -6,6 +6,73 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestFileFuncs(t *testing.T) {
+	testCases := []struct {
+		name     string
+		filename string
+		exists   bool
+		isJSON   bool
+		err      bool
+		secret   map[string]interface{}
+	}{
+		{
+			name:     "test: normal json",
+			filename: "testdata/normal_json.json",
+			exists:   true,
+			isJSON:   true,
+			secret: map[string]interface{}{
+				"kv/secret": map[string]interface{}{
+					"username": "username",
+					"password": "passw0rd",
+				},
+			},
+		},
+		{
+			name:     "test: normal json",
+			filename: "testdata/normal_yaml.yml",
+			exists:   true,
+			isJSON:   false,
+			secret: map[string]interface{}{
+				"kv/secret": map[string]interface{}{
+					"username": "username",
+					"password": "passw0rd",
+				},
+			},
+		},
+		{
+			name:     "test: file does not exist",
+			filename: "testdata/invalid_file",
+			exists:   false,
+		},
+		{
+			name:     "test: neither json or yaml",
+			filename: "testdata/invalid_format.md",
+			exists:   true,
+			isJSON:   false,
+			err:      true,
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.exists, FileExists(tc.filename), "file exists "+tc.name)
+
+		if tc.exists {
+			content, err := ReadFile(tc.filename)
+			assert.NoError(t, err)
+
+			data, res, err := JSONorYAML(content)
+
+			if tc.err {
+				assert.Error(t, err, "file is not json or yaml "+tc.name)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.isJSON, res, "json or yaml "+tc.name)
+				assert.Equal(t, tc.secret, data, "data "+tc.name)
+			}
+		}
+	}
+}
+
 func TestRemoveEmptyElements(t *testing.T) {
 	testCases := []struct {
 		name     string
