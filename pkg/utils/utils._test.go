@@ -191,3 +191,87 @@ key_3:
 		}
 	}
 }
+
+func TestMergeMaps(t *testing.T) {
+	testCases := []struct {
+		name                string
+		src, dest, expected map[string]interface{}
+	}{
+		{
+			name: "merge with override",
+			src: map[string]interface{}{
+				"a/dir":  map[string]interface{}{"key": 12},
+				"a/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+			dest: map[string]interface{}{
+				"c/dir": map[string]interface{}{"key": 9},
+			},
+			expected: map[string]interface{}{
+				"c/dir":  map[string]interface{}{"key": 12},
+				"c/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+		},
+		{
+			name: "merge with override 2",
+			src: map[string]interface{}{
+				"a/dir":  map[string]interface{}{"key": 12},
+				"a/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+			dest: map[string]interface{}{
+				"c/dir": map[string]interface{}{"key": 9, "key3": "test"},
+			},
+			expected: map[string]interface{}{
+				"c/dir":  map[string]interface{}{"key": 12, "key3": "test"},
+				"c/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+		},
+		{
+			name: "merge with additional keys",
+			src: map[string]interface{}{
+				"a/dir":  map[string]interface{}{"key": 12},
+				"a/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+			dest: map[string]interface{}{
+				"c/dir": map[string]interface{}{"key2": 9},
+			},
+			expected: map[string]interface{}{
+				"c/dir":  map[string]interface{}{"key": 12, "key2": 9},
+				"c/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+		},
+		{
+			name: "empty dest",
+			src: map[string]interface{}{
+				"a/dir":  map[string]interface{}{"key": 12},
+				"a/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+			dest: map[string]interface{}{},
+			expected: map[string]interface{}{
+				"c/dir":  map[string]interface{}{"key": 12},
+				"c/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+		},
+		{
+			name: "empty src",
+			src:  map[string]interface{}{},
+			dest: map[string]interface{}{
+				"a/dir":  map[string]interface{}{"key": 12},
+				"a/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+			expected: map[string]interface{}{
+				"c/dir":  map[string]interface{}{"key": 12},
+				"c/dir2": map[string]interface{}{"key": "value", "user": "password"},
+			},
+		},
+		{
+			name:     "empty both",
+			src:      map[string]interface{}{},
+			dest:     map[string]interface{}{},
+			expected: map[string]interface{}{},
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expected, MergeMaps(tc.src, tc.dest, "c"), tc.name)
+	}
+}

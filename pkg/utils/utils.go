@@ -2,10 +2,13 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
+	"path"
 	"sort"
 	"strings"
 
 	"github.com/ghodss/yaml"
+	"github.com/imdario/mergo"
 )
 
 const (
@@ -87,4 +90,33 @@ func (k Keys) Less(i, j int) bool {
 	k2 := strings.ReplaceAll(k[j], "/", "\x00")
 
 	return k1 < k2
+}
+
+// MergeMaps merges src map in dest map.
+func MergeMaps(a, b map[string]interface{}, destPath string) map[string]interface{} {
+	newA := map[string]interface{}{}
+
+	for k, v := range a {
+		_, subPath := SplitPath(k)
+		newA[subPath] = v
+	}
+
+	newB := map[string]interface{}{}
+
+	for k, v := range b {
+		_, subPath := SplitPath(k)
+		newB[subPath] = v
+	}
+
+	if err := mergo.Merge(&newB, newA, mergo.WithOverride); err != nil {
+		log.Fatalf("error merging maps: %v", err)
+	}
+
+	result := map[string]interface{}{}
+
+	for k, v := range newB {
+		result[path.Join(destPath, k)] = v
+	}
+
+	return result
 }
