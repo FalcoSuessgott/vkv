@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/AlecAivazis/survey/v2 v2.3.2 // indirect
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
@@ -23,7 +24,9 @@ require (
 	github.com/hashicorp/go-version v1.3.0 // indirect
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/imdario/mergo v0.3.12
+	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mingrammer/cfmt v1.1.0 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect

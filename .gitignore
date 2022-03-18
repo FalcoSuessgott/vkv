@@ -12,3 +12,4 @@ coverage.out
 /dist
 .envrc
 format.yaml
+data.json

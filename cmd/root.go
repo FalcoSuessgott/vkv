@@ -57,8 +57,11 @@ func rootCmd(version string) *cobra.Command {
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
 
 	// commands
-	cmd.AddCommand(mergeCmd())
-	cmd.AddCommand(lsCmd())
+	cmd.AddCommand(
+		mergeCmd(),
+		lsCmd(),
+		importCmd(),
+	)
 
 	return cmd
 }
