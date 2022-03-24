@@ -132,7 +132,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
-				ToJSON(true),
+				ToFormat(JSON),
 				ShowSecrets(true),
 			},
 			output: "{\n\t\"key_1\": {\n\t\t\"key\": \"value\",\n\t\t\"user\": \"password\"\n\t},\n\t\"key_2\": {\n\t\t\"key\": 12\n\t}\n}",
@@ -144,7 +144,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
-				ToJSON(true),
+				ToFormat(JSON),
 				OnlyKeys(true),
 			},
 			output: "{\n\t\"key_1\": {\n\t\t\"key\": \"\",\n\t\t\"user\": \"\"\n\t},\n\t\"key_2\": {\n\t\t\"key\": \"\"\n\t}\n}",
@@ -156,7 +156,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
-				ToYAML(true),
+				ToFormat(YAML),
 				ShowSecrets(true),
 			},
 			output: "key_1:\n  key: value\n  user: password\nkey_2:\n  key: 12\n",
@@ -168,7 +168,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
-				ToYAML(true),
+				ToFormat(YAML),
 				OnlyKeys(true),
 			},
 			output: "key_1:\n  key: \"\"\n  user: \"\"\nkey_2:\n  key: \"\"\n",
@@ -180,7 +180,8 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
-				ToExportFormat(true),
+				ToFormat(Export),
+				ShowSecrets(true),
 			},
 			output: "export key=value\nexport user=password\nexport key=12\n",
 		},
@@ -188,7 +189,7 @@ key_2
 			name: "test: empty export",
 			s:    map[string]interface{}{},
 			opts: []Option{
-				ToExportFormat(true),
+				ToFormat(Export),
 			},
 			output: "",
 		},
@@ -199,7 +200,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
-				ToMarkdown(true),
+				ToFormat(Markdown),
 			},
 			output: "| PATHS | KEYS |  VALUES  |\n|-------|------|----------|\n| key_1 | key  | *****    |\n|       | user | ******** |\n| key_2 | key  | **       |\n",
 		},
@@ -210,7 +211,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
-				ToMarkdown(true),
+				ToFormat(Markdown),
 			},
 			output: "| PATHS | KEYS |  VALUES  |\n|-------|------|----------|\n| key_1 | key  | *****    |\n|       | user | ******** |\n| key_2 | key  | **       |\n",
 		},

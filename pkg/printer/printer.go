@@ -10,7 +10,8 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-type outputFormat int
+// OutputFormat enum of valid output formats.
+type OutputFormat int
 
 const (
 	maskChar = "*"
@@ -18,10 +19,20 @@ const (
 	// MaxValueLength maximum length of passwords.
 	MaxValueLength = 12
 
-	yaml outputFormat = iota
-	json
-	export
-	markdown
+	// Base prints the secrets in the default format.
+	Base OutputFormat = iota
+
+	// YAML prints the secrets in yaml format.
+	YAML
+
+	// JSON prints the secrets in json format.
+	JSON
+
+	// Export prints the secrets in export (export "key=value") format.
+	Export
+
+	// Markdown prints the secrets in markdowntable format.
+	Markdown
 )
 
 var defaultWriter = os.Stdout
@@ -32,7 +43,7 @@ type Option func(*Printer)
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
 	secrets     map[string]interface{}
-	format      outputFormat
+	format      OutputFormat
 	writer      io.Writer
 	onlyKeys    bool
 	onlyPaths   bool
@@ -65,40 +76,10 @@ func OnlyPaths(b bool) Option {
 	}
 }
 
-// ToMarkdown outputformat to yaml.
-func ToMarkdown(b bool) Option {
+// ToFormat sets the output format of the printer.
+func ToFormat(format OutputFormat) Option {
 	return func(p *Printer) {
-		if b {
-			p.format = markdown
-		}
-	}
-}
-
-// ToYAML outputformat to yaml.
-func ToYAML(b bool) Option {
-	return func(p *Printer) {
-		if b {
-			p.format = yaml
-		}
-	}
-}
-
-// ToJSON outputformat to yaml.
-func ToJSON(b bool) Option {
-	return func(p *Printer) {
-		if b {
-			p.format = json
-		}
-	}
-}
-
-// ToExportFormat option for printing out variables so they can be exported into the shell.
-func ToExportFormat(b bool) Option {
-	return func(p *Printer) {
-		if b {
-			p.format = export
-			p.showSecrets = true
-		}
+		p.format = format
 	}
 }
 
@@ -149,27 +130,27 @@ func NewPrinter(m map[string]interface{}, opts ...Option) *Printer {
 //nolint:cyclop
 func (p *Printer) Out() error {
 	switch p.format {
-	case yaml:
+	case YAML:
 		out, err := utils.ToYAML(p.secrets)
 		if err != nil {
 			return err
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
-	case json:
+	case JSON:
 		out, err := utils.ToJSON(p.secrets)
 		if err != nil {
 			return err
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
-	case export:
+	case Export:
 		for _, s := range utils.SortMapKeys(p.secrets) {
 			for _, k := range utils.SortMapKeys(p.secrets[s].(map[string]interface{})) {
 				fmt.Fprintf(p.writer, "export %s=%v\n", k, p.secrets[s].(map[string]interface{})[k])
 			}
 		}
-	case markdown:
+	case Markdown:
 		headers, data := p.buildMarkdownTable()
 
 		table := tablewriter.NewWriter(p.writer)
@@ -184,6 +165,7 @@ func (p *Printer) Out() error {
 		}
 
 		table.Render()
+	case Base:
 	default:
 		for _, k := range utils.SortMapKeys(p.secrets) {
 			fmt.Fprintf(p.writer, "%s\n", k)

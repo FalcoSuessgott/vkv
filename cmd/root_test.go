@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"testing"
 
@@ -9,17 +10,79 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestOutputFormat(t *testing.T) {
+	testCases := []struct {
+		name     string
+		format   string
+		expected printer.OutputFormat
+		err      bool
+	}{
+		{
+			name:     "json",
+			err:      false,
+			format:   "json",
+			expected: printer.JSON,
+		},
+		{
+			name:     "yaml",
+			err:      false,
+			format:   "YamL",
+			expected: printer.YAML,
+		},
+		{
+			name:     "yml",
+			err:      false,
+			format:   "yml",
+			expected: printer.YAML,
+		},
+		{
+			name:     "invalid",
+			err:      true,
+			format:   "invalid",
+			expected: printer.YAML,
+		},
+		{
+			name:     "export",
+			err:      false,
+			format:   "Export",
+			expected: printer.Export,
+		},
+		{
+			name:     "markdown",
+			err:      false,
+			format:   "Markdown",
+			expected: printer.Markdown,
+		},
+		{
+			name:     "base",
+			err:      false,
+			format:   "base",
+			expected: printer.Base,
+		},
+	}
+
+	for _, tc := range testCases {
+		o := &Options{
+			FormatString: tc.format,
+		}
+
+		err := o.validateFlags()
+
+		if tc.err {
+			assert.ErrorIs(t, err, errInvalidFormat, tc.name)
+		} else {
+			assert.NoError(t, err, tc.name)
+			assert.Equal(t, tc.expected, o.outputFormat)
+		}
+	}
+}
+
 func TestValidateFlags(t *testing.T) {
 	testCases := []struct {
 		name string
 		args []string
 		err  bool
 	}{
-		{
-			name: "test: yaml and json",
-			err:  true,
-			args: []string{"--json", "--yaml"},
-		},
 		{
 			name: "test: only keys and only paths",
 			err:  true,
@@ -34,16 +97,6 @@ func TestValidateFlags(t *testing.T) {
 			name: "test: only paths and show secrets ",
 			err:  true,
 			args: []string{"--only-paths", "--show-values"},
-		},
-		{
-			name: "test: export 2",
-			err:  true,
-			args: []string{"--json", "--markdown"},
-		},
-		{
-			name: "test: export 2",
-			err:  true,
-			args: []string{"--json", "--yaml"},
 		},
 	}
 
@@ -68,75 +121,109 @@ func TestValidateFlags(t *testing.T) {
 	}
 }
 
-func TestMaxValueLength(t *testing.T) {
+func TestEnvVars(t *testing.T) {
 	testCases := []struct {
-		name           string
-		opts           *Options
-		maxValueLength string
-		expected       int
-		err            bool
+		name     string
+		envs     map[string]interface{}
+		err      bool
+		expected *Options
 	}{
 		{
-			name:           "no env set no flag defined",
-			opts:           defaultOptions(),
-			maxValueLength: "",
-			expected:       printer.MaxValueLength,
-		},
-		{
-			name:           "env set no flag defined",
-			opts:           defaultOptions(),
-			maxValueLength: "2",
-			expected:       2,
-		},
-		{
-			name: "env set and flag defined",
-			opts: &Options{
-				maxValueLength: 23,
+			name: "only keys",
+			err:  false,
+			envs: map[string]interface{}{
+				"VKV_ONLY_KEYS": true,
 			},
-			maxValueLength: "2",
-			expected:       23,
-		},
-		{
-			name: "no env set and flag defined",
-			opts: &Options{
-				maxValueLength: 23,
+			expected: &Options{
+				MaxValueLength: printer.MaxValueLength,
+				Paths:          []string{"kv"},
+				FormatString:   "base",
+
+				OnlyKeys: true,
 			},
-			maxValueLength: "",
-			expected:       23,
 		},
 		{
-			name: "no env set and flag defined",
-			opts: &Options{
-				maxValueLength: 23,
+			name: "only paths",
+			err:  false,
+			envs: map[string]interface{}{
+				"VKV_ONLY_PATHS": true,
 			},
-			maxValueLength: "",
-			expected:       23,
+			expected: &Options{
+				MaxValueLength: printer.MaxValueLength,
+				Paths:          []string{"kv"},
+				FormatString:   "base",
+
+				OnlyPaths: true,
+			},
 		},
 		{
-			name:           "invalid env",
-			opts:           defaultOptions(),
-			maxValueLength: "invalid",
-			err:            true,
+			name: "invalid value only paths",
+			err:  true,
+			envs: map[string]interface{}{
+				"VKV_ONLY_PATHS": "invalid",
+			},
 		},
 		{
-			name:           "length off",
-			opts:           defaultOptions(),
-			maxValueLength: "-1",
-			expected:       -1,
+			name: "show values and max value length",
+			err:  false,
+			envs: map[string]interface{}{
+				"VKV_SHOW_VALUES":      true,
+				"VKV_MAX_VALUE_LENGTH": 213,
+			},
+			expected: &Options{
+				MaxValueLength: 213,
+				Paths:          []string{"kv"},
+				FormatString:   "base",
+				ShowValues:     true,
+			},
+		},
+		{
+			name: "format",
+			err:  false,
+			envs: map[string]interface{}{
+				"VKV_FORMAT": "yaml",
+			},
+			expected: &Options{
+				MaxValueLength: 12,
+				Paths:          []string{"kv"},
+				FormatString:   "yaml",
+			},
+		},
+		{
+			name: "show values and max value length",
+			err:  false,
+			envs: map[string]interface{}{
+				"VKV_PATHS":            "kv1:kv2:kv3",
+				"VKV_MAX_VALUE_LENGTH": 213,
+			},
+			expected: &Options{
+				MaxValueLength: 213,
+				Paths:          []string{"kv1", "kv2", "kv3"},
+				FormatString:   "base",
+			},
 		},
 	}
 
 	for _, tc := range testCases {
-		if tc.maxValueLength != "" {
-			os.Setenv(maxValueLengthEnvVar, tc.maxValueLength)
+		o := &Options{}
+
+		for k, v := range tc.envs {
+			os.Setenv(k, fmt.Sprintf("%v", v))
 		}
 
-		err := tc.opts.validateFlags()
-		if !tc.err {
-			assert.NoError(t, err)
-			assert.Equal(t, tc.expected, tc.opts.maxValueLength, tc.name)
-		} else {
-			assert.Error(t, err)
+		err := o.parseEnvs()
+
+		for k := range tc.envs {
+			os.Unsetenv(k)
 		}
+
+		if tc.err {
+			assert.Error(t, err, tc.name)
+
+			continue
+		}
+
+		assert.NoError(t, err, tc.name)
+		assert.Equal(t, tc.expected, o)
 	}
 }
