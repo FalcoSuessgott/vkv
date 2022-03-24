@@ -2,60 +2,52 @@ package cmd
 
 import (
 	"fmt"
-	"io"
-	"os"
-	"strconv"
+	"log"
+	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
+	"github.com/caarlos0/env/v6"
 	"github.com/spf13/cobra"
 )
 
 const (
-	defaultKVPath        = "kv"
-	maxValueLengthEnvVar = "VKV_MAX_VALUE_LENGTH"
+	envVarPrefix = "VKV_"
 )
 
 var (
-	defaultWriter             = os.Stdout
 	errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
-	errMultipleOutputFormats  = fmt.Errorf("specified multiple output formats, only one is allowed")
+	errInvalidFormat          = fmt.Errorf("invalid format (valid options: base, yaml, json, export, markdown)")
 )
 
 // Options holds all available commandline options.
 type Options struct {
-	paths          []string
-	writer         io.Writer
-	onlyKeys       bool
-	onlyPaths      bool
-	showValues     bool
-	json           bool
-	yaml           bool
-	markdown       bool
-	version        bool
-	export         bool
-	maxValueLength int
-}
+	Paths []string `env:"PATHS" envDefault:"kv" envSeparator:":"`
 
-func defaultOptions() *Options {
-	return &Options{
-		paths:          []string{defaultKVPath},
-		showValues:     false,
-		writer:         defaultWriter,
-		maxValueLength: printer.MaxValueLength,
-	}
+	OnlyKeys       bool `env:"ONLY_KEYS"`
+	OnlyPaths      bool `env:"ONLY_PATHS"`
+	ShowValues     bool `env:"SHOW_VALUES"`
+	MaxValueLength int  `env:"MAX_VALUE_LENGTH" envDefault:"12"`
+
+	FormatString string `env:"FORMAT" envDefault:"base"`
+	outputFormat printer.OutputFormat
+
+	version bool
 }
 
 func newRootCmd(version string) *cobra.Command {
-	o := defaultOptions()
+	o := &Options{}
+
+	if err := o.parseEnvs(); err != nil {
+		log.Fatal(err)
+	}
 
 	cmd := &cobra.Command{
 		Use:           "vkv",
 		Short:         "recursively list secrets from Vaults KV2 engine",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if o.version {
 				fmt.Printf("vkv %s\n", version)
@@ -72,21 +64,18 @@ func newRootCmd(version string) *cobra.Command {
 				return err
 			}
 
-			for _, p := range o.paths {
+			for _, p := range o.Paths {
 				if err := v.ListRecursive(utils.SplitPath(p)); err != nil {
 					return err
 				}
 			}
 
 			printer := printer.NewPrinter(v.Secrets,
-				printer.OnlyKeys(o.onlyKeys),
-				printer.OnlyPaths(o.onlyPaths),
-				printer.CustomValueLength(o.maxValueLength),
-				printer.ShowSecrets(o.showValues),
-				printer.ToExportFormat(o.export),
-				printer.ToJSON(o.json),
-				printer.ToYAML(o.yaml),
-				printer.ToMarkdown(o.markdown),
+				printer.OnlyKeys(o.OnlyKeys),
+				printer.OnlyPaths(o.OnlyPaths),
+				printer.CustomValueLength(o.MaxValueLength),
+				printer.ShowSecrets(o.ShowValues),
+				printer.ToFormat(o.outputFormat),
 			)
 
 			if err := printer.Out(); err != nil {
@@ -100,22 +89,18 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().SortFlags = false
 
 	// Input
-	cmd.Flags().StringSliceVarP(&o.paths, "path", "p", o.paths, "kv engine paths (comma separated to define multiple paths)")
+	cmd.Flags().StringSliceVarP(&o.Paths, "path", "p", o.Paths, "kv engine mount paths (colon separated for specifying multiple paths)")
 
 	// Modify
-	cmd.Flags().BoolVar(&o.onlyKeys, "only-keys", o.onlyKeys, "show only keys")
-	cmd.Flags().BoolVar(&o.onlyPaths, "only-paths", o.onlyPaths, "show only paths")
-	cmd.Flags().BoolVar(&o.showValues, "show-values", o.showValues, "dont mask values")
-	cmd.Flags().IntVar(&o.maxValueLength, "max-value-length", o.maxValueLength,
-		"maximum char length of values (precedes VKV_MAX_PASSWORD_LENGTH). \"-1\" for disabling")
+	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys")
+	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths")
+	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "dont mask values")
+	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values (-1 for disable)")
 
 	// Output format
-	cmd.Flags().BoolVarP(&o.markdown, "markdown", "m", o.markdown, "print entries in markdown table format")
-	cmd.Flags().BoolVarP(&o.json, "json", "j", o.json, "print entries in json format")
-	cmd.Flags().BoolVarP(&o.yaml, "yaml", "y", o.json, "print entries in yaml format")
-	cmd.Flags().BoolVarP(&o.export, "export", "e", o.export,
-		"print entries in export format (export \"key=value\")")
+	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "output format (options: base, json, yaml, export, nmarkdown)")
 
+	// version
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
 
 	return cmd
@@ -133,21 +118,34 @@ func Execute(version string) error {
 //nolint: cyclop
 func (o *Options) validateFlags() error {
 	switch {
-	case o.json && (o.markdown || o.yaml || o.export), o.yaml && (o.markdown || o.json || o.export),
-		o.export && (o.markdown || o.json || o.yaml), o.markdown && (o.json || o.yaml || o.export):
-		return errMultipleOutputFormats
-	case (o.onlyKeys && o.showValues), (o.onlyPaths && o.showValues), (o.onlyKeys && o.onlyPaths):
+	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):
 		return errInvalidFlagCombination
+	case true:
+		switch strings.ToLower(o.FormatString) {
+		case "yaml", "yml":
+			o.outputFormat = printer.YAML
+		case "json":
+			o.outputFormat = printer.JSON
+		case "export":
+			o.outputFormat = printer.Export
+			o.ShowValues = true
+		case "markdown":
+			o.outputFormat = printer.Markdown
+		case "base":
+			o.outputFormat = printer.Base
+		default:
+			return errInvalidFormat
+		}
 	}
 
-	// -m flag precedes VKV_MAX_PASSWORD_LENGTH, so we check if the flag has been provided
-	if v, ok := os.LookupEnv(maxValueLengthEnvVar); ok && o.maxValueLength == printer.MaxValueLength {
-		l, err := strconv.Atoi(v)
-		if err != nil {
-			return fmt.Errorf("invalid value \"%v\" for %s", v, maxValueLengthEnvVar)
-		}
+	return nil
+}
 
-		o.maxValueLength = l
+func (o *Options) parseEnvs() error {
+	if err := env.Parse(o, env.Options{
+		Prefix: envVarPrefix,
+	}); err != nil {
+		return err
 	}
 
 	return nil

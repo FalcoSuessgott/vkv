@@ -11,19 +11,18 @@
 So far `vkv` offers:
 
 ### Input flags
-* `-p | --paths` (default: `kv`): Comma separated list of KVv2 Engine Paths
+* `-p | --paths`: KV mount paths (colon separated list for multiple paths) (env: `VKV_PATHS`, default: `kv`)
 
 ### Modifying flags
-* `--only-keys`: show only keys
-* `--only-paths`: show only paths
-* `-show-values`: dont mask values
-* `--max-value-length` (default: `12`): maximum char length of values (precedes `VKV_MAX_PASSWORD_LENGTH`). Set to `-1` for disabling
+* `--only-keys`: show only keys (env: `VKV_ONLY_KEYS`, default: `false`)
+* `--only-paths`: show only paths (env: `VKV_ONLY_PATHS`, default: `false`)
+* `-show-values`: dont mask values (env: `VKV_SHOW_VALUES`, default: `false`)
+* `--max-value-length`: maximum char length of values (set to `-1` for disabling) (env: `VKV_MAX_VALUE_LENGTH`, default: `12`)
 
 ### Output Flags
-* `-e | --export`: print entries in export format (export "key=value")
-* `-j | --json`: print entries in json format
-* `-y | --yaml`: print entries in yaml format
-* `-m | --markdown`: print entries in markdown table format
+* `-f | --format`: output format (options: `base`, `yaml`, `json`, `export`, `markdown`)  (env: `"VKV_FORMAT"`, default: `"base"`)
+
+⚠️ **A flag always preceed its environment variable**
 
 You can combine most of those flags in order to receive the desired output.
 For examples see the [Examples](https://github.com/FalcoSuessgott/vkv#examples)
@@ -72,7 +71,7 @@ secret/
 ```
 
 ## Input
-### list secrets `--path | -p (default "kv")`
+### list secrets (`--path` | `-p` | `VKV_PATHS="kv1:kv2"`)
 You can list all secrets recursively by running:
 
 ```bash
@@ -104,8 +103,8 @@ secret/sub/sub2/demo
 and list as much paths as you want:
 
 ```bash
-# comma separated and no spaces!
-vkv -p secret,secret2
+# colon separated and no spaces!
+vkv -p secret:secret2
 secret/demo
         foo=***
 secret/sub
@@ -123,7 +122,7 @@ secret2/demo
 ```
 
 ## Modifying
-### list only paths `--only-paths`
+### list only paths (`--only-paths` | `VKV_ONLY_PATHS=true`)
 We can receive only the paths by running
 
 ```bash
@@ -134,7 +133,7 @@ secret/sub/demo
 secret/sub/sub2/demo
 ```
 
-### list only secret keys  `--only-keys`
+### list only secret keys  (`--only-keys` | `VKV_ONLY_KEYS=true`)
 If we want to know just the keys in every directory we can run
 
 ```bash
@@ -153,10 +152,8 @@ secret/sub/sub2/demo
         user
 ```
 
-### show values  `--show-values`
+### show values  (`--show-values` | `VKV_SHOW_VALUES=true`)
 Per default values are masked. Using `--show-values` shows the values. **Use with Caution**
-
-We can get the secrets of a certain sub path, by running
 
 ```bash
 vkv -p secret --show-values
@@ -175,11 +172,11 @@ secret/sub/sub2/demo
 ```
 
 ## Output Format
-### export format `--export | -e`
+### export format (`--format=export` | `VKV_FORMAT=export`)
 You can print out the entries in `export key=value` format for further processing:
 
 ```bash
-vkv --path secret/sub/sub2 --export
+vkv --path secret/sub/sub2 --format=export
 export foo=secret1
 export password=secret2
 export user=secret3
@@ -189,14 +186,14 @@ You can then use `eval` to source those env vars:
 
 ```bash
 echo $foo # not defined
-eval $(vkv --export --path secret/sub/sub2)
+eval $(vkv -f=export --path secret/sub/sub2)
 echo $foo
 "secret1" # value under the specific key exported
 ```
 
-## markdown `--markdown | -m`
+## markdown (`--format=markdown` | `VKV_FORMAT=markdown`)
 ```bash
-vkv -p secret --markdown
+vkv -p secret --format=markdown
 ```
 
 returns:
@@ -235,11 +232,11 @@ In combination with:
 |                      | password |
 
 
-### json `--json | -j`
+### json (`--format=json` | `VKV_FORMAT=json`)
 You can combine all flags and export the result to json by running:
 
 ```bash
-vkv -p secret --show-values --json | jq .
+vkv -p secret --show-values --format=json
 ```
 
 ```json
@@ -263,11 +260,11 @@ vkv -p secret --show-values --json | jq .
 }
 ```
 
-### yaml  `--yaml | -y`
+### yaml (`--format=yaml` | `VKV_FORMAT=yaml`)
 Same applies for yaml:
 
 ```bash
-vkv --path secret --show-values --yaml
+vkv --path secret --show-values --format=yaml
 ```
 
 ```yaml
