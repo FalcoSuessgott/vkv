@@ -4,7 +4,7 @@ on:
     branches:
       - master
   pull_request:
-  
+
 jobs:
   golangci:
     name: lint
@@ -25,7 +25,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.43.0
+          version: v1.45.2
           args: -c .golang-ci.yml -v --timeout=5m
         env:
           GO111MODULES: off

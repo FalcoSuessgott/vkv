@@ -18,3 +18,4 @@ linters:
     - varnamelen
     - funlen
     - gomnd
+    - containedctx

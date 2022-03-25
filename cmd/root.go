@@ -23,7 +23,7 @@ var (
 
 // Options holds all available commandline options.
 type Options struct {
-	Paths []string `env:"PATHS" envDefault:"kv" envSeparator:":"`
+	Paths []string `env:"PATHS" envDefault:"kv" envSeparator:","`
 
 	OnlyKeys       bool `env:"ONLY_KEYS"`
 	OnlyPaths      bool `env:"ONLY_PATHS"`
@@ -70,7 +70,7 @@ func newRootCmd(version string) *cobra.Command {
 				}
 			}
 
-			printer := printer.NewPrinter(v.Secrets,
+			printer := printer.NewPrinter(
 				printer.OnlyKeys(o.OnlyKeys),
 				printer.OnlyPaths(o.OnlyPaths),
 				printer.CustomValueLength(o.MaxValueLength),
@@ -78,7 +78,7 @@ func newRootCmd(version string) *cobra.Command {
 				printer.ToFormat(o.outputFormat),
 			)
 
-			if err := printer.Out(); err != nil {
+			if err := printer.Out(v.Secrets); err != nil {
 				return err
 			}
 
@@ -89,7 +89,7 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().SortFlags = false
 
 	// Input
-	cmd.Flags().StringSliceVarP(&o.Paths, "path", "p", o.Paths, "kv engine mount paths (colon separated for specifying multiple paths)")
+	cmd.Flags().StringSliceVarP(&o.Paths, "path", "p", o.Paths, "kv engine mount paths (comma separated for specifying multiple paths)")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys")
