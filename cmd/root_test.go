@@ -193,7 +193,7 @@ func TestEnvVars(t *testing.T) {
 			name: "show values and max value length",
 			err:  false,
 			envs: map[string]interface{}{
-				"VKV_PATHS":            "kv1:kv2:kv3",
+				"VKV_PATHS":            "kv1,kv2,kv3",
 				"VKV_MAX_VALUE_LENGTH": 213,
 			},
 			expected: &Options{

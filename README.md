@@ -11,7 +11,7 @@
 So far `vkv` offers:
 
 ### Input flags
-* `-p | --paths`: KV mount paths (colon separated list for multiple paths) (env: `VKV_PATHS`, default: `kv`)
+* `-p | --paths`: KV mount paths (comma separated list for multiple paths) (env: `VKV_PATHS`, default: `kv`)
 
 ### Modifying flags
 * `--only-keys`: show only keys (env: `VKV_ONLY_KEYS`, default: `false`)
@@ -103,8 +103,8 @@ secret/sub/sub2/demo
 and list as much paths as you want:
 
 ```bash
-# colon separated and no spaces!
-vkv -p secret:secret2
+# comma separated and no spaces!
+vkv -p secret,secret2
 secret/demo
         foo=***
 secret/sub

@@ -47,11 +47,11 @@ func TestMaskSecrets(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		p := NewPrinter(tc.input, tc.options...)
+		p := NewPrinter(tc.options...)
 
-		p.maskSecrets()
+		p.maskSecrets(tc.input)
 
-		assert.Equal(t, tc.output, p.secrets, tc.name)
+		assert.Equal(t, tc.output, tc.input, tc.name)
 	}
 }
 
@@ -69,6 +69,7 @@ func TestPrint(t *testing.T) {
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
+				ToFormat(Base),
 				ShowSecrets(false),
 			},
 			output: `key_1
@@ -85,6 +86,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
+				ToFormat(Base),
 				ShowSecrets(true),
 			},
 			output: `key_1
@@ -101,6 +103,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
+				ToFormat(Base),
 				OnlyPaths(true),
 				ShowSecrets(true),
 			},
@@ -115,6 +118,7 @@ key_2
 				"key_2": map[string]interface{}{"key": 12},
 			},
 			opts: []Option{
+				ToFormat(Base),
 				OnlyKeys(true),
 				ShowSecrets(true),
 			},
@@ -221,8 +225,8 @@ key_2
 		var b bytes.Buffer
 		tc.opts = append(tc.opts, WithWriter(&b))
 
-		p := NewPrinter(tc.s, tc.opts...)
-		assert.NoError(t, p.Out())
+		p := NewPrinter(tc.opts...)
+		assert.NoError(t, p.Out(tc.s))
 
 		assert.Equal(t, tc.output, b.String(), tc.name)
 	}
@@ -272,8 +276,8 @@ func TestMarkdownHeader(t *testing.T) {
 		var b bytes.Buffer
 		tc.opts = append(tc.opts, WithWriter(&b))
 
-		p := NewPrinter(tc.s, tc.opts...)
-		headers, _ := p.buildMarkdownTable()
+		p := NewPrinter(tc.opts...)
+		headers, _ := p.buildMarkdownTable(tc.s)
 
 		assert.Equal(t, tc.expected, headers, tc.name)
 	}

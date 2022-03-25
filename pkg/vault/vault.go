@@ -2,6 +2,7 @@ package vault
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -105,8 +106,13 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 	if data.Data != nil {
 		keys := []string{}
 
-		for _, k := range data.Data["keys"].([]interface{}) {
-			keys = append(keys, k.(string))
+		k, ok := data.Data["keys"].([]interface{})
+		if !ok {
+			log.Fatalf("did not found any keys in %s/%s", rootPath, subPath)
+		}
+
+		for _, e := range k {
+			keys = append(keys, fmt.Sprintf("%v", e))
 		}
 
 		return keys, nil
