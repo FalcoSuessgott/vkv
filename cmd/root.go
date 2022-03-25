@@ -16,10 +16,7 @@ const (
 	envVarPrefix = "VKV_"
 )
 
-var (
-	errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
-	errInvalidFormat          = fmt.Errorf("invalid format (valid options: base, yaml, json, export, markdown)")
-)
+var errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
 
 // Options holds all available commandline options.
 type Options struct {
@@ -134,7 +131,7 @@ func (o *Options) validateFlags() error {
 		case "base":
 			o.outputFormat = printer.Base
 		default:
-			return errInvalidFormat
+			return printer.ErrInvalidFormat
 		}
 	}
 

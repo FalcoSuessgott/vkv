@@ -69,7 +69,7 @@ func TestOutputFormat(t *testing.T) {
 		err := o.validateFlags()
 
 		if tc.err {
-			assert.ErrorIs(t, err, errInvalidFormat, tc.name)
+			assert.ErrorIs(t, err, printer.ErrInvalidFormat, tc.name)
 		} else {
 			assert.NoError(t, err, tc.name)
 			assert.Equal(t, tc.expected, o.outputFormat)

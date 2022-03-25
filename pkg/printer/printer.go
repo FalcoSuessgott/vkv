@@ -36,7 +36,12 @@ const (
 	Markdown
 )
 
-var defaultWriter = os.Stdout
+var (
+	defaultWriter = os.Stdout
+
+	// ErrInvalidFormat invalid output format.
+	ErrInvalidFormat = fmt.Errorf("invalid format (valid options: base, yaml, json, export, markdown)")
+)
 
 // Option list of available options for modifying the output.
 type Option func(*Printer)
@@ -175,7 +180,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 			p.printSecrets(secrets[k])
 		}
 	default:
-		return fmt.Errorf("invalid format")
+		return ErrInvalidFormat
 	}
 
 	return nil
