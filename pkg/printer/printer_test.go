@@ -139,7 +139,7 @@ key_2
 				ToFormat(JSON),
 				ShowSecrets(true),
 			},
-			output: "{\n\t\"key_1\": {\n\t\t\"key\": \"value\",\n\t\t\"user\": \"password\"\n\t},\n\t\"key_2\": {\n\t\t\"key\": 12\n\t}\n}",
+			output: "{\n  \"key_1\": {\n    \"key\": \"value\",\n    \"user\": \"password\"\n  },\n  \"key_2\": {\n    \"key\": 12\n  }\n}",
 		},
 		{
 			name: "test: normal map to json only keys",
@@ -151,7 +151,7 @@ key_2
 				ToFormat(JSON),
 				OnlyKeys(true),
 			},
-			output: "{\n\t\"key_1\": {\n\t\t\"key\": \"\",\n\t\t\"user\": \"\"\n\t},\n\t\"key_2\": {\n\t\t\"key\": \"\"\n\t}\n}",
+			output: "{\n  \"key_1\": {\n    \"key\": \"\",\n    \"user\": \"\"\n  },\n  \"key_2\": {\n    \"key\": \"\"\n  }\n}",
 		},
 		{
 			name: "test: normal map to yaml",
