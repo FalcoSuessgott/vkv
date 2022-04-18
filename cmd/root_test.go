@@ -138,8 +138,7 @@ func TestEnvVars(t *testing.T) {
 				MaxValueLength: printer.MaxValueLength,
 				Paths:          []string{"kv"},
 				FormatString:   "base",
-
-				OnlyKeys: true,
+				OnlyKeys:       true,
 			},
 		},
 		{
@@ -152,8 +151,7 @@ func TestEnvVars(t *testing.T) {
 				MaxValueLength: printer.MaxValueLength,
 				Paths:          []string{"kv"},
 				FormatString:   "base",
-
-				OnlyPaths: true,
+				OnlyPaths:      true,
 			},
 		},
 		{
@@ -206,6 +204,8 @@ func TestEnvVars(t *testing.T) {
 
 	for _, tc := range testCases {
 		o := &Options{}
+
+		os.Clearenv()
 
 		for k, v := range tc.envs {
 			os.Setenv(k, fmt.Sprintf("%v", v))
