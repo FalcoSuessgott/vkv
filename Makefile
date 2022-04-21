@@ -18,14 +18,6 @@ install: ## install golang binary
 run: ## run the app
 	@go run -ldflags "-X main.version=$(shell git describe --abbrev=0 --tags)"  main.go
 
-.PHONY: fmtcheck
-fmtcheck: ## run gofmt and print detected files
-	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
-
-PHONY: test
-test: ## run go tests
-	go test -v ./...
-
 PHONY: clean
 clean: ## clean up environment
 	@rm -rf coverage.out dist/ $(projectname)
@@ -43,22 +35,9 @@ PHONY: lint
 lint: ## lint go files
 	golangci-lint run -c .golang-ci.yml
 
-PHONY: lint-fix
-lint-fix: ## fix
-	golangci-lint run -c .golang-ci.yml --fix
-
-.PHONY: docker-build
-docker-build: ## dockerize golang application
-	@docker build --tag $(projectname) .
-
-.PHONY: docker-run
-docker-run:
-	@docker run $(projectname)
-
 .PHONY: pre-commit
 pre-commit:	## run pre-commit hooks
 	pre-commit run
-
 
 vault: export VAULT_ADDR = http://127.0.0.1:8200
 vault: export VAULT_SKIP_VERIFY = true
