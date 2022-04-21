@@ -100,7 +100,7 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 	}
 
 	if data == nil {
-		return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
+		return nil, fmt.Errorf("no secrets under path \"%s\" found", path.Join(rootPath, subPath))
 	}
 
 	if data.Data != nil {
