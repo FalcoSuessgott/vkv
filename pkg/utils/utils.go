@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
 	"sort"
 	"strings"
 
@@ -37,6 +38,22 @@ func removeEmptyElements(s []string) []string {
 	}
 
 	return r
+}
+
+// ToMapStringInterface takes any value and returns the map string interface.
+func ToMapStringInterface(i interface{}) map[string]interface{} {
+	var m map[string]interface{}
+
+	data, err := json.Marshal(i)
+	if err != nil {
+		log.Fatalf("cannot convert %v to map[string]interface: %v", i, err)
+	}
+
+	if err := json.Unmarshal(data, &m); err != nil {
+		log.Fatalf("cannot convert %v to map[string]interface: %v", i, err)
+	}
+
+	return m
 }
 
 // ToJSON marshalls a given map to json.
