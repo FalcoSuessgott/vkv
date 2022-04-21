@@ -61,6 +61,10 @@ func newRootCmd(version string) *cobra.Command {
 				return err
 			}
 
+			if len(o.Paths) == 0 {
+				return fmt.Errorf("no paths specified")
+			}
+
 			for _, p := range o.Paths {
 				if err := v.ListRecursive(utils.SplitPath(p)); err != nil {
 					return err
@@ -86,16 +90,18 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().SortFlags = false
 
 	// Input
-	cmd.Flags().StringSliceVarP(&o.Paths, "path", "p", o.Paths, "kv engine mount paths (comma separated for specifying multiple paths)")
+	cmd.Flags().StringSliceVarP(&o.Paths, "path", "p", o.Paths, "Comma separated list of kv paths (env var: VKV_PATHS)")
 
 	// Modify
-	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys")
-	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths")
-	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "dont mask values")
-	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values (-1 for disable)")
+	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env var: VKV_ONLY_KEYS)")
+	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env var: VKV_ONLY_PATHS)")
+	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "dont mask values (env var: VKV_SHOW_VALUES)")
+	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
+		"(env var: VKV_MAX_VALUE_LENGTH)")
 
 	// Output format
-	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "output format (options: base, json, yaml, export, nmarkdown)")
+	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "output format: \"base\", \"json\", \"yaml\", \"export\", \"nmarkdown\") "+
+		"(env var: VKV_FORMAT)")
 
 	// version
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
