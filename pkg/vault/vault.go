@@ -20,14 +20,13 @@ const (
 
 // Vault represents a vault struct used for reading and writing secrets.
 type Vault struct {
-	Client  *api.Client
-	Secrets map[string]interface{}
+	Client *api.Client
 }
 
+// Secrets holds all recursive secrets of a certain path.
+type Secrets map[string]interface{}
+
 // NewClient returns a new vault client wrapper.
-// VAULT_ADDR and VAULT_TOKEN are required
-// VAULT_SKIP_VERIFY is considered, if defined
-// reads the proxy configuration via HTTP_PROXY and HTTPS_PROXY.
 func NewClient() (*Vault, error) {
 	_, ok := os.LookupEnv("VAULT_ADDR")
 	if !ok {
@@ -56,17 +55,17 @@ func NewClient() (*Vault, error) {
 		c.SetNamespace(vaultNamespace)
 	}
 
-	return &Vault{Client: c, Secrets: make(map[string]interface{})}, nil
+	return &Vault{Client: c}, nil
 }
 
 // ListRecursive returns secrets to a path recursive.
-func (v *Vault) ListRecursive(rootPath, subPath string) error {
+func (s *Secrets) ListRecursive(v *Vault, rootPath, subPath string) error {
 	keys, err := v.ListSecrets(rootPath, subPath)
 	if err != nil {
 		// no sub directories in here, but lets check for normal kv pairs then..
 		secrets, e := v.ReadSecrets(rootPath, subPath)
 		if e == nil {
-			v.Secrets[path.Join(rootPath, subPath)] = secrets
+			(*s)[path.Join(rootPath, subPath)] = secrets
 
 			return nil
 		}
@@ -76,7 +75,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string) error {
 
 	for _, k := range keys {
 		if strings.HasSuffix(k, utils.Delimiter) {
-			if err := v.ListRecursive(rootPath, path.Join(subPath, k)); err != nil {
+			if err := s.ListRecursive(v, rootPath, path.Join(subPath, k)); err != nil {
 				return err
 			}
 		} else {
@@ -85,7 +84,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string) error {
 				return err
 			}
 
-			v.Secrets[path.Join(rootPath, subPath, k)] = secrets
+			(*s)[path.Join(rootPath, subPath, k)] = secrets
 		}
 	}
 

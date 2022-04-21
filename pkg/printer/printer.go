@@ -52,7 +52,7 @@ type Printer struct {
 	writer      io.Writer
 	onlyKeys    bool
 	onlyPaths   bool
-	showSecrets bool
+	showValues  bool
 	valueLength int
 }
 
@@ -95,11 +95,11 @@ func WithWriter(w io.Writer) Option {
 	}
 }
 
-// ShowSecrets flag for unmasking secrets in output.
-func ShowSecrets(b bool) Option {
+// ShowValues flag for unmasking secrets in output.
+func ShowValues(b bool) Option {
 	return func(p *Printer) {
 		if b {
-			p.showSecrets = true
+			p.showValues = true
 		}
 	}
 }
@@ -121,16 +121,18 @@ func NewPrinter(opts ...Option) *Printer {
 // Out prints out the secrets according all configured options.
 //nolint:cyclop
 func (p *Printer) Out(secrets map[string]interface{}) error {
-	if !p.showSecrets {
-		p.maskSecrets(secrets)
-	}
+	for k, v := range secrets {
+		if !p.showValues {
+			secrets[k] = p.maskValues(utils.ToMapStringInterface(v))
+		}
 
-	if p.onlyPaths {
-		p.printOnlyPaths(secrets)
-	}
+		if p.onlyPaths {
+			secrets[k] = p.printOnlyPaths(utils.ToMapStringInterface(v))
+		}
 
-	if p.onlyKeys {
-		p.printOnlykeys(secrets)
+		if p.onlyKeys {
+			secrets[k] = p.printOnlykeys(utils.ToMapStringInterface(v))
+		}
 	}
 
 	switch p.format {
@@ -150,13 +152,15 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		fmt.Fprintf(p.writer, "%s", string(out))
 	case Export:
 		for _, s := range utils.SortMapKeys(secrets) {
-			m, ok := secrets[s].(map[string]interface{})
-			if !ok {
-				log.Fatalf("cannot convert %s to map[string]interface", secrets[s])
-			}
+			for _, v := range utils.ToMapStringInterface(secrets[s]) {
+				m, ok := v.(map[string]interface{})
+				if !ok {
+					log.Fatalf("cannot convert %T to map[string]interface", secrets[s])
+				}
 
-			for _, k := range utils.SortMapKeys(m) {
-				fmt.Fprintf(p.writer, "export %s=\"%v\"\n", k, m[k])
+				for _, k := range utils.SortMapKeys(m) {
+					fmt.Fprintf(p.writer, "export %s=\"%v\"\n", k, m[k])
+				}
 			}
 		}
 	case Markdown:
@@ -167,17 +171,18 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
 		table.SetCenterSeparator("|")
 		table.AppendBulk(data)
-
-		// only merge cell for paths column
-		if headers[0] == "paths" {
-			table.SetAutoMergeCellsByColumnIndex([]int{0})
-		}
-
+		// merge mounts and paths colunmn
+		table.SetAutoMergeCellsByColumnIndex([]int{0, 1})
 		table.Render()
 	case Base:
 		for _, k := range utils.SortMapKeys(secrets) {
 			fmt.Fprintf(p.writer, "%s\n", k)
-			p.printSecrets(secrets[k])
+			m := utils.ToMapStringInterface(secrets[k])
+
+			for _, i := range utils.SortMapKeys(m) {
+				fmt.Fprintf(p.writer, "%s\n", i)
+				p.printSecrets(utils.ToMapStringInterface(m[i]))
+			}
 		}
 	default:
 		return ErrInvalidFormat
@@ -191,27 +196,30 @@ func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, 
 	headers := []string{}
 
 	for _, s := range utils.SortMapKeys(secrets) {
-		m, ok := secrets[s].(map[string]interface{})
-		if !ok {
-			log.Fatalf("cannot convert %s to map[string]interface", secrets[s])
-		}
-
-		//nolint: gocritic
-		if p.onlyPaths {
-			headers = []string{"paths"}
-
-			data = append(data, []string{s})
-		} else if p.onlyKeys {
-			headers = []string{"paths", "keys"}
-
-			for _, k := range utils.SortMapKeys(m) {
-				data = append(data, []string{s, k})
+		v := utils.ToMapStringInterface(secrets[s])
+		for _, k := range utils.SortMapKeys(v) {
+			m, ok := v[k].(map[string]interface{})
+			if !ok {
+				log.Fatalf("cannot convert %s to map[string]interface", secrets[s])
 			}
-		} else {
-			headers = []string{"paths", "keys", "values"}
 
-			for _, k := range utils.SortMapKeys(m) {
-				data = append(data, []string{s, k, fmt.Sprintf("%v", m[k])})
+			//nolint: gocritic
+			if p.onlyPaths {
+				headers = []string{"mount", "paths"}
+
+				data = append(data, []string{s, k})
+			} else if p.onlyKeys {
+				headers = []string{"mount", "paths", "keys"}
+
+				for _, j := range utils.SortMapKeys(m) {
+					data = append(data, []string{s, k, j})
+				}
+			} else {
+				headers = []string{"mount", "paths", "keys", "values"}
+
+				for _, j := range utils.SortMapKeys(m) {
+					data = append(data, []string{s, k, j, fmt.Sprintf("%v", m[j])})
+				}
 			}
 		}
 	}
@@ -219,55 +227,77 @@ func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, 
 	return headers, data
 }
 
-func (p *Printer) printOnlykeys(secrets map[string]interface{}) {
-	for k := range secrets {
-		m, ok := secrets[k].(map[string]interface{})
+func (p *Printer) printOnlykeys(secrets map[string]interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
+
+	for k, v := range secrets {
+		m, ok := v.(map[string]interface{})
 		if !ok {
 			continue
 		}
 
-		for k := range m {
-			m[k] = ""
+		for j := range m {
+			m[j] = ""
 		}
+
+		res[k] = m
 	}
+
+	return res
 }
 
-func (p *Printer) printOnlyPaths(secrets map[string]interface{}) {
-	for k := range secrets {
-		secrets[k] = nil
-	}
-}
+func (p *Printer) printOnlyPaths(secrets map[string]interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
 
-func (p *Printer) maskSecrets(secrets map[string]interface{}) {
-	for k := range secrets {
-		m, ok := secrets[k].(map[string]interface{})
+	for k, v := range secrets {
+		m, ok := v.(map[string]interface{})
 		if !ok {
 			continue
 		}
 
-		for k := range m {
-			secret := fmt.Sprintf("%v", m[k])
+		for j := range m {
+			m[j] = nil
+		}
+
+		res[k] = m
+	}
+
+	return res
+}
+
+func (p *Printer) maskValues(secrets map[string]interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
+
+	for k, v := range secrets {
+		m, ok := v.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		for j, v := range m {
+			secret := fmt.Sprintf("%v", v)
 
 			if len(secret) > p.valueLength && p.valueLength != -1 {
-				m[k] = strings.Repeat(maskChar, p.valueLength)
+				m[j] = strings.Repeat(maskChar, p.valueLength)
 			} else {
-				m[k] = strings.Repeat(maskChar, len(secret))
+				m[j] = strings.Repeat(maskChar, len(secret))
 			}
 		}
+
+		res[k] = m
 	}
+
+	return res
 }
 
-func (p *Printer) printSecrets(s interface{}) {
-	m, ok := s.(map[string]interface{})
-	if ok {
-		for _, k := range utils.SortMapKeys(m) {
-			if p.onlyKeys {
-				fmt.Fprintf(p.writer, "\t%s\n", k)
-			}
+func (p *Printer) printSecrets(s map[string]interface{}) {
+	for _, k := range utils.SortMapKeys(s) {
+		if p.onlyKeys {
+			fmt.Fprintf(p.writer, "\t%s\n", k)
+		}
 
-			if !p.onlyKeys && !p.onlyPaths {
-				fmt.Fprintf(p.writer, "\t%s=%v\n", k, m[k])
-			}
+		if !p.onlyKeys && !p.onlyPaths {
+			fmt.Fprintf(p.writer, "\t%s=%v\n", k, s[k])
 		}
 	}
 }

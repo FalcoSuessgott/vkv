@@ -47,11 +47,16 @@ vault: export VAULT_TOKEN = root
 vault:
 	echo hallo
 	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
-	vault secrets enable kv
 	vault kv put secret/demo foo=bar
 	vault kv put secret/sub sub=password
 	vault kv put secret/sub/demo foo=bar user=user password=password
 	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
+
+	vault secrets enable -path secret_2 -version=2 kv
+	vault kv put secret_2/demo foo=bar
+	vault kv put secret_2/sub sub=password
+	vault kv put secret_2/sub/demo foo=bar user=user password=password
+	vault kv put secret_2/sub/sub2/demo foo=bar user=user password=password
 
 .PHONY: kill
 kill:

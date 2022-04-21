@@ -75,7 +75,8 @@ secret/
 You can list all secrets recursively by running:
 
 ```bash
-vkv --path secret
+$> vkv --path secret
+secret
 secret/demo
         foo=***
 secret/sub
@@ -93,7 +94,8 @@ secret/sub/sub2/demo
 You can also specifiy a specific subpaths:
 
 ```bash
-vkv --path secret/sub/sub2
+$> vkv --path secret/sub/sub2
+secret/sub/sub2/
 secret/sub/sub2/demo
         foo=***
         password=********
@@ -103,8 +105,9 @@ secret/sub/sub2/demo
 and list as much paths as you want:
 
 ```bash
-# comma separated and no spaces!
-vkv -p secret,secret2
+# or as comma separated with no spaces!
+$> vkv -p secret -p secret2
+secret
 secret/demo
         foo=***
 secret/sub
@@ -117,8 +120,19 @@ secret/sub/sub2/demo
         foo=***
         password=********
         user=****
-secret2/demo
-        user=********
+secret_2
+secret_2/demo
+        foo=***
+secret_2/sub
+        sub=********
+secret_2/sub/demo
+        foo=***
+        password=********
+        user=****
+secret_2/sub/sub2/demo
+        foo=***
+        password=********
+        user=****
 ```
 
 ## Modifying
@@ -126,7 +140,8 @@ secret2/demo
 We can receive only the paths by running
 
 ```bash
-vkv  -p secret --only-paths
+$> vkv  -p secret --only-paths
+secret
 secret/demo
 secret/sub
 secret/sub/demo
@@ -137,7 +152,8 @@ secret/sub/sub2/demo
 If we want to know just the keys in every directory we can run
 
 ```bash
-vkv -p secret --only-keys
+$> vkv -p secret --only-keys
+secret
 secret/demo
         foo
 secret/sub
@@ -156,7 +172,8 @@ secret/sub/sub2/demo
 Per default values are masked. Using `--show-values` shows the values. **Use with Caution**
 
 ```bash
-vkv -p secret --show-values
+$> vkv -p secret --show-values
+secret
 secret/demo
         foo=bar
 secret/sub
@@ -176,7 +193,7 @@ secret/sub/sub2/demo
 You can print out the entries in `export key=value` format for further processing:
 
 ```bash
-vkv --path secret/sub/sub2 --format=export
+$> vkv --path secret/sub/sub2 --format=export
 export foo=secret1
 export password=secret2
 export user=secret3
@@ -193,43 +210,29 @@ echo $foo
 
 ## markdown (`--format=markdown` | `VKV_FORMAT=markdown`)
 ```bash
-vkv -p secret --format=markdown
+vkv -p secret -p secret_2 --format=markdown
 ```
 
 returns:
 
-|        PATHS         |   KEYS   |  VALUES  |
-|----------------------|----------|----------|
-| secret/demo          | foo      | ***      |
-| secret/sub           | sub      | ******** |
-| secret/sub/demo      | foo      | ***      |
-|                      | password | ******** |
-|                      | user     | ****     |
-| secret/sub/sub2/demo | foo      | ***      |
-|                      | password | ******** |
-|                      | user     | ****     |
-
-In combination with:
-
-`--only-paths`:
-|        PATHS         |
-|----------------------|
-| secret/demo          |
-| secret/sub           |
-| secret/sub/demo      |
-| secret/sub/sub2/demo |
-
-`--only-keys`:
-|        PATHS         |   KEYS   |
-|----------------------|----------|
-| secret/demo          | foo      |
-| secret/sub           | sub      |
-| secret/sub/demo      | foo      |
-|                      | password |
-|                      | user     |
-| secret/sub/sub2/demo | user     |
-|                      | foo      |
-|                      | password |
+|  MOUNT   |         PATHS          |   KEYS   |  VALUES  |
+|----------|------------------------|----------|----------|
+| secret   | secret/demo            | foo      | ***      |
+|          | secret/sub             | sub      | ******** |
+|          | secret/sub/demo        | foo      | ***      |
+|          |                        | password | ******** |
+|          |                        | user     | ****     |
+|          | secret/sub/sub2/demo   | foo      | ***      |
+|          |                        | password | ******** |
+|          |                        | user     | ****     |
+| secret_2 | secret_2/demo          | foo      | ***      |
+|          | secret_2/sub           | sub      | ******** |
+|          | secret_2/sub/demo      | foo      | ***      |
+|          |                        | password | ******** |
+|          |                        | user     | ****     |
+|          | secret_2/sub/sub2/demo | foo      | ***      |
+|          |                        | password | ******** |
+|          |                        | user     | ****     |
 
 
 ### json (`--format=json` | `VKV_FORMAT=json`)
@@ -241,21 +244,23 @@ vkv -p secret --show-values --format=json
 
 ```json
 {
-  "secret/demo": {
-    "foo": "bar"
-  },
-  "secret/sub": {
-    "sub": "password"
-  },
-  "secret/sub/demo": {
-    "foo": "bar",
-    "password": "password",
-    "user": "user"
-  },
-  "secret/sub/sub2/demo": {
-    "foo": "bar",
-    "password": "password",
-    "user": "user"
+  "secret": {
+    "secret/demo": {
+      "foo": "bar"
+    },
+    "secret/sub": {
+      "sub": "password"
+    },
+    "secret/sub/demo": {
+      "foo": "bar",
+      "password": "password",
+      "user": "user"
+    },
+    "secret/sub/sub2/demo": {
+      "foo": "bar",
+      "password": "password",
+      "user": "user"
+    }
   }
 }
 ```
@@ -268,18 +273,19 @@ vkv --path secret --show-values --format=yaml
 ```
 
 ```yaml
-secret/demo:
-  foo: bar
-secret/sub:
-  sub: password
-secret/sub/demo:
-  foo: bar
-  password: password
-  user: user
-secret/sub/sub2/demo:
-  foo: bar
-  password: password
-  user: user
+secret:
+  secret/demo:
+    foo: bar
+  secret/sub:
+    sub: password
+  secret/sub/demo:
+    foo: bar
+    password: password
+    user: user
+  secret/sub/sub2/demo:
+    foo: bar
+    password: password
+    user: user
 ```
 
 # Acknowledgements / Similar tools

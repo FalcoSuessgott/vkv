@@ -75,6 +75,30 @@ func TestSplitPath(t *testing.T) {
 	}
 }
 
+func TestToMapStringInterface(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    interface{}
+		expected map[string]interface{}
+	}{
+		{
+			name: "test: normal map",
+			input: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": false},
+			},
+			expected: map[string]interface{}{
+				"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				"key_2": map[string]interface{}{"key": false},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expected, ToMapStringInterface(tc.input), tc.name)
+	}
+}
+
 func TestSort(t *testing.T) {
 	testCases := []struct {
 		name       string

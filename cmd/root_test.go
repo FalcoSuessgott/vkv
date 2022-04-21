@@ -98,6 +98,11 @@ func TestValidateFlags(t *testing.T) {
 			err:  true,
 			args: []string{"--only-paths", "--show-values"},
 		},
+		{
+			name: "test: no paths",
+			err:  false,
+			args: []string{"--path", ""},
+		},
 	}
 
 	for _, tc := range testCases {

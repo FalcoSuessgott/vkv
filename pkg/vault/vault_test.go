@@ -297,7 +297,7 @@ func (s *VaultSuite) TestListRecursive() {
 		subPath  string
 		err      bool
 		secrets  map[string]interface{}
-		expected map[string]interface{}
+		expected Secrets
 	}{
 		{
 			name:     "test: simple secret",
@@ -348,14 +348,16 @@ func (s *VaultSuite) TestListRecursive() {
 			}
 		}
 
+		secrets := Secrets{}
+
 		// read them, expect the exact same secrets as written before
-		err := s.v.ListRecursive(tc.rootPath, tc.subPath)
+		err := secrets.ListRecursive(s.v, tc.rootPath, tc.subPath)
 
 		if tc.err {
 			assert.Error(s.Suite.T(), err)
 		} else {
 			assert.NoError(s.Suite.T(), err)
-			assert.Equal(s.Suite.T(), tc.expected, s.v.Secrets, tc.name)
+			assert.Equal(s.Suite.T(), tc.expected, secrets, tc.name)
 		}
 
 		// disable kv engine, expect no error

@@ -61,25 +61,30 @@ func newRootCmd(version string) *cobra.Command {
 				return err
 			}
 
-			if len(o.Paths) == 0 {
-				return fmt.Errorf("no paths specified")
-			}
+			m := map[string]interface{}{}
 
 			for _, p := range o.Paths {
-				if err := v.ListRecursive(utils.SplitPath(p)); err != nil {
-					return err
+				s := &vault.Secrets{}
+
+				rootPath, subPath := utils.SplitPath(p)
+				if err := s.ListRecursive(v, rootPath, subPath); err != nil {
+					fmt.Printf("[ERROR] %s\n", err)
+
+					continue
 				}
+
+				m[p] = (*s)
 			}
 
 			printer := printer.NewPrinter(
 				printer.OnlyKeys(o.OnlyKeys),
 				printer.OnlyPaths(o.OnlyPaths),
 				printer.CustomValueLength(o.MaxValueLength),
-				printer.ShowSecrets(o.ShowValues),
+				printer.ShowValues(o.ShowValues),
 				printer.ToFormat(o.outputFormat),
 			)
 
-			if err := printer.Out(v.Secrets); err != nil {
+			if err := printer.Out(m); err != nil {
 				return err
 			}
 
@@ -139,6 +144,8 @@ func (o *Options) validateFlags() error {
 		default:
 			return printer.ErrInvalidFormat
 		}
+	case len(o.Paths) == 0, o.Paths[0] == "":
+		return fmt.Errorf("no paths specified")
 	}
 
 	return nil

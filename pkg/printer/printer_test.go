@@ -49,12 +49,13 @@ func TestMaskSecrets(t *testing.T) {
 	for _, tc := range testCases {
 		p := NewPrinter(tc.options...)
 
-		p.maskSecrets(tc.input)
+		p.maskValues(tc.input)
 
 		assert.Equal(t, tc.output, tc.input, tc.name)
 	}
 }
 
+//nolint: lll
 func TestPrint(t *testing.T) {
 	testCases := []struct {
 		name   string
@@ -65,14 +66,47 @@ func TestPrint(t *testing.T) {
 		{
 			name: "test: default opions",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(Base),
-				ShowSecrets(false),
+				ShowValues(false),
 			},
-			output: `key_1
+			output: `secret
+key_1
+	key=*****
+	user=********
+key_2
+	key=**
+`,
+		},
+		{
+			name: "test: default opions multiple paths",
+			s: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
+				"secret_2": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
+			},
+			opts: []Option{
+				ToFormat(Base),
+				ShowValues(false),
+			},
+			output: `secret
+key_1
+	key=*****
+	user=********
+key_2
+	key=**
+secret_2
+key_1
 	key=*****
 	user=********
 key_2
@@ -82,14 +116,17 @@ key_2
 		{
 			name: "test: show secrets",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(Base),
-				ShowSecrets(true),
+				ShowValues(true),
 			},
-			output: `key_1
+			output: `secret
+key_1
 	key=value
 	user=password
 key_2
@@ -99,30 +136,36 @@ key_2
 		{
 			name: "test: only paths",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(Base),
 				OnlyPaths(true),
-				ShowSecrets(true),
+				ShowValues(true),
 			},
-			output: `key_1
+			output: `secret
+key_1
 key_2
 `,
 		},
 		{
 			name: "test: only keys",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(Base),
 				OnlyKeys(true),
-				ShowSecrets(true),
+				ShowValues(true),
 			},
-			output: `key_1
+			output: `secret
+key_1
 	key
 	user
 key_2
@@ -132,60 +175,70 @@ key_2
 		{
 			name: "test: normal map to json",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(JSON),
-				ShowSecrets(true),
+				ShowValues(true),
 			},
-			output: "{\n  \"key_1\": {\n    \"key\": \"value\",\n    \"user\": \"password\"\n  },\n  \"key_2\": {\n    \"key\": 12\n  }\n}",
+			output: "{\n  \"secrets\": {\n    \"key_1\": {\n      \"key\": \"value\",\n      \"user\": \"password\"\n    },\n    \"key_2\": {\n      \"key\": 12\n    }\n  }\n}",
 		},
 		{
 			name: "test: normal map to json only keys",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(JSON),
 				OnlyKeys(true),
 			},
-			output: "{\n  \"key_1\": {\n    \"key\": \"\",\n    \"user\": \"\"\n  },\n  \"key_2\": {\n    \"key\": \"\"\n  }\n}",
+			output: "{\n  \"secrets\": {\n    \"key_1\": {\n      \"key\": \"\",\n      \"user\": \"\"\n    },\n    \"key_2\": {\n      \"key\": \"\"\n    }\n  }\n}",
 		},
 		{
 			name: "test: normal map to yaml",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(YAML),
-				ShowSecrets(true),
+				ShowValues(true),
 			},
-			output: "key_1:\n  key: value\n  user: password\nkey_2:\n  key: 12\n",
+			output: "secrets:\n  key_1:\n    key: value\n    user: password\n  key_2:\n    key: 12\n",
 		},
 		{
 			name: "test: normal map to yaml only keys",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(YAML),
 				OnlyKeys(true),
 			},
-			output: "key_1:\n  key: \"\"\n  user: \"\"\nkey_2:\n  key: \"\"\n",
+			output: "secrets:\n  key_1:\n    key: \"\"\n    user: \"\"\n  key_2:\n    key: \"\"\n",
 		},
 		{
 			name: "test: export format",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(Export),
-				ShowSecrets(true),
+				ShowValues(true),
 			},
 			output: "export key=\"value\"\nexport user=\"password\"\nexport key=\"12\"\n",
 		},
@@ -200,24 +253,43 @@ key_2
 		{
 			name: "test: markdown",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(Markdown),
 			},
-			output: "| PATHS | KEYS |  VALUES  |\n|-------|------|----------|\n| key_1 | key  | *****    |\n|       | user | ******** |\n| key_2 | key  | **       |\n",
+			output: "|  MOUNT  | PATHS | KEYS |  VALUES  |\n|---------|-------|------|----------|\n| secrets | key_1 | key  | *****    |\n|         |       | user | ******** |\n|         | key_2 | key  | **       |\n",
 		},
 		{
-			name: "test: markdown",
+			name: "test: markdown only keys",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				ToFormat(Markdown),
+				OnlyKeys(true),
 			},
-			output: "| PATHS | KEYS |  VALUES  |\n|-------|------|----------|\n| key_1 | key  | *****    |\n|       | user | ******** |\n| key_2 | key  | **       |\n",
+			output: "|  MOUNT  | PATHS | KEYS |\n|---------|-------|------|\n| secrets | key_1 | key  |\n|         |       | user |\n|         | key_2 | key  |\n",
+		},
+		{
+			name: "test: markdown only paths",
+			s: map[string]interface{}{
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
+			},
+			opts: []Option{
+				ToFormat(Markdown),
+				OnlyPaths(true),
+			},
+			output: "|  MOUNT  | PATHS |\n|---------|-------|\n| secrets | key_1 |\n|         | key_2 |\n",
 		},
 	}
 
@@ -242,33 +314,39 @@ func TestMarkdownHeader(t *testing.T) {
 		{
 			name: "default",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts:     []Option{},
-			expected: []string{"paths", "keys", "values"},
+			expected: []string{"mount", "paths", "keys", "values"},
 		},
 		{
 			name: "only paths",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				OnlyPaths(true),
 			},
-			expected: []string{"paths"},
+			expected: []string{"mount", "paths"},
 		},
 		{
 			name: "only keys",
 			s: map[string]interface{}{
-				"key_1": map[string]interface{}{"key": "value", "user": "password"},
-				"key_2": map[string]interface{}{"key": 12},
+				"secret": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
 			},
 			opts: []Option{
 				OnlyKeys(true),
 			},
-			expected: []string{"paths", "keys"},
+			expected: []string{"mount", "paths", "keys"},
 		},
 	}
 
