@@ -187,7 +187,7 @@ key_2
 				ToFormat(Export),
 				ShowSecrets(true),
 			},
-			output: "export key=value\nexport user=password\nexport key=12\n",
+			output: "export key=\"value\"\nexport user=\"password\"\nexport key=\"12\"\n",
 		},
 		{
 			name: "test: empty export",

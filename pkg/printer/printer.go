@@ -156,7 +156,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 			}
 
 			for _, k := range utils.SortMapKeys(m) {
-				fmt.Fprintf(p.writer, "export %s=%v\n", k, m[k])
+				fmt.Fprintf(p.writer, "export %s=\"%v\"\n", k, m[k])
 			}
 		}
 	case Markdown:
