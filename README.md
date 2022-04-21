@@ -31,7 +31,7 @@ For examples see the [Examples](https://github.com/FalcoSuessgott/vkv#examples)
 Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](https://github.com/FalcoSuessgott/vkv/releases) section.
 
 # Supported OS and Vault Versions
-`vkv` is being tested on `Windows`, `MacOS` and `Ubuntu` and also against Vault Version < `v1.8.0` (but it also may work with lower versions).
+`vkv` is being tested on `Windows`, `MacOS` and `Linux` and also against Vault Version < `v1.8.0` (but it also may work with lower versions).
 
 # Authentication
 `vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.
