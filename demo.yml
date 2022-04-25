@@ -9,8 +9,8 @@ config:
     VAULT_ADDR: "http://127.0.0.1:8200"
     VAULT_SKIP_VERIFY: "true"
     recording: true
-  cols: 239
-  rows: 22
+  cols: 100
+  rows: 20
   repeat: 0
   quality: 100
   frameDelay: auto
@@ -32,7 +32,7 @@ config:
       opacity: 0.9
   cursorStyle: block
   fontFamily: "Monaco, Lucida Console, Ubuntu Mono, Monospace"
-  fontSize: 12
+  fontSize: 16
   lineHeight: 1
   letterSpacing: 0
   theme:
@@ -58,261 +58,267 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 799
+  - delay: 823
     content: "\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 385
+  - delay: 412
     content: v
-  - delay: 183
+  - delay: 191
     content: a
-  - delay: 88
+  - delay: 81
     content: u
-  - delay: 173
+  - delay: 184
     content: l
-  - delay: 73
+  - delay: 68
     content: t
-  - delay: 115
+  - delay: 122
     content: ' '
-  - delay: 41
-    content: l
-  - delay: 159
-    content: o
   - delay: 55
+    content: l
+  - delay: 162
+    content: o
+  - delay: 78
     content: g
-  - delay: 137
+  - delay: 105
     content: i
-  - delay: 38
+  - delay: 74
     content: 'n'
-  - delay: 362
+  - delay: 220
     content: "\r\n"
-  - delay: 66
+  - delay: 47
     content: 'Token (will be hidden): '
-  - delay: 926
+  - delay: 1205
     content: "\r\n"
-  - delay: 5
+  - delay: 7
     content: "\e[93mWARNING! The VAULT_TOKEN environment variable is set! This takes precedence\r\nover the value set by this command. To use the value set by this command,\r\nunset the VAULT_TOKEN environment variable or set it to the token displayed\r\nbelow.\r\n\e[0m\r\n\e[0mSuccess! You are now authenticated. The token information displayed below\r\nis already stored in the token helper. You do NOT need to run \"vault login\"\r\nagain. Future Vault requests will automatically use this token.\r\n\e[0m\r\n\e[0mKey                  Value\r\n---                  -----\r\ntoken                root\r\ntoken_accessor       hl0fRP0zr6fZXQhLLD9RsEFM\r\ntoken_duration       ∞\r\ntoken_renewable      false\r\ntoken_policies       [\"root\"]\r\nidentity_policies    []\r\npolicies             [\"root\"]\e[0m\r\n"
-  - delay: 9
+  - delay: 7
     content: "\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 1369
+  - delay: 771
     content: v
-  - delay: 112
+  - delay: 136
     content: k
-  - delay: 71
+  - delay: 72
     content: v
   - delay: 130
     content: ' '
-  - delay: 92
+  - delay: 239
     content: '-'
-  - delay: 199
+  - delay: 201
     content: p
-  - delay: 128
+  - delay: 101
     content: ' '
-  - delay: 107
+  - delay: 138
     content: s
-  - delay: 165
+  - delay: 144
     content: e
-  - delay: 232
+  - delay: 224
     content: c
+  - delay: 144
+    content: r
   - delay: 184
-    content: r
-  - delay: 163
     content: e
-  - delay: 152
+  - delay: 112
     content: t
-  - delay: 178
+  - delay: 224
     content: "\r\n"
-  - delay: 26
+  - delay: 30
     content: "secret/\r\n├── demo\r\n│   └── foo=***\r\n├── sub\r\n│   └── sub=********\r\n├── sub/\r\n│   └── demo\r\n│       ├── demo=***********\r\n│       ├── password=******\r\n│       └── user=*****\r\n└── sub/\r\n    └── sub2/\r\n        └── demo\r\n            ├── user=************\r\n            └── value=*********\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 1587
+  - delay: 830
     content: vkv -p secret
-  - delay: 344
+  - delay: 276
     content: ' '
-  - delay: 144
+  - delay: 153
     content: '-'
-  - delay: 183
+  - delay: 166
     content: f
-  - delay: 465
+  - delay: 119
     content: o
-  - delay: 471
-    content: "\b\e[K"
-  - delay: 368
-    content: '='
-  - delay: 513
-    content: e
-  - delay: 207
-    content: x
-  - delay: 65
-    content: p
-  - delay: 38
-    content: o
-  - delay: 114
+  - delay: 94
     content: r
-  - delay: 111
-    content: t
-  - delay: 170
-    content: "\r\n"
-  - delay: 27
-    content: "export foo=\"bar\"\r\nexport sub=\"password\"\r\nexport demo=\"hello world\"\r\nexport password=\"s3cre5\"\r\nexport user=\"admin\"\r\nexport user=\"databasepassword=secret2\"\r\nexport value=\"nevermind\"\r\n"
-  - delay: 6
-    content: "\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 444
-    content: vkv -p secret -f=export
-  - delay: 504
-    content: "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-  - delay: 121
-    content: "\e[1@e"
-  - delay: 204
-    content: "\e[C\e[1@v\b"
-  - delay: 160
-    content: "\e[1@a"
+  - delay: 448
+    content: "\b\e[K"
+  - delay: 241
+    content: "\b\e[K"
+  - delay: 289
+    content: '='
+  - delay: 281
+    content: e
+  - delay: 191
+    content: x
+  - delay: 77
+    content: p
+  - delay: 59
+    content: o
+  - delay: 71
+    content: r
   - delay: 120
-    content: "\e[1@l"
-  - delay: 88
-    content: "\e[1@ "
-  - delay: 227
-    content: "\e[1@$"
-  - delay: 145
-    content: "\e[1@("
-  - delay: 263
-    content: "\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C"
-  - delay: 295
-    content: )
-  - delay: 291
+    content: t
+  - delay: 154
     content: "\r\n"
-  - delay: 18
-    content: "\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 404
-    content: e
-  - delay: 183
-    content: c
-  - delay: 103
-    content: h
-  - delay: 63
-    content: o
-  - delay: 115
-    content: ' '
-  - delay: 216
-    content: $
-  - delay: 215
-    content: d
-  - delay: 128
-    content: e
-  - delay: 87
-    content: m
-  - delay: 64
-    content: o
-  - delay: 282
-    content: "\r\nhello world\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 632
-    content: echo $demo
-  - delay: 240
-    content: "\b\b\b\b\b\b\b\b\bval $(vkv -p secret -f=export)"
-  - delay: 480
-    content: "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[8Pvkv -p secret -f=export"
-  - delay: 784
-    content: "\b\e[K"
+  - delay: 28
+    content: "export foo=\"bar\"\r\nexport sub=\"password\"\r\nexport demo=\"hello world\"\r\nexport password=\"s3cre5\"\r\nexport user=\"admin\"\r\nexport user=\"databasepassword=secret2\"\r\nexport value=\"nevermind\"\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
+  - delay: 524
+    content: vkv -p secret -f=export
+  - delay: 262
+    content: "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
   - delay: 223
-    content: "\b\e[K"
-  - delay: 169
-    content: "\b\e[K"
+    content: "\e[1@e"
+  - delay: 170
+    content: "\e[C\e[1@v\b"
+  - delay: 192
+    content: "\e[1@a"
+  - delay: 119
+    content: "\e[1@l"
+  - delay: 80
+    content: "\e[1@ "
+  - delay: 192
+    content: "\e[1@$"
   - delay: 144
-    content: "\b\e[K"
-  - delay: 149
-    content: "\b\e[K"
-  - delay: 219
-    content: "\b\e[K"
-  - delay: 264
-    content: j
-  - delay: 104
-    content: s
-  - delay: 56
-    content: o
-  - delay: 108
-    content: 'n'
-  - delay: 44
-    content: ' '
-  - delay: 240
-    content: '|'
-  - delay: 124
-    content: ' '
-  - delay: 267
-    content: j
-  - delay: 79
-    content: q
-  - delay: 106
-    content: ' '
-  - delay: 111
-    content: .
-  - delay: 330
+    content: "\e[1@("
+  - delay: 262
+    content: "\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C"
+  - delay: 274
+    content: )
+  - delay: 235
     content: "\r\n"
-  - delay: 64
+  - delay: 23
+    content: "\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
+  - delay: 414
+    content: e
+  - delay: 208
+    content: c
+  - delay: 104
+    content: h
+  - delay: 54
+    content: o
+  - delay: 88
+    content: ' '
+  - delay: 226
+    content: $
+  - delay: 240
+    content: d
+  - delay: 102
+    content: e
+  - delay: 130
+    content: m
+  - delay: 30
+    content: o
+  - delay: 321
+    content: "\r\nhello world\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
+  - delay: 904
+    content: echo $demo
+  - delay: 377
+    content: "\b\b\b\b\b\b\b\b\bval $(vkv -p secret -f=export)"
+  - delay: 783
+    content: "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\e[8Pvkv -p secret -f=export"
+  - delay: 392
+    content: "\b\e[K"
+  - delay: 224
+    content: "\b\e[K"
+  - delay: 184
+    content: "\b\e[K"
+  - delay: 143
+    content: "\b\e[K"
+  - delay: 162
+    content: "\b\e[K"
+  - delay: 256
+    content: "\b\e[K"
+  - delay: 207
+    content: j
+  - delay: 160
+    content: s
+  - delay: 136
+    content: o
+  - delay: 61
+    content: 'n'
+  - delay: 121
+    content: ' '
+  - delay: 730
+    content: '|'
+  - delay: 109
+    content: ' '
+  - delay: 146
+    content: j
+  - delay: 120
+    content: q
+  - delay: 78
+    content: ' '
+  - delay: 161
+    content: .
+  - delay: 222
+    content: "\r\n"
+  - delay: 40
     content: "\e[1;39m{\r\n  \e[0m\e[34;1m\"secret\"\e[0m\e[1;39m: \e[0m\e[1;39m{\r\n    \e[0m\e[34;1m\"secret/demo\"\e[0m\e[1;39m: \e[0m\e[1;39m{\r\n      \e[0m\e[34;1m\"foo\"\e[0m\e[1;39m: \e[0m\e[0;32m\"***\"\e[0m\e[1;39m\r\n    \e[1;39m}\e[0m\e[1;39m,\r\n    \e[0m\e[34;1m\"secret/sub\"\e[0m\e[1;39m: \e[0m\e[1;39m{\r\n      \e[0m\e[34;1m\"sub\"\e[0m\e[1;39m: \e[0m\e[0;32m\"********\"\e[0m\e[1;39m\r\n    \e[1;39m}\e[0m\e[1;39m,\r\n    \e[0m\e[34;1m\"secret/sub/demo\"\e[0m\e[1;39m: \e[0m\e[1;39m{\r\n      \e[0m\e[34;1m\"demo\"\e[0m\e[1;39m: \e[0m\e[0;32m\"***********\"\e[0m\e[1;39m,\r\n      \e[0m\e[34;1m\"password\"\e[0m\e[1;39m: \e[0m\e[0;32m\"******\"\e[0m\e[1;39m,\r\n      \e[0m\e[34;1m\"user\"\e[0m\e[1;39m: \e[0m\e[0;32m\"*****\"\e[0m\e[1;39m\r\n    \e[1;39m}\e[0m\e[1;39m,\r\n    \e[0m\e[34;1m\"secret/sub/sub2/demo\"\e[0m\e[1;39m: \e[0m\e[1;39m{\r\n      \e[0m\e[34;1m\"user\"\e[0m\e[1;39m: \e[0m\e[0;32m\"************\"\e[0m\e[1;39m,\r\n      \e[0m\e[34;1m\"value\"\e[0m\e[1;39m: \e[0m\e[0;32m\"*********\"\e[0m\e[1;39m\r\n    \e[1;39m}\e[0m\e[1;39m\r\n  \e[1;39m}\e[0m\e[1;39m\r\n\e[1;39m}\e[0m\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 479
+  - delay: 508
     content: vkv -p secret -f=json | jq .
-  - delay: 551
+  - delay: 759
     content: "\b\e[K"
-  - delay: 498
+  - delay: 499
     content: "\b\e[K"
-  - delay: 33
+  - delay: 30
+    content: "\b\e[K"
+  - delay: 32
+    content: "\b\e[K"
+  - delay: 31
     content: "\b\e[K"
   - delay: 28
     content: "\b\e[K"
-  - delay: 29
-    content: "\b\e[K"
   - delay: 31
     content: "\b\e[K"
-  - delay: 31
+  - delay: 142
     content: "\b\e[K"
-  - delay: 191
-    content: "\b\e[K"
-  - delay: 200
+  - delay: 216
     content: "\b\e[K"
   - delay: 176
     content: "\b\e[K"
-  - delay: 151
-    content: "\b\e[K"
-  - delay: 89
+  - delay: 159
     content: 'y'
-  - delay: 183
+  - delay: 280
+    content: "\b\e[K"
+  - delay: 199
+    content: "\b\e[K"
+  - delay: 88
+    content: 'y'
+  - delay: 177
     content: a
-  - delay: 86
+  - delay: 87
     content: m
-  - delay: 83
+  - delay: 55
     content: l
-  - delay: 360
+  - delay: 305
     content: "\r\n"
-  - delay: 27
+  - delay: 35
     content: "secret:\r\n  secret/demo:\r\n    foo: '***'\r\n  secret/sub:\r\n    sub: '********'\r\n  secret/sub/demo:\r\n    demo: '***********'\r\n    password: '******'\r\n    user: '*****'\r\n  secret/sub/sub2/demo:\r\n    user: '************'\r\n    value: '*********'\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 353
+  - delay: 537
     content: vkv -p secret -f=yaml
-  - delay: 340
+  - delay: 833
     content: "\b\e[K"
-  - delay: 175
+  - delay: 183
     content: "\b\e[K"
-  - delay: 176
+  - delay: 166
     content: "\b\e[K"
-  - delay: 223
+  - delay: 160
     content: "\b\e[K"
-  - delay: 192
+  - delay: 178
     content: m
-  - delay: 112
+  - delay: 104
     content: a
-  - delay: 175
+  - delay: 351
     content: r
-  - delay: 138
+  - delay: 145
     content: k
-  - delay: 87
+  - delay: 119
     content: d
-  - delay: 152
+  - delay: 113
     content: o
-  - delay: 87
+  - delay: 103
     content: w
-  - delay: 105
+  - delay: 97
     content: 'n'
-  - delay: 241
+  - delay: 272
     content: "\r\n"
-  - delay: 20
+  - delay: 25
     content: "| MOUNT  |        PATHS         |   KEYS   |    VALUES    |\r\n|--------|----------------------|----------|--------------|\r\n| secret | secret/demo          | foo      | ***          |\r\n|        | secret/sub           | sub      | ********     |\r\n|        | secret/sub/demo      | demo     | ***********  |\r\n|        |                      | password | ******       |\r\n|        |                      | user     | *****        |\r\n|        | secret/sub/sub2/demo | user     | ************ |\r\n|        |                      | value    | *********    |\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 926
+  - delay: 852
     content: "^C\r\n\e]0;morelly_t1@sva-tm:~/git/github/vkv\amorelly_t1@sva-tm:~/git/github/vkv$ "
-  - delay: 317
+  - delay: 328
     content: "logout\r\n"
