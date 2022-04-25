@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/disiqueira/gotree/v3"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -119,7 +120,7 @@ func NewPrinter(opts ...Option) *Printer {
 }
 
 // Out prints out the secrets according all configured options.
-//nolint:cyclop
+//nolint:cyclop,gocognit
 func (p *Printer) Out(secrets map[string]interface{}) error {
 	for k, v := range secrets {
 		if !p.showValues {
@@ -176,19 +177,51 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		table.Render()
 	case Base:
 		for _, k := range utils.SortMapKeys(secrets) {
-			fmt.Fprintf(p.writer, "%s\n", k)
+			tree := gotree.New(k + utils.Delimiter)
 			m := utils.ToMapStringInterface(secrets[k])
 
 			for _, i := range utils.SortMapKeys(m) {
-				fmt.Fprintf(p.writer, "%s\n", i)
-				p.printSecrets(utils.ToMapStringInterface(m[i]))
+				subMap, ok := m[i].(map[string]interface{})
+				if !ok {
+					log.Fatal("exiting")
+				}
+
+				// remove mount point of path
+				path := strings.Join(strings.Split(i, utils.Delimiter)[1:], utils.Delimiter)
+
+				tree.AddTree(p.printTree(path, subMap))
 			}
+
+			fmt.Fprint(p.writer, tree.Print())
 		}
 	default:
 		return ErrInvalidFormat
 	}
 
 	return nil
+}
+
+func (p *Printer) printTree(path string, m map[string]interface{}) gotree.Tree {
+	var tree gotree.Tree
+
+	parts := strings.Split(path, utils.Delimiter)
+	if len(parts) > 1 {
+		tree = gotree.New(parts[0] + utils.Delimiter)
+		tree.AddTree(p.printTree(strings.Join(parts[1:], utils.Delimiter), m))
+	} else {
+		tree = gotree.New(parts[0])
+		for _, k := range utils.SortMapKeys(m) {
+			if p.onlyKeys {
+				tree.Add(k)
+			}
+
+			if !p.onlyKeys && !p.onlyPaths {
+				tree.Add(fmt.Sprintf("%s=%v", k, m[k]))
+			}
+		}
+	}
+
+	return tree
 }
 
 func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, [][]string) {
@@ -288,16 +321,4 @@ func (p *Printer) maskValues(secrets map[string]interface{}) map[string]interfac
 	}
 
 	return res
-}
-
-func (p *Printer) printSecrets(s map[string]interface{}) {
-	for _, k := range utils.SortMapKeys(s) {
-		if p.onlyKeys {
-			fmt.Fprintf(p.writer, "\t%s\n", k)
-		}
-
-		if !p.onlyKeys && !p.onlyPaths {
-			fmt.Fprintf(p.writer, "\t%s=%v\n", k, s[k])
-		}
-	}
 }

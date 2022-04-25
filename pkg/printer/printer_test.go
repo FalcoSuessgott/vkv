@@ -75,13 +75,7 @@ func TestPrint(t *testing.T) {
 				ToFormat(Base),
 				ShowValues(false),
 			},
-			output: `secret
-key_1
-	key=*****
-	user=********
-key_2
-	key=**
-`,
+			output: "secret/\n├── \n│   ├── key=*****\n│   └── user=********\n└── \n    └── key=**\n",
 		},
 		{
 			name: "test: default opions multiple paths",
@@ -99,19 +93,7 @@ key_2
 				ToFormat(Base),
 				ShowValues(false),
 			},
-			output: `secret
-key_1
-	key=*****
-	user=********
-key_2
-	key=**
-secret_2
-key_1
-	key=*****
-	user=********
-key_2
-	key=**
-`,
+			output: "secret/\n├── \n│   ├── key=*****\n│   └── user=********\n└── \n    └── key=**\nsecret_2/\n├── \n│   ├── key=*****\n│   └── user=********\n└── \n    └── key=**\n",
 		},
 		{
 			name: "test: show secrets",
@@ -125,13 +107,7 @@ key_2
 				ToFormat(Base),
 				ShowValues(true),
 			},
-			output: `secret
-key_1
-	key=value
-	user=password
-key_2
-	key=12
-`,
+			output: "secret/\n├── \n│   ├── key=value\n│   └── user=password\n└── \n    └── key=12\n",
 		},
 		{
 			name: "test: only paths",
@@ -146,10 +122,7 @@ key_2
 				OnlyPaths(true),
 				ShowValues(true),
 			},
-			output: `secret
-key_1
-key_2
-`,
+			output: "secret/\n├── \n└── \n",
 		},
 		{
 			name: "test: only keys",
@@ -164,13 +137,7 @@ key_2
 				OnlyKeys(true),
 				ShowValues(true),
 			},
-			output: `secret
-key_1
-	key
-	user
-key_2
-	key
-`,
+			output: "secret/\n├── \n│   ├── key\n│   └── user\n└── \n    └── key\n",
 		},
 		{
 			name: "test: normal map to json",

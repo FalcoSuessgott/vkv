@@ -3,6 +3,7 @@ module github.com/FalcoSuessgott/vkv
 go 1.17
 
 require (
+	github.com/disiqueira/gotree/v3 v3.0.2
 	github.com/ghodss/yaml v1.0.0
 	github.com/hashicorp/vault/api v1.5.0
 	github.com/spf13/cobra v1.4.0
