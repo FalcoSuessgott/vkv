@@ -183,7 +183,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 			for _, i := range utils.SortMapKeys(m) {
 				subMap, ok := m[i].(map[string]interface{})
 				if !ok {
-					log.Fatal("exiting")
+					log.Fatalf("cannot convert %T to map[string]interface", m[i])
 				}
 
 				// remove mount point of path
