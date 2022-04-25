@@ -19,3 +19,4 @@ linters:
     - funlen
     - gomnd
     - containedctx
+    - ireturn

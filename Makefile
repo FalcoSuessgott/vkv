@@ -49,8 +49,8 @@ vault:
 	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
 	vault kv put secret/demo foo=bar
 	vault kv put secret/sub sub=password
-	vault kv put secret/sub/demo foo=bar user=user password=password
-	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
+	vault kv put secret/sub/demo demo="hello world" user=admin password=s3cre5
+	vault kv put secret/sub/sub2/demo value="nevermind" user="database" password=secret2
 
 	vault secrets enable -path secret_2 -version=2 kv
 	vault kv put secret_2/demo foo=bar
@@ -61,3 +61,8 @@ vault:
 .PHONY: kill
 kill:
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
+
+.PHONY: gif
+gif:
+	terminalizer record demo -k -c assets/config.yml
+	terminalizer render demo -o assets/demo.gif
