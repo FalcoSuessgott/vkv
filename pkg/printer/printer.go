@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/FalcoSuessgott/vkv/pkg/render"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/disiqueira/gotree/v3"
 	"github.com/olekukonko/tablewriter"
@@ -35,6 +36,9 @@ const (
 
 	// Markdown prints the secrets in markdowntable format.
 	Markdown
+
+	// Template renders a given template string or file.
+	Template
 )
 
 var (
@@ -55,6 +59,7 @@ type Printer struct {
 	onlyPaths   bool
 	showValues  bool
 	valueLength int
+	template    string
 }
 
 // CustomValueLength option for trimming down the output of secrets.
@@ -105,6 +110,28 @@ func ShowValues(b bool) Option {
 	}
 }
 
+// WithTemplate sets the template file.
+func WithTemplate(str, path string) Option {
+	return func(p *Printer) {
+		if str != "" {
+			p.template = str
+
+			return
+		}
+
+		if path != "" {
+			str, err := utils.ReadFile(path)
+			if err != nil {
+				log.Fatalf("error reading %s: %s", path, err.Error())
+			}
+
+			p.template = string(str)
+
+			return
+		}
+	}
+}
+
 // NewPrinter return a new printer struct.
 func NewPrinter(opts ...Option) *Printer {
 	p := &Printer{
@@ -144,6 +171,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
+
 	case JSON:
 		out, err := utils.ToJSON(secrets)
 		if err != nil {
@@ -151,19 +179,23 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		}
 
 		fmt.Fprintf(p.writer, "%s", string(out))
+
 	case Export:
-		for _, s := range utils.SortMapKeys(secrets) {
-			for _, v := range utils.ToMapStringInterface(secrets[s]) {
-				m, ok := v.(map[string]interface{})
+		for _, k := range utils.SortMapKeys(secrets) {
+			m := utils.ToMapStringInterface(secrets[k])
+
+			for _, i := range utils.SortMapKeys(m) {
+				subMap, ok := m[i].(map[string]interface{})
 				if !ok {
-					log.Fatalf("cannot convert %T to map[string]interface", secrets[s])
+					log.Fatalf("cannot convert %T to map[string]interface", m[i])
 				}
 
-				for _, k := range utils.SortMapKeys(m) {
-					fmt.Fprintf(p.writer, "export %s=\"%v\"\n", k, m[k])
+				for _, j := range utils.SortMapKeys(subMap) {
+					fmt.Fprintf(p.writer, "export %s=\"%v\"\n", j, subMap[j])
 				}
 			}
 		}
+
 	case Markdown:
 		headers, data := p.buildMarkdownTable(secrets)
 
@@ -172,9 +204,39 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
 		table.SetCenterSeparator("|")
 		table.AppendBulk(data)
-		// merge mounts and paths colunmn
-		table.SetAutoMergeCellsByColumnIndex([]int{0, 1})
+		table.SetAutoMergeCellsByColumnIndex([]int{0, 1}) // merge mounts and paths colunmn
 		table.Render()
+
+	case Template:
+		type entry struct {
+			Path, Key string
+			Value     interface{}
+		}
+
+		entries := []entry{}
+
+		for _, k := range utils.SortMapKeys(secrets) {
+			m := utils.ToMapStringInterface(secrets[k])
+
+			for _, i := range utils.SortMapKeys(m) {
+				subMap, ok := m[i].(map[string]interface{})
+				if !ok {
+					log.Fatalf("cannot convert %T to map[string]interface", m[i])
+				}
+
+				for _, j := range utils.SortMapKeys(subMap) {
+					entries = append(entries, entry{Path: i, Key: j, Value: subMap[j]})
+				}
+			}
+		}
+
+		output, err := render.String([]byte(p.template), entries)
+		if err != nil {
+			return err
+		}
+
+		fmt.Fprintln(p.writer, output.String())
+
 	case Base:
 		for _, k := range utils.SortMapKeys(secrets) {
 			tree := gotree.New(k + utils.Delimiter)

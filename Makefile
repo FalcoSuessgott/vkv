@@ -61,8 +61,3 @@ vault:
 .PHONY: kill
 kill:
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
-
-.PHONY: gif
-gif:
-	terminalizer record demo -k -c assets/config.yml
-	terminalizer render demo -o assets/demo.gif

@@ -1,8 +1,0 @@
-vault login
-vkv -p secret
-vkv -p secret --format=export
-eval $(vkv -p secret --format=export)
-echo $demo
-vkv -p secret --format=json | jq .
-vkv -p secret --format=json | yq .
-vkv -p secret --format=markdown

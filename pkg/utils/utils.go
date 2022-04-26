@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"sort"
 	"strings"
@@ -16,6 +17,16 @@ const (
 
 // Keys type for receiving all keys of a map.
 type Keys []string
+
+// ReadFile reads from a file.
+func ReadFile(path string) ([]byte, error) {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
+}
 
 // SplitPath splits a given path by / and returns the first element and the joined rest paths.
 func SplitPath(path string) (string, string) {

@@ -62,6 +62,7 @@ func TestPrint(t *testing.T) {
 		s      map[string]interface{}
 		opts   []Option
 		output string
+		err    bool
 	}{
 		{
 			name: "test: default opions",
@@ -200,14 +201,14 @@ func TestPrint(t *testing.T) {
 			s: map[string]interface{}{
 				"secrets": map[string]interface{}{
 					"key_1": map[string]interface{}{"key": "value", "user": "password"},
-					"key_2": map[string]interface{}{"key": 12},
+					"key_2": map[string]interface{}{"password": 12},
 				},
 			},
 			opts: []Option{
 				ToFormat(Export),
 				ShowValues(true),
 			},
-			output: "export key=\"value\"\nexport user=\"password\"\nexport key=\"12\"\n",
+			output: "export key=\"value\"\nexport user=\"password\"\nexport password=\"12\"\n",
 		},
 		{
 			name: "test: empty export",
@@ -258,6 +259,69 @@ func TestPrint(t *testing.T) {
 			},
 			output: "|  MOUNT  | PATHS |\n|---------|-------|\n| secrets | key_1 |\n|         | key_2 |\n",
 		},
+		{
+			name: "test: markdown only paths",
+			s: map[string]interface{}{
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+					"key_2": map[string]interface{}{"key": 12},
+				},
+			},
+			opts: []Option{
+				ToFormat(Markdown),
+				OnlyPaths(true),
+			},
+			output: "|  MOUNT  | PATHS |\n|---------|-------|\n| secrets | key_1 |\n|         | key_2 |\n",
+		},
+		{
+			name: "test: template",
+			s: map[string]interface{}{
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				},
+			},
+			opts: []Option{
+				ToFormat(Template),
+				WithTemplate(`
+{{ range $entry := . }}
+{{ printf "%s:\t%s=%v\n" $entry.Path $entry.Key $entry.Value }}
+{{ end }}
+`, ""),
+			},
+			output: "\n\nkey_1:\tkey=*****\n\n\nkey_1:\tuser=********\n\n\n\n",
+		},
+		{
+			name: "test: template show values",
+			s: map[string]interface{}{
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				},
+			},
+			opts: []Option{
+				ToFormat(Template),
+				ShowValues(true),
+				WithTemplate(`
+{{ range $entry := . }}
+{{ printf "%s:\t%s=%v\n" $entry.Path $entry.Key $entry.Value }}
+{{ end }}
+`, ""),
+			},
+			output: "\n\nkey_1:\tkey=value\n\n\nkey_1:\tuser=password\n\n\n\n",
+		},
+		{
+			name: "test: template file show values",
+			s: map[string]interface{}{
+				"secrets": map[string]interface{}{
+					"key_1": map[string]interface{}{"key": "value", "user": "password"},
+				},
+			},
+			opts: []Option{
+				ToFormat(Template),
+				ShowValues(true),
+				WithTemplate("", "testdata/policies.tmpl"),
+			},
+			output: "\npath \"key_1/*\" {\n    capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\" ]\n}\n\npath \"key_1/*\" {\n    capabilities = [ \"create\", \"read\", \"update\", \"delete\", \"list\" ]\n}\n\n",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -266,7 +330,6 @@ func TestPrint(t *testing.T) {
 
 		p := NewPrinter(tc.opts...)
 		assert.NoError(t, p.Out(tc.s))
-
 		assert.Equal(t, tc.output, b.String(), tc.name)
 	}
 }
