@@ -27,6 +27,9 @@ type Options struct {
 	ShowValues     bool `env:"SHOW_VALUES"`
 	MaxValueLength int  `env:"MAX_VALUE_LENGTH" envDefault:"12"`
 
+	TemplateFile   string `env:"TEMPLATE_FILE"`
+	TemplateString string `env:"TEMPLATE_STRING"`
+
 	FormatString string `env:"FORMAT" envDefault:"base"`
 	outputFormat printer.OutputFormat
 
@@ -76,11 +79,16 @@ func newRootCmd(version string) *cobra.Command {
 				m[p] = (*s)
 			}
 
+			if len(m) == 0 {
+				return nil
+			}
+
 			printer := printer.NewPrinter(
 				printer.OnlyKeys(o.OnlyKeys),
 				printer.OnlyPaths(o.OnlyPaths),
 				printer.CustomValueLength(o.MaxValueLength),
 				printer.ShowValues(o.ShowValues),
+				printer.WithTemplate(o.TemplateString, o.TemplateFile),
 				printer.ToFormat(o.outputFormat),
 			)
 
@@ -104,8 +112,12 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
 		"(env var: VKV_MAX_VALUE_LENGTH)")
 
+	// Template
+	cmd.Flags().StringVar(&o.TemplateFile, "template-file", o.TemplateFile, "path to a file containing Go-template syntax to render the KV entries (env var: VKV_TEMPLATE_FILE)")
+	cmd.Flags().StringVar(&o.TemplateString, "template-string", o.TemplateString, "template string containting Go-template syntax to render KV entries (env var: VKV_TEMPLATE_STRING)")
+
 	// Output format
-	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "output format: \"base\", \"json\", \"yaml\", \"export\", \"nmarkdown\") "+
+	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "output format: \"base\", \"json\", \"yaml\", \"export\", \"markdown\", \"template\") "+
 		"(env var: VKV_FORMAT)")
 
 	// version
@@ -141,6 +153,16 @@ func (o *Options) validateFlags() error {
 			o.outputFormat = printer.Markdown
 		case "base":
 			o.outputFormat = printer.Base
+		case "template", "tmpl":
+			o.outputFormat = printer.Template
+
+			if o.TemplateFile != "" && o.TemplateString != "" {
+				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
+			}
+
+			if o.TemplateFile == "" && o.TemplateString == "" {
+				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
+			}
 		default:
 			return printer.ErrInvalidFormat
 		}

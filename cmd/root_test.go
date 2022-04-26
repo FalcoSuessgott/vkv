@@ -59,11 +59,24 @@ func TestOutputFormat(t *testing.T) {
 			format:   "base",
 			expected: printer.Base,
 		},
+		{
+			name:     "template",
+			err:      false,
+			format:   "template",
+			expected: printer.Template,
+		},
+		{
+			name:     "tmpl",
+			err:      false,
+			format:   "tmpl",
+			expected: printer.Template,
+		},
 	}
 
 	for _, tc := range testCases {
 		o := &Options{
 			FormatString: tc.format,
+			TemplateFile: "o", // needed for testing template format
 		}
 
 		err := o.validateFlags()
@@ -102,6 +115,26 @@ func TestValidateFlags(t *testing.T) {
 			name: "test: no paths",
 			err:  false,
 			args: []string{"--path", ""},
+		},
+		{
+			name: "test: template with file",
+			err:  false,
+			args: []string{"--format", "template", "--template-file", "OK"},
+		},
+		{
+			name: "test: template with string",
+			err:  false,
+			args: []string{"--format", "template", "--template-string", "OK"},
+		},
+		{
+			name: "test: template no file or string",
+			err:  true,
+			args: []string{"--format", "template"},
+		},
+		{
+			name: "test: template file and string",
+			err:  true,
+			args: []string{"--format", "template", "--template-string", "ok", "--template-file", "OK"},
 		},
 	}
 
@@ -203,6 +236,23 @@ func TestEnvVars(t *testing.T) {
 				MaxValueLength: 213,
 				Paths:          []string{"kv1", "kv2", "kv3"},
 				FormatString:   "base",
+			},
+		},
+		{
+			name: "show values and max value length",
+			err:  false,
+			envs: map[string]interface{}{
+				"VKV_PATHS":           "kv1,kv2,kv3",
+				"VKV_FORMAT":          "template",
+				"VKV_TEMPLATE_STRING": "string",
+				"VKV_TEMPLATE_FILE":   "path",
+			},
+			expected: &Options{
+				MaxValueLength: 12,
+				Paths:          []string{"kv1", "kv2", "kv3"},
+				FormatString:   "template",
+				TemplateFile:   "path",
+				TemplateString: "string",
 			},
 		},
 	}
