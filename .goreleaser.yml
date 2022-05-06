@@ -26,22 +26,24 @@ archives:
       - goos: windows
         format: zip
     replacements:
+      windows: Windows
       darwin: Darwin
       linux: Linux
       amd64: x86_64
 
 nfpms:
-  -
-    vendor: vkv
+  - builds:
+      - vkv
+    vendor: FalcoSuessgott
     homepage:  https://github.com/FalcoSuessgott/vkv
     maintainer: "Tom Morelly <tom-morelly@gmx.de"
-    description: "recursively list secrets from Vaults KV2 engine"
+    description: "recursively list secrets from Vaults KV2 engine in various formats"
     license: GPL-3.0
     formats:
       - apk
       - deb
       - rpm
-    bindir: /usr/local/bin
+    bindir: /usr/bin
 
 checksum:
   name_template: "checksums.txt"
