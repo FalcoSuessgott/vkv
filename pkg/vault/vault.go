@@ -81,7 +81,9 @@ func (s *Secrets) ListRecursive(v *Vault, rootPath, subPath string) error {
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
 			if err != nil {
-				return err
+				(*s)[path.Join(rootPath, subPath, k)] = map[string]interface{}{}
+
+				continue
 			}
 
 			(*s)[path.Join(rootPath, subPath, k)] = secrets
