@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/disiqueira/gotree/v3 v3.0.2
 	github.com/ghodss/yaml v1.0.0
-	github.com/hashicorp/vault/api v1.6.0
+	github.com/hashicorp/vault/api v1.7.1
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.2
 	github.com/testcontainers/testcontainers-go v0.13.0
@@ -71,7 +71,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/hashicorp/go-hclog v1.0.0 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.0 // indirect
-	github.com/hashicorp/go-secure-stdlib/parseutil v0.1.5 // indirect
+	github.com/hashicorp/go-secure-stdlib/parseutil v0.1.6 // indirect
 	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
 	github.com/hashicorp/go-version v1.3.0 // indirect
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
