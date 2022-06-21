@@ -6,7 +6,7 @@ require (
 	github.com/disiqueira/gotree/v3 v3.0.2
 	github.com/ghodss/yaml v1.0.0
 	github.com/hashicorp/vault/api v1.7.2
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.7.4
 	github.com/testcontainers/testcontainers-go v0.13.0
 )
