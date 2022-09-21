@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/disiqueira/gotree/v3 v3.0.2
 	github.com/ghodss/yaml v1.0.0
-	github.com/hashicorp/vault/api v1.7.2
+	github.com/hashicorp/vault/api v1.8.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
 	github.com/testcontainers/testcontainers-go v0.14.0
@@ -38,7 +38,7 @@ require (
 	github.com/hashicorp/go-uuid v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/vault/sdk v0.5.1 // indirect
+	github.com/hashicorp/vault/sdk v0.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
