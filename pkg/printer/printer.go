@@ -147,6 +147,7 @@ func NewPrinter(opts ...Option) *Printer {
 }
 
 // Out prints out the secrets according all configured options.
+//
 //nolint:cyclop,gocognit
 func (p *Printer) Out(secrets map[string]interface{}) error {
 	for k, v := range secrets {
@@ -223,7 +224,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 				if !ok {
 					log.Fatalf("cannot convert %T to map[string]interface", m[i])
 				}
-
+				
 				for _, j := range utils.SortMapKeys(subMap) {
 					entries = append(entries, entry{Path: i, Key: j, Value: subMap[j]})
 				}
@@ -239,7 +240,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 
 	case Base:
 		for _, k := range utils.SortMapKeys(secrets) {
-			tree := gotree.New(k + utils.Delimiter)
+			tree := gotree.New(k)
 			m := utils.ToMapStringInterface(secrets[k])
 
 			for _, i := range utils.SortMapKeys(m) {
@@ -248,10 +249,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 					log.Fatalf("cannot convert %T to map[string]interface", m[i])
 				}
 
-				// remove mount point of path
-				path := strings.Join(strings.Split(i, utils.Delimiter)[1:], utils.Delimiter)
-
-				tree.AddTree(p.printTree(path, subMap))
+				tree.AddTree(p.printTree(i, subMap))
 			}
 
 			fmt.Fprint(p.writer, tree.Print())
@@ -266,12 +264,20 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 func (p *Printer) printTree(path string, m map[string]interface{}) gotree.Tree {
 	var tree gotree.Tree
 
-	parts := strings.Split(path, utils.Delimiter)
-	if len(parts) > 1 {
-		tree = gotree.New(parts[0] + utils.Delimiter)
-		tree.AddTree(p.printTree(strings.Join(parts[1:], utils.Delimiter), m))
+	if strings.HasSuffix(path, utils.Delimiter) {
+		tree = gotree.New(path)
+
+		for _, i := range utils.SortMapKeys(m) {
+			subMap, ok := m[i].(map[string]interface{})
+			if !ok {
+				log.Fatalf("cannot convert %T to map[string]interface", m[i])
+			}
+
+			tree.AddTree(p.printTree(i, subMap))
+
+		}
 	} else {
-		tree = gotree.New(parts[0])
+		tree = gotree.New(path)
 		for _, k := range utils.SortMapKeys(m) {
 			if p.onlyKeys {
 				tree.Add(k)
@@ -298,22 +304,25 @@ func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, 
 				log.Fatalf("cannot convert %s to map[string]interface", secrets[s])
 			}
 
+			subPath := strings.Join(strings.Split(k, utils.Delimiter)[1:], utils.Delimiter)
+			mount := s + utils.Delimiter
+
 			//nolint: gocritic
 			if p.onlyPaths {
 				headers = []string{"mount", "paths"}
 
-				data = append(data, []string{s, k})
+				data = append(data, []string{mount, subPath})
 			} else if p.onlyKeys {
 				headers = []string{"mount", "paths", "keys"}
 
 				for _, j := range utils.SortMapKeys(m) {
-					data = append(data, []string{s, k, j})
+					data = append(data, []string{mount, subPath, j})
 				}
 			} else {
 				headers = []string{"mount", "paths", "keys", "values"}
 
 				for _, j := range utils.SortMapKeys(m) {
-					data = append(data, []string{s, k, j, fmt.Sprintf("%v", m[j])})
+					data = append(data, []string{mount, subPath, j, fmt.Sprintf("%v", m[j])})
 				}
 			}
 		}
@@ -327,15 +336,11 @@ func (p *Printer) printOnlykeys(secrets map[string]interface{}) map[string]inter
 
 	for k, v := range secrets {
 		m, ok := v.(map[string]interface{})
-		if !ok {
-			continue
+		if ok {
+			res[k] = p.printOnlykeys(m)
+		} else {
+			res[k] = ""
 		}
-
-		for j := range m {
-			m[j] = ""
-		}
-
-		res[k] = m
 	}
 
 	return res
@@ -346,15 +351,11 @@ func (p *Printer) printOnlyPaths(secrets map[string]interface{}) map[string]inte
 
 	for k, v := range secrets {
 		m, ok := v.(map[string]interface{})
-		if !ok {
-			continue
+		if ok {
+			res[k] = p.printOnlyPaths(m)
+		} else {
+			res[k] = nil
 		}
-
-		for j := range m {
-			m[j] = nil
-		}
-
-		res[k] = m
 	}
 
 	return res
@@ -365,22 +366,17 @@ func (p *Printer) maskValues(secrets map[string]interface{}) map[string]interfac
 
 	for k, v := range secrets {
 		m, ok := v.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		for j, v := range m {
-			secret := fmt.Sprintf("%v", v)
-
-			if len(secret) > p.valueLength && p.valueLength != -1 {
-				m[j] = strings.Repeat(maskChar, p.valueLength)
+		if ok {
+			res[k] = p.maskValues(m)
+		} else {
+			n := fmt.Sprintf("%v", v)
+			if len(n) > p.valueLength && p.valueLength != -1 {
+				secrets[k] = strings.Repeat(maskChar, p.valueLength)
 			} else {
-				m[j] = strings.Repeat(maskChar, len(secret))
+				secrets[k] = strings.Repeat(maskChar, len(n))
 			}
 		}
-
-		res[k] = m
 	}
 
-	return res
+	return secrets
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -70,13 +71,14 @@ func newRootCmd(version string) *cobra.Command {
 				s := &vault.Secrets{}
 
 				rootPath, subPath := utils.SplitPath(p)
-				if err := s.ListRecursive(v, rootPath, subPath); err != nil {
+				s, err := vault.ListRecursive(v, rootPath, subPath)
+				if err != nil {
 					fmt.Printf("[ERROR] %s\n", err)
 
 					continue
 				}
 
-				m[p] = (*s)
+				m[p+utils.Delimiter] = (*s)
 			}
 
 			if len(m) == 0 {
@@ -91,6 +93,12 @@ func newRootCmd(version string) *cobra.Command {
 				printer.WithTemplate(o.TemplateString, o.TemplateFile),
 				printer.ToFormat(o.outputFormat),
 			)
+
+			b, err := json.MarshalIndent(m, "", "  ")
+			if err != nil {
+				fmt.Println("error:", err)
+			}
+			fmt.Println(string(b))
 
 			if err := printer.Out(m); err != nil {
 				return err
@@ -135,7 +143,7 @@ func Execute(version string) error {
 	return nil
 }
 
-//nolint: cyclop
+// nolint: cyclop
 func (o *Options) validateFlags() error {
 	switch {
 	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):

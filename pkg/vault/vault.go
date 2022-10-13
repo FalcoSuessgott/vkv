@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/vault/api"
 )
 
-//nolint: gosec
+// nolint: gosec
 const (
 	mountEnginePath      = "sys/mounts/%s"
 	readWriteSecretsPath = "%s/data/%s"
@@ -59,38 +59,44 @@ func NewClient() (*Vault, error) {
 }
 
 // ListRecursive returns secrets to a path recursive.
-func (s *Secrets) ListRecursive(v *Vault, rootPath, subPath string) error {
+func ListRecursive(v *Vault, rootPath, subPath string) (*Secrets, error) {
+	s := make(Secrets)
+
 	keys, err := v.ListSecrets(rootPath, subPath)
 	if err != nil {
 		// no sub directories in here, but lets check for normal kv pairs then..
 		secrets, e := v.ReadSecrets(rootPath, subPath)
 		if e == nil {
-			(*s)[path.Join(rootPath, subPath)] = secrets
+			(s)[subPath] = secrets
 
-			return nil
+			return &s, nil
 		}
 
-		return err
+		return &s, err
 	}
 
 	for _, k := range keys {
 		if strings.HasSuffix(k, utils.Delimiter) {
-			if err := s.ListRecursive(v, rootPath, path.Join(subPath, k)); err != nil {
-				return err
+			secrets, err := ListRecursive(v, rootPath, path.Join(subPath, k))
+			if err != nil {
+				return &s, err
 			}
+
+			(s)[k] = secrets
+
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
 			if err != nil {
-				(*s)[path.Join(rootPath, subPath, k)] = map[string]interface{}{}
+				(s)[k] = map[string]interface{}{}
 
 				continue
 			}
 
-			(*s)[path.Join(rootPath, subPath, k)] = secrets
+			(s)[k] = secrets
 		}
 	}
 
-	return nil
+	return &s, nil
 }
 
 // ListSecrets returns all keys from vault kv secret path.
@@ -123,6 +129,7 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 }
 
 // ReadSecrets returns a map with all secrets from a kv engine path.
+// TODO: return *Secrets
 func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, error) {
 	data, err := v.Client.Logical().Read(fmt.Sprintf(readWriteSecretsPath, rootPath, subPath))
 	if err != nil {

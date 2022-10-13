@@ -55,7 +55,7 @@ func TestMaskSecrets(t *testing.T) {
 	}
 }
 
-//nolint: lll
+// nolint: lll
 func TestPrint(t *testing.T) {
 	testCases := []struct {
 		name   string
@@ -67,7 +67,7 @@ func TestPrint(t *testing.T) {
 		{
 			name: "test: default opions",
 			s: map[string]interface{}{
-				"secret": map[string]interface{}{
+				"secret/": map[string]interface{}{
 					"key_1": map[string]interface{}{"key": "value", "user": "password"},
 					"key_2": map[string]interface{}{"key": 12},
 				},
@@ -76,7 +76,7 @@ func TestPrint(t *testing.T) {
 				ToFormat(Base),
 				ShowValues(false),
 			},
-			output: "secret/\n├── \n│   ├── key=*****\n│   └── user=********\n└── \n    └── key=**\n",
+			output: "secret/\n├── key_1\n│   ├── key=*****\n│   └── user=********\n└── key_2\n    └── key=**\n",
 		},
 		{
 			name: "test: default opions multiple paths",
@@ -94,7 +94,7 @@ func TestPrint(t *testing.T) {
 				ToFormat(Base),
 				ShowValues(false),
 			},
-			output: "secret/\n├── \n│   ├── key=*****\n│   └── user=********\n└── \n    └── key=**\nsecret_2/\n├── \n│   ├── key=*****\n│   └── user=********\n└── \n    └── key=**\n",
+			output: "secret\n├── key_1\n│   ├── key=*****\n│   └── user=********\n└── key_2\n    └── key=**\nsecret_2\n├── key_1\n│   ├── key=*****\n│   └── user=********\n└── key_2\n    └── key=**\n",
 		},
 		{
 			name: "test: show secrets",
@@ -108,7 +108,7 @@ func TestPrint(t *testing.T) {
 				ToFormat(Base),
 				ShowValues(true),
 			},
-			output: "secret/\n├── \n│   ├── key=value\n│   └── user=password\n└── \n    └── key=12\n",
+			output: "secret\n├── key_1\n│   ├── key=value\n│   └── user=password\n└── key_2\n    └── key=12\n",
 		},
 		{
 			name: "test: only paths",
@@ -123,7 +123,7 @@ func TestPrint(t *testing.T) {
 				OnlyPaths(true),
 				ShowValues(true),
 			},
-			output: "secret/\n├── \n└── \n",
+			output: "secret\n├── key_1\n└── key_2\n",
 		},
 		{
 			name: "test: only keys",
@@ -138,7 +138,7 @@ func TestPrint(t *testing.T) {
 				OnlyKeys(true),
 				ShowValues(true),
 			},
-			output: "secret/\n├── \n│   ├── key\n│   └── user\n└── \n    └── key\n",
+			output: "secret\n├── key_1\n│   ├── key\n│   └── user\n└── key_2\n    └── key\n",
 		},
 		{
 			name: "test: normal map to json",

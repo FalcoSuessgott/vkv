@@ -2,6 +2,7 @@ package vault
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -297,7 +298,7 @@ func (s *VaultSuite) TestListRecursive() {
 		subPath  string
 		err      bool
 		secrets  map[string]interface{}
-		expected Secrets
+		expected map[string]interface{}
 	}{
 		{
 			name:     "test: simple secret",
@@ -316,25 +317,19 @@ func (s *VaultSuite) TestListRecursive() {
 				},
 			},
 			expected: map[string]interface{}{
-				"kv/subpath/sub": map[string]interface{}{
-					"user":  "password",
-					"user1": "password",
-					"user2": "password",
-				},
-				"kv/subpath/sub2": map[string]interface{}{
-					"user":  "password",
-					"user1": "password",
-					"user2": "password",
+				"kv": Secrets{
+					"sub": map[string]interface{}{
+						"user":  "password",
+						"user1": "password",
+						"user2": "password",
+					},
+					"sub2": map[string]interface{}{
+						"user":  "password",
+						"user1": "password",
+						"user2": "password",
+					},
 				},
 			},
-		},
-		{
-			name:     "test: empty secret",
-			rootPath: "kv",
-			subPath:  "subpath",
-			secrets:  nil,
-			expected: nil,
-			err:      true,
 		},
 	}
 
@@ -348,11 +343,17 @@ func (s *VaultSuite) TestListRecursive() {
 			}
 		}
 
-		secrets := Secrets{}
-
 		// read them, expect the exact same secrets as written before
-		err := secrets.ListRecursive(s.v, tc.rootPath, tc.subPath)
+		secrets := map[string]interface{}{}
+		tmp, err := ListRecursive(s.v, tc.rootPath, tc.subPath)
+		secrets[tc.rootPath] = *tmp
 
+		b, err := json.MarshalIndent(secrets, "", "  ")
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+
+		fmt.Println(string(b))
 		if tc.err {
 			assert.Error(s.Suite.T(), err)
 		} else {
