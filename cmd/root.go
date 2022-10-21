@@ -31,6 +31,7 @@ type Options struct {
 	TemplateString string `env:"TEMPLATE_STRING"`
 
 	FormatString string `env:"FORMAT" envDefault:"base"`
+
 	outputFormat printer.OutputFormat
 
 	version bool
@@ -50,7 +51,7 @@ func newRootCmd(version string) *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if o.version {
-				fmt.Printf("vkv %s\n", version)
+				fmt.Fprintf(cmd.OutOrStdout(), "vkv %s\n", version)
 
 				return nil
 			}
@@ -135,7 +136,7 @@ func Execute(version string) error {
 	return nil
 }
 
-//nolint: cyclop
+// nolint: cyclop
 func (o *Options) validateFlags() error {
 	switch {
 	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):

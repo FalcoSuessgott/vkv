@@ -1,6 +1,7 @@
 linters-settings:
   lll:
     line-length: 180
+    allow-leading-space: true
 linters:
   enable-all: true
   disable:
@@ -20,3 +21,10 @@ linters:
     - gomnd
     - containedctx
     - ireturn
+    - exhaustruct
+    - varcheck
+    - deadcode
+    - structcheck
+    - nosnakecase
+    - ifshort
+    - nolintlint

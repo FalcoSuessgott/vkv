@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/vault/api"
 )
 
-//nolint: gosec
+// nolint: gosec
 const (
 	mountEnginePath      = "sys/mounts/%s"
 	readWriteSecretsPath = "%s/data/%s"

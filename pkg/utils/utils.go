@@ -1,5 +1,6 @@
 package utils
 
+// nolint: staticcheck
 import (
 	"encoding/json"
 	"io/ioutil"

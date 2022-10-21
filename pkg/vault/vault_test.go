@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"path"
 	"runtime"
@@ -59,7 +60,7 @@ func spinUpVault(ctx context.Context) (*VaultContainer, error) {
 		log.Fatalf("error getting socket: %v", err)
 	}
 
-	uri := fmt.Sprintf("http://%s:%s", ip, mappedPort.Port())
+	uri := fmt.Sprintf("http://%s", net.JoinHostPort(ip, mappedPort.Port()))
 
 	return &VaultContainer{Container: c, URI: uri}, nil
 }

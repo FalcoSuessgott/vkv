@@ -34,6 +34,7 @@ func TestRemoveEmptyElements(t *testing.T) {
 	}
 }
 
+// nolint: dupword
 func TestSplitPath(t *testing.T) {
 	testCases := []struct {
 		name            string
