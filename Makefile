@@ -40,6 +40,10 @@ lint: ## lint go files
 pre-commit:	## run pre-commit hooks
 	pre-commit run
 
+.PHONY: bootstrap
+bootstrap: ## install build deps
+	go generate -tags tools tools/tools.go
+
 vault: export VAULT_ADDR = http://127.0.0.1:8200
 vault: export VAULT_SKIP_VERIFY = true
 vault: export VAULT_TOKEN = root
