@@ -3,7 +3,7 @@
   <img src="assets/base.svg" alt="drawing" height="400" width="550">
 
   [![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) [![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) [![codecov](https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg?token=UYVZ8LTA45)](https://codecov.io/gh/FalcoSuessgott/vkv)
-[![Github all releases](https://img.shields.io/github/downloads/FalcoSuessgott/vkv/total.svg)](https://GitHub.com/FalcoSuessgott/vkv/releases/)
+  [![Github all releases](https://img.shields.io/github/downloads/FalcoSuessgott/vkv/total.svg)](https://GitHub.com/FalcoSuessgott/vkv/releases/)
 </div>
 
 
@@ -12,16 +12,17 @@
 
 So far `vkv` offers:
 
-| Flag                 | Description                                                                       | Env Var                | Default |
-|----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
-| `-p`, `--paths`      | KV mount paths (comma separated list for multiple paths)                          | `VKV_PATHS`            | `kv`    |
-| `-f`, `--format`     | output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
-| `--only-keys`        | show only keys                                                                    | `VKV_ONLY_KEYS`        | `false` |
-| `--only-paths`       | show only paths                                                                   | `VKV_ONLY_PATHS`       | `false` |
-| `--show-values`      | dont mask values                                                                  | `VKV_SHOW_VALUES`      | `false` |
-| `--max-value-length` | maximum char length of values (set to `-1` for disabling)                         | `VKV_MAX_VALUE_LENGTH` | `12`    |
-| `--template-file`    | path to a file containing Go-template syntax to render the KV entries             | `VKV_TEMPLATE_FILE`    |         |
-| `--template-string`  | string containing Go-template syntax to render KV entries                         | `VKV_TEMPLATE_STRING`  |         |
+| Flag                  | Description                                                                       | Env Var                | Default |
+|-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
+| `-p`, `--path`        | KVv2 Engine path (env var: VKV_PATH)                                              | `VKV_PATH`             | `kv`    |
+| `-e`, `--engine-path` | Specify the engine path. This flag is only required in case your kv-engine contains special characters such as a `/`. <br/> `vkv` will then append the values of the path-flag to the engine path, if specified (`<engine-path>/<path>`)| `VKV_ENGINE_PATH`      |       |
+| `-f`, `--format`      | output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
+| `--only-keys`         | show only keys                                                                    | `VKV_ONLY_KEYS`        | `false` |
+| `--only-paths`        | show only paths                                                                   | `VKV_ONLY_PATHS`       | `false` |
+| `--show-values`       | dont mask values                                                                  | `VKV_SHOW_VALUES`      | `false` |
+| `--max-value-length`  | maximum char length of values (set to `-1` for disabling)                         | `VKV_MAX_VALUE_LENGTH` | `12`    |
+| `--template-file`     | path to a file containing Go-template syntax to render the KV entries             | `VKV_TEMPLATE_FILE`    |         |
+| `--template-string`   | string containing Go-template syntax to render KV entries                         | `VKV_TEMPLATE_STRING`  |         |
 
 
 ⚠️ **A flag always preceed its environment variable**
@@ -41,7 +42,8 @@ All of vaults [environment variables](https://www.vaultproject.io/docs/commands#
 
 ```bash
 # on linux/macos
-VAULT_ADDR="http://127.0.0.1:8200" VAULT_TOKEN="s.XXX" vkv -p <kv-path>
+VAULT_ADDR="http://127.0.0.1:8200" VAULT_TOKEN="s.XXX" vkv -p <k`vkv` will then append the values of the path-flag to the engine path, if specified (`<engine-path>/<path>`)| `VKV_ENGINE_PATH`      | ``      |
+v-path>
 
 # on windows
 SET VAULT_ADDR=http://127.0.0.1:8200

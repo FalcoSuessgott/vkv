@@ -127,62 +127,53 @@ func TestOutputFormat(t *testing.T) {
 func TestValidateFlags(t *testing.T) {
 	testCases := []struct {
 		name string
-		args []string
+		opts *Options
 		err  bool
 	}{
 		{
 			name: "test: only keys and only paths",
 			err:  true,
-			args: []string{"--only-keys", "--only-paths"},
+			opts: &Options{OnlyKeys: true, OnlyPaths: true},
 		},
 		{
 			name: "test: only keys and show secrets ",
 			err:  true,
-			args: []string{"--only-keys", "--show-values"},
+			opts: &Options{OnlyKeys: true, ShowValues: true},
 		},
 		{
 			name: "test: only paths and show secrets ",
 			err:  true,
-			args: []string{"--only-paths", "--show-values"},
+			opts: &Options{OnlyPaths: true, ShowValues: true},
 		},
 		{
 			name: "test: no paths",
 			err:  false,
-			args: []string{"--path", ""},
+			opts: &Options{FormatString: "base", Path: ""},
 		},
 		{
 			name: "test: template with file",
 			err:  false,
-			args: []string{"--format", "template", "--template-file", "OK"},
+			opts: &Options{FormatString: "tmpl", TemplateFile: "OK"},
 		},
 		{
 			name: "test: template with string",
 			err:  false,
-			args: []string{"--format", "template", "--template-string", "OK"},
+			opts: &Options{FormatString: "tmpl", TemplateString: "OK"},
 		},
 		{
 			name: "test: template no file or string",
 			err:  true,
-			args: []string{"--format", "template"},
+			opts: &Options{FormatString: "tmpl"},
 		},
 		{
 			name: "test: template file and string",
 			err:  true,
-			args: []string{"--format", "template", "--template-string", "ok", "--template-file", "OK"},
+			opts: &Options{FormatString: "tmpl", TemplateString: "OK", TemplateFile: "OK"},
 		},
 	}
 
 	for _, tc := range testCases {
-		c := newRootCmd("")
-		b := bytes.NewBufferString("")
-
-		c.SetArgs(tc.args)
-		c.SetOut(b)
-
-		os.Setenv("VAULT_ADDR", "")
-		os.Setenv("VAULT_TOKEN", "")
-
-		err := c.Execute()
+		err := tc.opts.validateFlags()
 		if tc.err {
 			assert.Error(t, err, tc.name)
 
@@ -208,7 +199,7 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: printer.MaxValueLength,
-				Paths:          []string{"kv"},
+				Path:           "kv",
 				FormatString:   "base",
 				OnlyKeys:       true,
 			},
@@ -221,7 +212,7 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: printer.MaxValueLength,
-				Paths:          []string{"kv"},
+				Path:           "kv",
 				FormatString:   "base",
 				OnlyPaths:      true,
 			},
@@ -242,7 +233,7 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: 213,
-				Paths:          []string{"kv"},
+				Path:           "kv",
 				FormatString:   "base",
 				ShowValues:     true,
 			},
@@ -255,20 +246,20 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: 12,
-				Paths:          []string{"kv"},
+				Path:           "kv",
 				FormatString:   "yaml",
 			},
 		},
 		{
-			name: "show values and max value length",
+			name: "show path and max value length",
 			err:  false,
 			envs: map[string]interface{}{
-				"VKV_PATHS":            "kv1,kv2,kv3",
+				"VKV_PATH":             "kv1",
 				"VKV_MAX_VALUE_LENGTH": 213,
 			},
 			expected: &Options{
 				MaxValueLength: 213,
-				Paths:          []string{"kv1", "kv2", "kv3"},
+				Path:           "kv1",
 				FormatString:   "base",
 			},
 		},
@@ -276,14 +267,14 @@ func TestEnvVars(t *testing.T) {
 			name: "show values and max value length",
 			err:  false,
 			envs: map[string]interface{}{
-				"VKV_PATHS":           "kv1,kv2,kv3",
+				"VKV_PATH":            "kv1",
 				"VKV_FORMAT":          "template",
 				"VKV_TEMPLATE_STRING": "string",
 				"VKV_TEMPLATE_FILE":   "path",
 			},
 			expected: &Options{
 				MaxValueLength: 12,
-				Paths:          []string{"kv1", "kv2", "kv3"},
+				Path:           "kv1",
 				FormatString:   "template",
 				TemplateFile:   "path",
 				TemplateString: "string",
@@ -313,6 +304,55 @@ func TestEnvVars(t *testing.T) {
 		}
 
 		assert.NoError(t, err, tc.name)
-		assert.Equal(t, tc.expected, o)
+		assert.Equal(t, tc.expected, o, tc.name)
+	}
+}
+
+func TestBuildEnginePath(t *testing.T) {
+	testCases := []struct {
+		name             string
+		expectedRootPath string
+		expectedSubPath  string
+		opts             *Options
+	}{
+		{
+			name: "only path",
+			opts: &Options{
+				Path: "1/2/3/4",
+			},
+			expectedRootPath: "1",
+			expectedSubPath:  "2/3/4",
+		},
+		{
+			name: "one element path",
+			opts: &Options{
+				Path: "1",
+			},
+			expectedRootPath: "1",
+			expectedSubPath:  "",
+		},
+		{
+			name: "engine path and path",
+			opts: &Options{
+				EnginePath: "1/2/3/4",
+				Path:       "5/6",
+			},
+			expectedRootPath: "1/2/3/4",
+			expectedSubPath:  "5/6",
+		},
+		{
+			name: " only engine path",
+			opts: &Options{
+				EnginePath: "1/2/3/4",
+			},
+			expectedRootPath: "1/2/3/4",
+		},
+	}
+
+	for _, tc := range testCases {
+		rootPath, subPath := tc.opts.buildEnginePath()
+
+		assert.Equal(t, tc.expectedRootPath, rootPath, tc.name)
+		assert.Equal(t, tc.expectedSubPath, subPath, tc.name)
 	}
 }

@@ -28,3 +28,4 @@ linters:
     - nosnakecase
     - ifshort
     - nolintlint
+    - maintidx

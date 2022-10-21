@@ -18,14 +18,9 @@ install: ## install golang binary
 run: ## run the app
 	@go run -ldflags "-X main.version=$(shell git describe --abbrev=0 --tags)"  main.go
 
-PHONY: clean
-clean: ## clean up environment
-	@rm -rf coverage.out dist/ $(projectname)
-
-PHONY: cover
-cover: ## display test coverage
-	go test -v -race $(shell go list ./... | grep -v /vendor/) -v -coverprofile=coverage.out
-	go tool cover -func=coverage.out
+PHONY: test
+test: clean ## display test coverage
+	go test -json -v ./... | gotestfmt
 
 PHONY: fmt
 fmt: ## format go files
@@ -49,12 +44,12 @@ vault: export VAULT_SKIP_VERIFY = true
 vault: export VAULT_TOKEN = root
 
 .PHONY: vault
-vault:
-	echo hallo
+vault: clean ## set up a development vault server and write kv secrets
 	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
+	sleep 5
 	vault kv put secret/demo foo=bar
 	vault kv put secret/sub sub=password
-	vault kv put secret/sub/demo demo="hello world" user=admin password=s3cre5
+	vault kv put secret/sub/demo1 demo="hello world" user=admin password=s3cre5
 	vault kv put secret/sub/sub2/demo value="nevermind" user="database" password=secret2
 
 	vault secrets enable -path secret_2 -version=2 kv
@@ -63,6 +58,7 @@ vault:
 	vault kv put secret_2/sub/demo foo=bar user=user password=password
 	vault kv put secret_2/sub/sub2/demo foo=bar user=user password=password
 
-.PHONY: kill
-kill:
+.PHONY: clean
+clean: ## clean the development vault
+	@rm -rf coverage.out dist/ $(projectname)
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true

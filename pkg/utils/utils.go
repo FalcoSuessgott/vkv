@@ -33,6 +33,14 @@ func ReadFile(path string) ([]byte, error) {
 func SplitPath(path string) (string, string) {
 	parts := removeEmptyElements(strings.Split(path, Delimiter))
 
+	// we use a double slash // for dividing root and subpath
+	// since a secret engine in vault can contain multiple slash
+	if strings.Contains(path, Delimiter+Delimiter) {
+		parts = strings.Split(path, Delimiter+Delimiter)
+
+		return parts[0], strings.Join(parts[1:], Delimiter)
+	}
+
 	if len(parts) >= 2 {
 		return parts[0], strings.Join(parts[1:], Delimiter)
 	}

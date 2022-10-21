@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"path"
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
@@ -20,7 +21,8 @@ var errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
 
 // Options holds all available commandline options.
 type Options struct {
-	Paths []string `env:"PATHS" envDefault:"kv" envSeparator:","`
+	Path       string `env:"PATH" envDefault:"kv"`
+	EnginePath string `env:"ENGINE_PATH" envDefault:""`
 
 	OnlyKeys       bool `env:"ONLY_KEYS"`
 	OnlyPaths      bool `env:"ONLY_PATHS"`
@@ -66,19 +68,14 @@ func newRootCmd(version string) *cobra.Command {
 			}
 
 			m := map[string]interface{}{}
+			s := &vault.Secrets{}
 
-			for _, p := range o.Paths {
-				s := &vault.Secrets{}
-
-				rootPath, subPath := utils.SplitPath(p)
-				if err := s.ListRecursive(v, rootPath, subPath); err != nil {
-					fmt.Printf("[ERROR] %s\n", err)
-
-					continue
-				}
-
-				m[p] = (*s)
+			rootPath, subPath := o.buildEnginePath()
+			if err := s.ListRecursive(v, rootPath, subPath); err != nil {
+				return fmt.Errorf("error reading secrets: %w", err)
 			}
+
+			m[path.Join(rootPath, subPath)] = (*s)
 
 			if len(m) == 0 {
 				return nil
@@ -104,7 +101,11 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().SortFlags = false
 
 	// Input
-	cmd.Flags().StringSliceVarP(&o.Paths, "path", "p", o.Paths, "Comma separated list of kv paths (env var: VKV_PATHS)")
+	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KVv2 Engine path (env var: VKV_PATH)")
+	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath,
+		"Specify the engine path using this flag in case your kv-engine contains special characters such as \"/\".\n"+
+			"vkv will then append the values of the path-flag to the engine path, if specified (<engine-path>/<path>)"+
+			"(env var: VKV_ENGINE_PATHS)")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env var: VKV_ONLY_KEYS)")
@@ -149,6 +150,8 @@ func (o *Options) validateFlags() error {
 			o.outputFormat = printer.JSON
 		case "export":
 			o.outputFormat = printer.Export
+			o.OnlyKeys = false
+			o.OnlyPaths = false
 			o.ShowValues = true
 		case "markdown":
 			o.outputFormat = printer.Markdown
@@ -156,6 +159,8 @@ func (o *Options) validateFlags() error {
 			o.outputFormat = printer.Base
 		case "template", "tmpl":
 			o.outputFormat = printer.Template
+			o.OnlyKeys = false
+			o.OnlyPaths = false
 
 			if o.TemplateFile != "" && o.TemplateString != "" {
 				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
@@ -167,11 +172,20 @@ func (o *Options) validateFlags() error {
 		default:
 			return printer.ErrInvalidFormat
 		}
-	case len(o.Paths) == 0, o.Paths[0] == "":
-		return fmt.Errorf("no paths specified")
+	case (o.EnginePath == "" && o.Path == ""):
+		return fmt.Errorf("no paths KVv2 paths given. Either --engine-path (-e) or --path (-p) needs to be specified")
 	}
 
 	return nil
+}
+
+func (o *Options) buildEnginePath() (string, string) {
+	// if engine path has been specified use that value as the root path and append the path
+	if o.EnginePath != "" {
+		return o.EnginePath, o.Path
+	}
+
+	return utils.SplitPath(o.Path)
 }
 
 func (o *Options) parseEnvs() error {
