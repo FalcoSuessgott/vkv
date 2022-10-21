@@ -147,6 +147,7 @@ func NewPrinter(opts ...Option) *Printer {
 }
 
 // Out prints out the secrets according all configured options.
+//
 //nolint:cyclop,gocognit
 func (p *Printer) Out(secrets map[string]interface{}) error {
 	for k, v := range secrets {

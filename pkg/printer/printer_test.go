@@ -55,8 +55,8 @@ func TestMaskSecrets(t *testing.T) {
 	}
 }
 
-//nolint: lll
 func TestPrint(t *testing.T) {
+	//nolint: lll
 	testCases := []struct {
 		name   string
 		s      map[string]interface{}
