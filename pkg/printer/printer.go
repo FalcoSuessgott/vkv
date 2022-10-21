@@ -249,10 +249,22 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 					log.Fatalf("cannot convert %T to map[string]interface", m[i])
 				}
 
-				// remove mount point of path
-				path := strings.Join(strings.Split(i, utils.Delimiter)[1:], utils.Delimiter)
+				// remove mount point from path and leading /
+				path := strings.TrimPrefix(strings.Join(strings.Split(i, k)[1:], utils.Delimiter), utils.Delimiter)
 
-				tree.AddTree(p.printTree(path, subMap))
+				if path == "" {
+					for _, k := range utils.SortMapKeys(subMap) {
+						if p.onlyKeys {
+							tree.Add(k)
+						}
+
+						if !p.onlyKeys && !p.onlyPaths {
+							tree.Add(fmt.Sprintf("%s=%v", k, subMap[k]))
+						}
+					}
+				} else {
+					tree.AddTree(p.printTree(path, subMap))
+				}
 			}
 
 			fmt.Fprint(p.writer, tree.Print())
@@ -301,20 +313,20 @@ func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, 
 
 			//nolint: gocritic
 			if p.onlyPaths {
-				headers = []string{"mount", "paths"}
+				headers = []string{"path"}
 
-				data = append(data, []string{s, k})
+				data = append(data, []string{k})
 			} else if p.onlyKeys {
-				headers = []string{"mount", "paths", "keys"}
+				headers = []string{"path", "key"}
 
 				for _, j := range utils.SortMapKeys(m) {
-					data = append(data, []string{s, k, j})
+					data = append(data, []string{k, j})
 				}
 			} else {
-				headers = []string{"mount", "paths", "keys", "values"}
+				headers = []string{"path", "key", "value"}
 
 				for _, j := range utils.SortMapKeys(m) {
-					data = append(data, []string{s, k, j, fmt.Sprintf("%v", m[j])})
+					data = append(data, []string{k, j, fmt.Sprintf("%v", m[j])})
 				}
 			}
 		}

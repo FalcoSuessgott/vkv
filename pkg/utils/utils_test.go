@@ -66,6 +66,12 @@ func TestSplitPath(t *testing.T) {
 			expectedRoot:    "",
 			expectedSubPath: "",
 		},
+		{
+			name:            "test: slash in root path",
+			path:            "a/b/c/d//sub/path",
+			expectedRoot:    "a/b/c/d",
+			expectedSubPath: "sub/path",
+		},
 	}
 
 	for _, tc := range testCases {
