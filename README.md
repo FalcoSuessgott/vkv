@@ -12,19 +12,17 @@
 
 So far `vkv` offers:
 
-### Input flags
-* `-p | --paths`: KV mount paths (comma separated list for multiple paths) (env: `VKV_PATHS`, default: `kv`)
+| Flag                 | Description                                                                       | Env Var                | Default |
+|----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
+| `-p`, `--paths`      | KV mount paths (comma separated list for multiple paths)                          | `VKV_PATHS`            | `kv`    |
+| `-f`, `--format`     | output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
+| `--only-keys`        | show only keys                                                                    | `VKV_ONLY_KEYS`        | `false` |
+| `--only-paths`       | show only paths                                                                   | `VKV_ONLY_PATHS`       | `false` |
+| `--show-values`      | dont mask values                                                                  | `VKV_SHOW_VALUES`      | `false` |
+| `--max-value-length` | maximum char length of values (set to `-1` for disabling)                         | `VKV_MAX_VALUE_LENGTH` | `12`    |
+| `--template-file`    | path to a file containing Go-template syntax to render the KV entries             | `VKV_TEMPLATE_FILE`    |         |
+| `--template-string`  | string containing Go-template syntax to render KV entries                         | `VKV_TEMPLATE_STRING`  |         |
 
-### Modifying flags
-* `--only-keys`: show only keys (env: `VKV_ONLY_KEYS`, default: `false`)
-* `--only-paths`: show only paths (env: `VKV_ONLY_PATHS`, default: `false`)
-* `--show-values`: dont mask values (env: `VKV_SHOW_VALUES`, default: `false`)
-* `--max-value-length`: maximum char length of values (set to `-1` for disabling) (env: `VKV_MAX_VALUE_LENGTH`, default: `12`)
-* `--template-file`: path to a file containing Go-template syntax to render the KV entries (env: `VKV_TEMPLATE_FILE`)
-* `--template-string`: string containting Go-template syntax to render KV entries (env: `VKV_TEMPLATE_STRING`)
-
-### Output Flags (see [Supported Formats](https://github.com/FalcoSuessgott/vkv/tree/template#supported-formats))
-* `-f | --format`: output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`)  (env: `"VKV_FORMAT"`, default: `"base"`)
 
 ⚠️ **A flag always preceed its environment variable**
 
@@ -52,13 +50,65 @@ vkv.exe -p <kv-path>
 ```
 
 # Supported Formats
-|  |                          |
-|:-------------:|:-------------------------------:|
-| `base`<br> ![](assets/base.svg)| `markdown`<br> ![](assets/markdown.svg) |
-| `json`<br> ![](assets/json.svg)| `yaml`<br> ![](assets/yaml.svg) |
+### `base`
+![](assets/base.svg)
 
-| |
-|:---:|
-| `template`<br> <img src="assets/template.svg" width="600" /> |
+### `markdown`
+![](assets/markdown.svg)
 
+### `json`
+![](assets/json.svg)
+
+### `yaml`
+![](assets/yaml.svg)
+
+### `template`
+![](assets/template.svg)
+
+
+
+# Development
+Clone this repository and run:
+
+```sh
+make bootstrap
+```
+
+in order to have all used build dependencies
+
+You can spin up a development vault for local testing by running:
+
+```sh
+make vault
+```
+
+The following environment variables are required:
+
+```sh
+export VAULT_ADDR="http://127.0.0.1:8200"
+export VAULT_TOKEN="root"
+export VKV_PATHS="secret"
+```
+
+If everthing worked fine, you should be able to run:
+
+```sh
+go run main.go   
+secret/
+├── demo
+│   └── foo=***
+├── sub
+│   └── sub=********
+├── sub/
+│   └── demo
+│       ├── demo=***********
+│       ├── password=******
+│       └── user=*****
+└── sub/
+    └── sub2/
+        └── demo
+            ├── password=*******
+            ├── user=********
+            └── value=*********
+```
 
