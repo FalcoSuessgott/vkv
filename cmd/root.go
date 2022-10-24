@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"path"
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
@@ -66,20 +67,6 @@ func newRootCmd(version string) *cobra.Command {
 				return err
 			}
 
-			m := map[string]interface{}{}
-			s := &vault.Secrets{}
-
-			rootPath, subPath := o.buildEnginePath()
-			if err := s.ListRecursive(v, rootPath, subPath); err != nil {
-				return err
-			}
-
-			m[rootPath] = (*s)
-
-			if len(m) == 0 {
-				return nil
-			}
-
 			printer := printer.NewPrinter(
 				printer.OnlyKeys(o.OnlyKeys),
 				printer.OnlyPaths(o.OnlyPaths),
@@ -88,6 +75,11 @@ func newRootCmd(version string) *cobra.Command {
 				printer.WithTemplate(o.TemplateString, o.TemplateFile),
 				printer.ToFormat(o.outputFormat),
 			)
+
+			m, err := o.buildMap(v)
+			if err != nil {
+				return err
+			}
 
 			if err := printer.Out(m); err != nil {
 				return err
@@ -187,6 +179,40 @@ func (o *Options) buildEnginePath() (string, string) {
 	}
 
 	return utils.SplitPath(o.Path)
+}
+
+func (o *Options) buildMap(v *vault.Vault) (map[string]interface{}, error) {
+	var isSecretPath bool
+
+	m := map[string]interface{}{}
+
+	// read recursive all secrets
+	rootPath, subPath := o.buildEnginePath()
+
+	s, err := v.ListRecursive(rootPath, subPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if path is a directory or secret path
+	if _, isSecret := v.ReadSecrets(rootPath, subPath); isSecret == nil {
+		isSecretPath = true
+	}
+
+	path := path.Join(rootPath, subPath)
+	if o.EnginePath != "" {
+		path = subPath
+	}
+
+	// prepare the output map
+	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
+	if o.EnginePath != "" {
+		m[o.EnginePath] = pathMap
+	} else {
+		m = pathMap
+	}
+
+	return m, nil
 }
 
 func (o *Options) parseEnvs() error {

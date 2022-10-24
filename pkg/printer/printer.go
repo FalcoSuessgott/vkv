@@ -5,12 +5,8 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 
-	"github.com/FalcoSuessgott/vkv/pkg/render"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/disiqueira/gotree/v3"
-	"github.com/olekukonko/tablewriter"
 )
 
 // OutputFormat enum of valid output formats.
@@ -148,7 +144,7 @@ func NewPrinter(opts ...Option) *Printer {
 
 // Out prints out the secrets according all configured options.
 //
-//nolint:cyclop,gocognit
+//nolint:cyclop
 func (p *Printer) Out(secrets map[string]interface{}) error {
 	for k, v := range secrets {
 		if !p.showValues {
@@ -166,237 +162,18 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 
 	switch p.format {
 	case YAML:
-		out, err := utils.ToYAML(secrets)
-		if err != nil {
-			return err
-		}
-
-		fmt.Fprintf(p.writer, "%s\n", string(out))
-
+		return p.printYAML(secrets)
 	case JSON:
-		out, err := utils.ToJSON(secrets)
-		if err != nil {
-			return err
-		}
-
-		fmt.Fprintf(p.writer, "%s\n", string(out))
-
+		return p.printJSON(secrets)
 	case Export:
-		for _, k := range utils.SortMapKeys(secrets) {
-			m := utils.ToMapStringInterface(secrets[k])
-
-			for _, i := range utils.SortMapKeys(m) {
-				subMap, ok := m[i].(map[string]interface{})
-				if !ok {
-					log.Fatalf("cannot convert %T to map[string]interface", m[i])
-				}
-
-				for _, j := range utils.SortMapKeys(subMap) {
-					fmt.Fprintf(p.writer, "export %s=\"%v\"\n", j, subMap[j])
-				}
-			}
-		}
-
+		return p.printExport(secrets)
 	case Markdown:
-		headers, data := p.buildMarkdownTable(secrets)
-
-		table := tablewriter.NewWriter(p.writer)
-		table.SetHeader(headers)
-		table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-		table.SetCenterSeparator("|")
-		table.AppendBulk(data)
-		table.SetAutoMergeCellsByColumnIndex([]int{0, 1}) // merge mounts and paths columns
-		table.Render()
-
+		return p.printMarkdownTable(secrets)
 	case Template:
-		type entry struct {
-			Key   string
-			Value interface{}
-		}
-
-		data := map[string][]entry{}
-
-		for _, k := range utils.SortMapKeys(secrets) {
-			m := utils.ToMapStringInterface(secrets[k])
-
-			for _, i := range utils.SortMapKeys(m) {
-				subMap, ok := m[i].(map[string]interface{})
-				if !ok {
-					log.Fatalf("cannot convert %T to map[string]interface", m[i])
-				}
-
-				entries := []entry{}
-				for _, j := range utils.SortMapKeys(subMap) {
-					entries = append(entries, entry{Key: j, Value: subMap[j]})
-				}
-
-				data[i] = entries
-			}
-		}
-
-		output, err := render.String([]byte(p.template), data)
-		if err != nil {
-			return err
-		}
-
-		fmt.Fprintln(p.writer, output.String())
-
+		return p.printTemplate(secrets)
 	case Base:
-		for _, k := range utils.SortMapKeys(secrets) {
-			tree := gotree.New(k + utils.Delimiter)
-			m := utils.ToMapStringInterface(secrets[k])
-
-			for _, i := range utils.SortMapKeys(m) {
-				subMap, ok := m[i].(map[string]interface{})
-				if !ok {
-					log.Fatalf("cannot convert %T to map[string]interface", m[i])
-				}
-
-				// remove mount point from path and leading /
-				path := strings.TrimPrefix(strings.Join(strings.Split(i, k)[1:], utils.Delimiter), utils.Delimiter)
-
-				if path == "" {
-					for _, k := range utils.SortMapKeys(subMap) {
-						if p.onlyKeys {
-							tree.Add(k)
-						}
-
-						if !p.onlyKeys && !p.onlyPaths {
-							tree.Add(fmt.Sprintf("%s=%v", k, subMap[k]))
-						}
-					}
-				} else {
-					tree.AddTree(p.printTree(path, subMap))
-				}
-			}
-
-			fmt.Fprint(p.writer, tree.Print())
-		}
+		return p.printBase(secrets)
 	default:
 		return ErrInvalidFormat
 	}
-
-	return nil
-}
-
-func (p *Printer) printTree(path string, m map[string]interface{}) gotree.Tree {
-	var tree gotree.Tree
-
-	parts := strings.Split(path, utils.Delimiter)
-	if len(parts) > 1 {
-		tree = gotree.New(parts[0] + utils.Delimiter)
-		tree.AddTree(p.printTree(strings.Join(parts[1:], utils.Delimiter), m))
-	} else {
-		tree = gotree.New(parts[0])
-		for _, k := range utils.SortMapKeys(m) {
-			if p.onlyKeys {
-				tree.Add(k)
-			}
-
-			if !p.onlyKeys && !p.onlyPaths {
-				tree.Add(fmt.Sprintf("%s=%v", k, m[k]))
-			}
-		}
-	}
-
-	return tree
-}
-
-func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, [][]string) {
-	data := [][]string{}
-	headers := []string{}
-
-	for _, s := range utils.SortMapKeys(secrets) {
-		v := utils.ToMapStringInterface(secrets[s])
-		for _, k := range utils.SortMapKeys(v) {
-			m, ok := v[k].(map[string]interface{})
-			if !ok {
-				log.Fatalf("cannot convert %s to map[string]interface", secrets[s])
-			}
-
-			//nolint: gocritic
-			if p.onlyPaths {
-				headers = []string{"path"}
-
-				data = append(data, []string{k})
-			} else if p.onlyKeys {
-				headers = []string{"path", "key"}
-
-				for _, j := range utils.SortMapKeys(m) {
-					data = append(data, []string{k, j})
-				}
-			} else {
-				headers = []string{"path", "key", "value"}
-
-				for _, j := range utils.SortMapKeys(m) {
-					data = append(data, []string{k, j, fmt.Sprintf("%v", m[j])})
-				}
-			}
-		}
-	}
-
-	return headers, data
-}
-
-func (p *Printer) printOnlykeys(secrets map[string]interface{}) map[string]interface{} {
-	res := map[string]interface{}{}
-
-	for k, v := range secrets {
-		m, ok := v.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		for j := range m {
-			m[j] = ""
-		}
-
-		res[k] = m
-	}
-
-	return res
-}
-
-func (p *Printer) printOnlyPaths(secrets map[string]interface{}) map[string]interface{} {
-	res := map[string]interface{}{}
-
-	for k, v := range secrets {
-		m, ok := v.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		for j := range m {
-			m[j] = nil
-		}
-
-		res[k] = m
-	}
-
-	return res
-}
-
-func (p *Printer) maskValues(secrets map[string]interface{}) map[string]interface{} {
-	res := map[string]interface{}{}
-
-	for k, v := range secrets {
-		m, ok := v.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		for j, v := range m {
-			secret := fmt.Sprintf("%v", v)
-
-			if len(secret) > p.valueLength && p.valueLength != -1 {
-				m[j] = strings.Repeat(maskChar, p.valueLength)
-			} else {
-				m[j] = strings.Repeat(maskChar, len(secret))
-			}
-		}
-
-		res[k] = m
-	}
-
-	return res
 }

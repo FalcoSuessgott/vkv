@@ -6,6 +6,187 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestTransformMap(t *testing.T) {
+	testCases := []struct {
+		name     string
+		m        map[string]interface{}
+		expected map[string]interface{}
+	}{
+		{
+			name: "2 level",
+			m: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"root": map[string]interface{}{
+						"kv":   12,
+						"bool": false,
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"secret/root": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+			},
+		},
+		{
+			name: "1 level",
+			m: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+			},
+			expected: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+			},
+		},
+		{
+			name: "3 level",
+			m: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"root": map[string]interface{}{
+						"sub": map[string]interface{}{
+							"kv":   12,
+							"bool": false,
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"secret/root/sub": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+			},
+		},
+		{
+			name: "3 multi level",
+			m: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"root": map[string]interface{}{
+						"sub": map[string]interface{}{
+							"kv":   12,
+							"bool": false,
+						},
+						"sub2": map[string]interface{}{
+							"kv":   12,
+							"bool": false,
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"secret/root/sub": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+				"secret/root/sub2": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+			},
+		},
+		{
+			name: "3 multi level 2",
+			m: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"root": map[string]interface{}{
+						"sub": map[string]interface{}{
+							"kv":   12,
+							"bool": false,
+						},
+					},
+					"root2": map[string]interface{}{
+						"kv":   12,
+						"bool": false,
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"secret/root/sub": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+				"secret/root2": map[string]interface{}{
+					"kv":   12,
+					"bool": false,
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		res := make(map[string]interface{})
+
+		TransformMap("", tc.m, &res)
+
+		assert.Equal(t, tc.expected, res, tc.expected)
+	}
+}
+
+func TestPathMap(t *testing.T) {
+	testCases := []struct {
+		name         string
+		path         string
+		m            map[string]interface{}
+		isSecretPath bool
+		expected     map[string]interface{}
+	}{
+		{
+			name: "secret path",
+			path: "root/sub",
+			m: map[string]interface{}{
+				"k":  "v",
+				"k2": 12,
+			},
+			isSecretPath: true,
+			expected: map[string]interface{}{
+				"root/": map[string]interface{}{
+					"sub": map[string]interface{}{
+						"k":  "v",
+						"k2": 12,
+					},
+				},
+			},
+		},
+		{
+			name:         "directory path",
+			path:         "root/sub",
+			m:            map[string]interface{}{},
+			isSecretPath: false,
+			expected: map[string]interface{}{
+				"root/": map[string]interface{}{
+					"sub/": map[string]interface{}{},
+				},
+			},
+		},
+		{
+			name:         "only root",
+			path:         "root",
+			m:            map[string]interface{}{},
+			isSecretPath: false,
+			expected: map[string]interface{}{
+				"root/": map[string]interface{}{},
+			},
+		},
+		{
+			name:         "only root",
+			path:         "",
+			m:            map[string]interface{}{},
+			isSecretPath: false,
+			expected:     map[string]interface{}{},
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expected, PathMap(tc.path, tc.m, tc.isSecretPath), tc.name)
+	}
+}
+
 func TestRemoveEmptyElements(t *testing.T) {
 	testCases := []struct {
 		name     string
@@ -65,12 +246,6 @@ func TestSplitPath(t *testing.T) {
 			path:            "",
 			expectedRoot:    "",
 			expectedSubPath: "",
-		},
-		{
-			name:            "test: slash in root path",
-			path:            "a/b/c/d//sub/path",
-			expectedRoot:    "a/b/c/d",
-			expectedSubPath: "sub/path",
 		},
 	}
 

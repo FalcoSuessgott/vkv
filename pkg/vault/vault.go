@@ -59,47 +59,50 @@ func NewClient() (*Vault, error) {
 }
 
 // ListRecursive returns secrets to a path recursive.
-func (s *Secrets) ListRecursive(v *Vault, rootPath, subPath string) error {
-	keys, err := v.ListSecrets(rootPath, subPath)
+func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
+	s := make(Secrets)
+
+	keys, err := v.ListKeys(rootPath, subPath)
 	if err != nil {
 		// no sub directories in here, but lets check for normal kv pairs then..
 		secrets, err := v.ReadSecrets(rootPath, subPath)
-		if err == nil {
-			(*s)[path.Join(rootPath, subPath)] = secrets
-
-			return nil
+		if err != nil {
+			log.Fatalf("could not read secrets from %s/%s: %v", rootPath, subPath, err)
 		}
 
-		return err
+		return (*Secrets)(&secrets), nil
 	}
 
 	for _, k := range keys {
 		if strings.HasSuffix(k, utils.Delimiter) {
-			if err := s.ListRecursive(v, rootPath, path.Join(subPath, k)); err != nil {
-				return err
+			secrets, err := v.ListRecursive(rootPath, path.Join(subPath, k))
+			if err != nil {
+				return &s, err
 			}
+
+			(s)[k] = secrets
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
 			if err != nil {
-				return fmt.Errorf("error while reading \"%s/%s\": %w", rootPath, subPath, err)
+				return nil, err
 			}
 
-			(*s)[path.Join(rootPath, subPath, k)] = secrets
+			(s)[k] = secrets
 		}
 	}
 
-	return nil
+	return &s, nil
 }
 
-// ListSecrets returns all keys from vault kv secret path.
-func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
+// ListKeys returns all keys from vault kv secret path.
+func (v *Vault) ListKeys(rootPath, subPath string) ([]string, error) {
 	data, err := v.Client.Logical().List(fmt.Sprintf(listSecretsPath, rootPath, subPath))
 	if err != nil {
 		return nil, err
 	}
 
 	if data == nil {
-		return nil, fmt.Errorf("no secrets under path \"%s\" found", path.Join(rootPath, subPath))
+		return nil, fmt.Errorf("no keys found in \"%s\"", path.Join(rootPath, subPath))
 	}
 
 	if data.Data != nil {
@@ -117,7 +120,7 @@ func (v *Vault) ListSecrets(rootPath, subPath string) ([]string, error) {
 		return keys, nil
 	}
 
-	return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
+	return nil, fmt.Errorf("no keys found in \"%s\"", path.Join(rootPath, subPath))
 }
 
 // ReadSecrets returns a map with all secrets from a kv engine path.

@@ -49,13 +49,13 @@ vault: clean ## set up a development vault server and write kv secrets
 	sleep 5
 
 	vault kv put secret/demo foo=bar
-	vault kv put secret/sub sub=password
+	vault kv put secret/admin sub=password
 	vault kv put secret/sub/demo demo="hello world" user=admin password=s3cre5
 	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
 
 	vault secrets enable -path secret_2 -version=2 kv
 	vault kv put secret_2/demo foo=bar
-	vault kv put secret_2/sub sub=password
+	vault kv put secret_2/admin sub=password
 	vault kv put secret_2/sub/demo demo="hello world" user=admin password=s3cre5
 	vault kv put secret_2/sub/sub2/demo foo=bar-updated user=user password=password
 

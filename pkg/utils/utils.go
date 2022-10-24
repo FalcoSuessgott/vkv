@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"path"
 	"sort"
 	"strings"
 
@@ -29,17 +30,47 @@ func ReadFile(path string) ([]byte, error) {
 	return content, nil
 }
 
+// TransformMap takes a multi leveled map and returns a map with its combined paths
+// as the keys and the map as its value. Also see TestTransformMap().
+func TransformMap(p string, m map[string]interface{}, s *map[string]interface{}) {
+	for k, v := range m {
+		subMap, ok := v.(map[string]interface{})
+		if ok {
+			TransformMap(path.Join(p, k), subMap, s)
+		} else {
+			(*s)[p] = m
+		}
+	}
+}
+
+// PathMap takes a path like "a/b/c" and returns a map like map[a] -> map[b] -> map[c].
+// if isSecretPath is true, then c does not have a / as suffix.
+func PathMap(path string, s map[string]interface{}, isSecretPath bool) map[string]interface{} {
+	m := map[string]interface{}{}
+
+	parts := strings.Split(path, Delimiter)
+
+	if path == "" {
+		return s
+	}
+
+	if len(parts) > 1 {
+		m[parts[0]+Delimiter] = PathMap(strings.Join(parts[1:], Delimiter), s, isSecretPath)
+	} else {
+		// if path leads to a vault kv directory, append a "/"
+		if !isSecretPath {
+			path += Delimiter
+		}
+
+		m[path] = s
+	}
+
+	return m
+}
+
 // SplitPath splits a given path by / and returns the first element and the joined rest paths.
 func SplitPath(path string) (string, string) {
 	parts := removeEmptyElements(strings.Split(path, Delimiter))
-
-	// we use a double slash // for dividing root and subpath
-	// since a secret engine in vault can contain multiple slash
-	if strings.Contains(path, Delimiter+Delimiter) {
-		parts = strings.Split(path, Delimiter+Delimiter)
-
-		return parts[0], strings.Join(parts[1:], Delimiter)
-	}
 
 	if len(parts) >= 2 {
 		return parts[0], strings.Join(parts[1:], Delimiter)
