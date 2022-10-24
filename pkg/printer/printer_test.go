@@ -69,7 +69,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: default options",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -88,7 +88,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: show secrets",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -107,7 +107,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: only paths",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -124,7 +124,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: only keys",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -143,7 +143,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: normal map to json",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -153,8 +153,8 @@ func TestPrint(t *testing.T) {
 				ShowValues(true),
 			},
 			output: `{
-  "root": {
-    "root/secret": {
+  "root/": {
+    "secret": {
       "key": "value",
       "user": "password"
     }
@@ -166,7 +166,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: normal map to json only keys",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -176,8 +176,8 @@ func TestPrint(t *testing.T) {
 				OnlyKeys(true),
 			},
 			output: `{
-  "root": {
-    "root/secret": {
+  "root/": {
+    "secret": {
       "key": "",
       "user": ""
     }
@@ -189,7 +189,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: normal map to yaml",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -198,8 +198,8 @@ func TestPrint(t *testing.T) {
 				ToFormat(YAML),
 				ShowValues(true),
 			},
-			output: `root:
-  root/secret:
+			output: `root/:
+  secret:
     key: value
     user: password
 
@@ -209,7 +209,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: normal map to yaml only keys",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -218,8 +218,8 @@ func TestPrint(t *testing.T) {
 				ToFormat(YAML),
 				OnlyKeys(true),
 			},
-			output: `root:
-  root/secret:
+			output: `root/:
+  secret:
     key: ""
     user: ""
 
@@ -229,7 +229,7 @@ func TestPrint(t *testing.T) {
 			name:     "test: export format",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -238,8 +238,8 @@ func TestPrint(t *testing.T) {
 				ToFormat(Export),
 				ShowValues(true),
 			},
-			output: `export key="value"
-export user="password"
+			output: `export key='value'
+export user='password'
 `,
 		},
 		{
@@ -254,7 +254,7 @@ export user="password"
 			name:     "test: markdown",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -272,7 +272,7 @@ export user="password"
 			name:     "test: markdown only keys",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -291,7 +291,7 @@ export user="password"
 			name:     "test: markdown only paths",
 			rootPath: "root",
 			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
+				"secret": map[string]interface{}{
 					"key":  "value",
 					"user": "password",
 				},
@@ -374,7 +374,7 @@ path "root/secret/*" {
 
 		m := map[string]interface{}{}
 
-		m[tc.rootPath] = tc.s
+		m[tc.rootPath+"/"] = tc.s
 		assert.NoError(t, p.Out(m))
 		assert.Equal(t, tc.output, b.String(), tc.name)
 	}

@@ -11,6 +11,6 @@ package tools
 import (
 	_ "github.com/daixiang0/gci"
 	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"
-	_ "github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest"
+	_ "github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt"
 	_ "mvdan.cc/gofumpt"
 )
