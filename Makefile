@@ -47,18 +47,26 @@ vault: export VAULT_TOKEN = root
 vault: clean ## set up a development vault server and write kv secrets
 	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
 	sleep 5
+
 	vault kv put secret/demo foo=bar
 	vault kv put secret/sub sub=password
-	vault kv put secret/sub/demo1 demo="hello world" user=admin password=s3cre5
-	vault kv put secret/sub/sub2/demo value="nevermind" user="database" password=secret2
+	vault kv put secret/sub/demo demo="hello world" user=admin password=s3cre5
+	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
 
 	vault secrets enable -path secret_2 -version=2 kv
 	vault kv put secret_2/demo foo=bar
 	vault kv put secret_2/sub sub=password
-	vault kv put secret_2/sub/demo foo=bar user=user password=password
-	vault kv put secret_2/sub/sub2/demo foo=bar user=user password=password
+	vault kv put secret_2/sub/demo demo="hello world" user=admin password=s3cre5
+	vault kv put secret_2/sub/sub2/demo foo=bar-updated user=user password=password
 
 .PHONY: clean
 clean: ## clean the development vault
 	@rm -rf coverage.out dist/ $(projectname)
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
+
+ASSETS = base yaml json markdown export template diff policies
+.PHONY: assets
+assets: clean vault ## generate all assets
+	for i in $(ASSETS); do \
+		vhs < assets/$$i.tape; \
+	done

@@ -159,7 +159,8 @@ func TestPrint(t *testing.T) {
       "user": "password"
     }
   }
-}`,
+}
+`,
 		},
 		{
 			name:     "test: normal map to json only keys",
@@ -181,7 +182,8 @@ func TestPrint(t *testing.T) {
       "user": ""
     }
   }
-}`,
+}
+`,
 		},
 		{
 			name:     "test: normal map to yaml",
@@ -200,6 +202,7 @@ func TestPrint(t *testing.T) {
   root/secret:
     key: value
     user: password
+
 `,
 		},
 		{
@@ -219,6 +222,7 @@ func TestPrint(t *testing.T) {
   root/secret:
     key: ""
     user: ""
+
 `,
 		},
 		{
@@ -360,6 +364,7 @@ path "root/secret/*" {
 path "root/secret/*" {
     capabilities = [ "create", "read", "update", "delete", "list" ]
 }
+
 
 `,
 		},

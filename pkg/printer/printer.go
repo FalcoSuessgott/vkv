@@ -171,7 +171,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 			return err
 		}
 
-		fmt.Fprintf(p.writer, "%s", string(out))
+		fmt.Fprintf(p.writer, "%s\n", string(out))
 
 	case JSON:
 		out, err := utils.ToJSON(secrets)
@@ -179,7 +179,7 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 			return err
 		}
 
-		fmt.Fprintf(p.writer, "%s", string(out))
+		fmt.Fprintf(p.writer, "%s\n", string(out))
 
 	case Export:
 		for _, k := range utils.SortMapKeys(secrets) {

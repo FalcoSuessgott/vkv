@@ -1,31 +1,41 @@
 <div align="center">
   <h1> vkv </h1>
-  <img src="assets/base.svg" alt="drawing" height="400" width="550">
+  <img src="assets/base.gif" alt="drawing" height="400" width="550">
 
-  [![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) [![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) [![codecov](https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg?token=UYVZ8LTA45)](https://codecov.io/gh/FalcoSuessgott/vkv)
+  [![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) [![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) [![codecov](https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg)](https://codecov.io/gh/FalcoSuessgott/vkv)
   [![Github all releases](https://img.shields.io/github/downloads/FalcoSuessgott/vkv/total.svg)](https://GitHub.com/FalcoSuessgott/vkv/releases/)
 </div>
 
+---
 
 # Description
-`vkv` recursively list you all key-value entries from Vaults KV2 secret engine in various formats. `vkv` flags can be devided into input, modifying and output format flags.
+`vkv` recursively list you all key-value entries from Vaults KV2 secret engine in various formats. `vkv` flags can be divided into input, modifying and output format flags.
 
 So far `vkv` offers:
 
+## Input flags
 | Flag                  | Description                                                                       | Env Var                | Default |
 |-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
 | `-p`, `--path`        | KVv2 Engine path (env var: VKV_PATH)                                              | `VKV_PATH`             | `kv`    |
 | `-e`, `--engine-path` | Specify the engine path. This flag is only required in case your kv-engine contains special characters such as a `/`. <br/> `vkv` will then append the values of the path-flag to the engine path, if specified (`<engine-path>/<path>`)| `VKV_ENGINE_PATH`      |       |
-| `-f`, `--format`      | output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
+
+
+## Modifying flags
+| Flag                  | Description                                                                       | Env Var                | Default |
+|-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
 | `--only-keys`         | show only keys                                                                    | `VKV_ONLY_KEYS`        | `false` |
 | `--only-paths`        | show only paths                                                                   | `VKV_ONLY_PATHS`       | `false` |
-| `--show-values`       | dont mask values                                                                  | `VKV_SHOW_VALUES`      | `false` |
+| `--show-values`       | don't mask values                                                                  | `VKV_SHOW_VALUES`      | `false` |
 | `--max-value-length`  | maximum char length of values (set to `-1` for disabling)                         | `VKV_MAX_VALUE_LENGTH` | `12`    |
 | `--template-file`     | path to a file containing Go-template syntax to render the KV entries             | `VKV_TEMPLATE_FILE`    |         |
 | `--template-string`   | string containing Go-template syntax to render KV entries                         | `VKV_TEMPLATE_STRING`  |         |
 
+## [Output flags](https://github.com/FalcoSuessgott/vkv/tree/output-formats)
+| Flag                  | Description                                                                       | Env Var                | Default |
+|-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
+| `-f`, `--format`      | output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
 
-⚠️ **A flag always preceed its environment variable**
+⚠️ **A flag always precede its environment variable**
 
 You can combine most of those flags in order to receive the desired output.
 
@@ -38,35 +48,55 @@ Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](htt
 # Authentication
 `vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.
 
-All of vaults [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) are supported. In order to authenticate to a Vault instance you have to set atleast `VAULT_ADDR` and `VAULT_TOKEN`:
+All of vaults [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) are supported. In order to authenticate to a Vault instance you have to set at least `VAULT_ADDR` and `VAULT_TOKEN`.
 
-```bash
-# on linux/macos
-VAULT_ADDR="http://127.0.0.1:8200" VAULT_TOKEN="s.XXX" vkv -p <k`vkv` will then append the values of the path-flag to the engine path, if specified (`<engine-path>/<path>`)| `VKV_ENGINE_PATH`      | ``      |
-v-path>
+---
 
-# on windows
-SET VAULT_ADDR=http://127.0.0.1:8200
-SET VAULT_TOKEN=s.XXX
-vkv.exe -p <kv-path>
+# Output Formats
+<div align="center">
+  <h2> Base </h2>
+  <img src="assets/base.gif" alt="drawing" height="400" width="550">
+
+  <h2> YAML </h2>
+  <img src="assets/yaml.gif" alt="drawing" height="400" width="550">
+
+  <h2> JSON </h2>
+  <img src="assets/json.gif" alt="drawing" height="400" width="550">
+
+  <h2> Markdown </h2>
+  <img src="assets/markdown.gif" alt="drawing" height="400" width="550">
+
+  <h2> Export </h2>
+  <img src="assets/export.gif" alt="drawing" height="400" width="550">
+
+  <h2> Template </h2>
+  <a href="https://github.com/FalcoSuessgott/vkv/tree/advances-examples">See Advanced Examples section</a>
+</div>
+
+# Advances Examples
+## Compare KV-Engines and get the diff 
+`vkv` can be used to compare secrets across Vault servers or KV engines.
+
+Here is an example using `diff`, the `|` indicates the changed entry per line:
+
+![](assets/diff.gif)
+
+## Generate policies
+`vkv` can be used to generate policies from an existing KV path. 
+
+Passing a file that contains the following Go-Template-Snippet:
+
+```go
+{{ range $entry := . }}
+path "{{ $entry.Path }}/*" {
+    capabilities = [ "create", "read" ]
+}
+{{ end }}
 ```
 
-# Supported Formats
-### `base`
-![](assets/base.svg)
+results in:
 
-### `markdown`
-![](assets/markdown.svg)
-
-### `json`
-![](assets/json.svg)
-
-### `yaml`
-![](assets/yaml.svg)
-
-### `template`
-![](assets/template.svg)
-
+![](assets/policies.gif)
 
 
 # Development
@@ -92,7 +122,7 @@ export VAULT_TOKEN="root"
 export VKV_PATHS="secret"
 ```
 
-If everthing worked fine, you should be able to run:
+If everything worked fine, you should be able to run:
 
 ```sh
 go run main.go   

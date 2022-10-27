@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"path"
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
@@ -75,7 +74,7 @@ func newRootCmd(version string) *cobra.Command {
 				return fmt.Errorf("error reading secrets: %w", err)
 			}
 
-			m[path.Join(rootPath, subPath)] = (*s)
+			m[rootPath] = (*s)
 
 			if len(m) == 0 {
 				return nil
