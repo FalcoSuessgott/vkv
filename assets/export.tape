@@ -21,6 +21,6 @@ Type "eval $(vkv -p secret/sub/demo -f=export)"
 Enter
 Sleep 1
 
-Type "echo $foo"
+Type "echo $password"
 Enter
-Sleep 3 
+Sleep 3

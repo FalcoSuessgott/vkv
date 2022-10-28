@@ -30,7 +30,7 @@ So far `vkv` offers:
 | `--template-file`     | path to a file containing Go-template syntax to render the KV entries             | `VKV_TEMPLATE_FILE`    |         |
 | `--template-string`   | string containing Go-template syntax to render KV entries                         | `VKV_TEMPLATE_STRING`  |         |
 
-## [Output flags](https://github.com/FalcoSuessgott/vkv/tree/output-formats)
+## [Output flags](https://github.com/FalcoSuessgott/vkv#output-formats)
 | Flag                  | Description                                                                       | Env Var                | Default |
 |-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
 | `-f`, `--format`      | output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
@@ -70,7 +70,7 @@ All of vaults [environment variables](https://www.vaultproject.io/docs/commands#
   <img src="assets/export.gif" alt="drawing" height="400" width="550">
 
   <h2> Template </h2>
-  <a href="https://github.com/FalcoSuessgott/vkv/tree/advances-examples">See Advanced Examples section</a>
+  <a href="https://github.com/FalcoSuessgott/vkv#generate-policies">See Advanced Examples section: Generate policies</a>
 </div>
 
 # Advances Examples
