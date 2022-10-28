@@ -316,7 +316,7 @@ export user="password"
 			},
 			opts: []Option{
 				ToFormat(Template),
-				WithTemplate(`{{ range $entry := . }}{{ printf "%s:\t%s=%v\n" $entry.Path $entry.Key $entry.Value }}{{ end }}`, ""),
+				WithTemplate(`{{ range $path, $data := . }}{{ range $entry := $data }}{{ printf "%s:\t%s=%v\n" $path $entry.Key $entry.Value }}{{ end }}{{ end }}`, ""),
 			},
 			output: `root/secret:	key=*****
 root/secret:	user=********
@@ -335,7 +335,7 @@ root/secret:	user=********
 			opts: []Option{
 				ToFormat(Template),
 				ShowValues(true),
-				WithTemplate(`{{ range $entry := . }}{{ printf "%s:\t%s=%v\n" $entry.Path $entry.Key $entry.Value }}{{ end }}`, ""),
+				WithTemplate(`{{ range $path, $data := . }}{{ range $entry := $data }}{{ printf "%s:\t%s=%v\n" $path $entry.Key $entry.Value }}{{ end }}{{ end }}`, ""),
 			},
 			output: `root/secret:	key=value
 root/secret:	user=password
@@ -358,11 +358,7 @@ root/secret:	user=password
 			},
 			output: `
 path "root/secret/*" {
-    capabilities = [ "create", "read", "update", "delete", "list" ]
-}
-
-path "root/secret/*" {
-    capabilities = [ "create", "read", "update", "delete", "list" ]
+    capabilities = [ "create", "read" ]
 }
 
 

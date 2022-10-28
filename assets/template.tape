@@ -14,9 +14,9 @@ Type "export VAULT_TOKEN='root'"
 Enter
 
 Show
-Type "cat assets/policies.tmpl"
+Type "cat assets/template.tmpl"
 Enter
 
-Type "vkv -f=template --template-string="{{ range $entry := . }}{{ printf "%s:\t%s=%v\n" $entry.Path $entry.Key $entry.Value }}{{ end }}" --show-values"
+Type "vkv -f=template --template-file=assets/template.tmpl --show-values"
 Enter
 Sleep 5

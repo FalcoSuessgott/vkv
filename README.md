@@ -70,7 +70,7 @@ All of vaults [environment variables](https://www.vaultproject.io/docs/commands#
   <img src="assets/export.gif" alt="drawing" height="400" width="550">
 
   <h2> Template </h2>
-  <a href="https://github.com/FalcoSuessgott/vkv#generate-policies">See Advanced Examples section: Generate policies</a>
+  <img src="assets/export.gif" alt="drawing" height="400" width="550">
 </div>
 
 # Advances Examples
@@ -83,12 +83,28 @@ Here is an example using `diff`, the `|` indicates the changed entry per line:
 
 ## Generate policies
 `vkv` can be used to generate policies from an existing KV path. 
-
-Passing a file that contains the following Go-Template-Snippet:
+When using the template output format, all the data is passed to STDOUT as a 
 
 ```go
-{{ range $entry := . }}
-path "{{ $entry.Path }}/*" {
+map[string][]entry
+```
+
+where `entry` is a struct of 
+
+```go
+type entry struct {
+  Key   string
+  Value interface{}
+}
+```
+
+Which means you can iterate over the map, where the map-key is the secret path and iterate again over the slice of entries in order to access the key and value of the secret (also see [assets/template.tmpl](assets/template.tmpl)).
+
+Knowing this, one can generate Vault policies from an existing KV-engine using the following Go-Template-Snippet:
+
+```go
+{{ range $path, $data := . }}
+path "{{ $path }}/*" {
     capabilities = [ "create", "read" ]
 }
 {{ end }}

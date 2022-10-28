@@ -16,6 +16,6 @@ Show
 Type "cat assets/policies.tmpl"
 Enter
 
-Type "vkv -p secret/sub/sub2 -f=template --template-file=assets/policies.tmpl"
+Type "vkv -p secret -f=template --template-file=assets/policies.tmpl"
 Enter
 Sleep 5

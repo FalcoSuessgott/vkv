@@ -205,16 +205,16 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
 		table.SetCenterSeparator("|")
 		table.AppendBulk(data)
-		table.SetAutoMergeCellsByColumnIndex([]int{0, 1}) // merge mounts and paths colunmn
+		table.SetAutoMergeCellsByColumnIndex([]int{0, 1}) // merge mounts and paths columns
 		table.Render()
 
 	case Template:
 		type entry struct {
-			Path, Key string
-			Value     interface{}
+			Key   string
+			Value interface{}
 		}
 
-		entries := []entry{}
+		data := map[string][]entry{}
 
 		for _, k := range utils.SortMapKeys(secrets) {
 			m := utils.ToMapStringInterface(secrets[k])
@@ -225,13 +225,16 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 					log.Fatalf("cannot convert %T to map[string]interface", m[i])
 				}
 
+				entries := []entry{}
 				for _, j := range utils.SortMapKeys(subMap) {
-					entries = append(entries, entry{Path: i, Key: j, Value: subMap[j]})
+					entries = append(entries, entry{Key: j, Value: subMap[j]})
 				}
+
+				data[i] = entries
 			}
 		}
 
-		output, err := render.String([]byte(p.template), entries)
+		output, err := render.String([]byte(p.template), data)
 		if err != nil {
 			return err
 		}

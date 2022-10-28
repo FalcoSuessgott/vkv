@@ -1,5 +1,5 @@
-{{ range $entry := . }}
-path "{{ $entry.Path }}/*" {
-    capabilities = [ "create", "read", "update", "delete", "list" ]
+{{ range $path, $data := . }}
+path "{{ $path }}/*" {
+    capabilities = [ "create", "read" ]
 }
 {{ end }}

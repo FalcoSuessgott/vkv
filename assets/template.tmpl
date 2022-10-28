@@ -1,0 +1,3 @@
+{{ range $path, $data := . }}
+{{ range $entry := $data }}{{ printf "%s:\t%s=%v\n" $path $entry.Key $entry.Value }}{{ end }}
+{{ end }}
