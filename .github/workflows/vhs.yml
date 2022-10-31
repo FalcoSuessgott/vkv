@@ -74,6 +74,12 @@ jobs:
           path: 'assets/policies.tape'
           install-fonts: false
 
+      - name: vhs template
+        uses: charmbracelet/vhs-action@main
+        with:
+          path: 'assets/template.tape'
+          install-fonts: false
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
