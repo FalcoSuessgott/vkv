@@ -20,8 +20,8 @@ var errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
 
 // Options holds all available commandline options.
 type Options struct {
-	Path       string `env:"PATH" envDefault:"kv"`
-	EnginePath string `env:"ENGINE_PATH" envDefault:""`
+	Path       string `env:"PATH"`
+	EnginePath string `env:"ENGINE_PATH"`
 
 	OnlyKeys       bool `env:"ONLY_KEYS"`
 	OnlyPaths      bool `env:"ONLY_PATHS"`
@@ -47,7 +47,7 @@ func newRootCmd(version string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:           "vkv",
-		Short:         "recursively list secrets from Vaults KV2 engine",
+		Short:         "recursively list secrets from Vaults KV2 engine in various formats",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -109,7 +109,7 @@ func newRootCmd(version string) *cobra.Command {
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env var: VKV_ONLY_KEYS)")
 	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env var: VKV_ONLY_PATHS)")
-	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "dont mask values (env var: VKV_SHOW_VALUES)")
+	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env var: VKV_SHOW_VALUES)")
 	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
 		"(env var: VKV_MAX_VALUE_LENGTH)")
 
@@ -138,9 +138,13 @@ func Execute(version string) error {
 
 // nolint: cyclop
 func (o *Options) validateFlags() error {
+	var err error
+
 	switch {
 	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):
-		return errInvalidFlagCombination
+		err = errInvalidFlagCombination
+	case o.EnginePath == "" && o.Path == "":
+		err = fmt.Errorf("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
 	case true:
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":
@@ -162,20 +166,18 @@ func (o *Options) validateFlags() error {
 			o.OnlyPaths = false
 
 			if o.TemplateFile != "" && o.TemplateString != "" {
-				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
+				err = fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
 			}
 
 			if o.TemplateFile == "" && o.TemplateString == "" {
-				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
+				err = fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
 			}
 		default:
-			return printer.ErrInvalidFormat
+			err = printer.ErrInvalidFormat
 		}
-	case (o.EnginePath == "" && o.Path == ""):
-		return fmt.Errorf("no paths KVv2 paths given. Either --engine-path (-e) or --path (-p) needs to be specified")
 	}
 
-	return nil
+	return err
 }
 
 func (o *Options) buildEnginePath() (string, string) {
