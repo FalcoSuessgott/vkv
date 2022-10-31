@@ -16,7 +16,7 @@ So far `vkv` offers:
 ## Input flags
 | Flag                  | Description                                                                       | Env Var                | Default |
 |-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
-| `-p`, `--path`        | KVv2 Engine path (env var: VKV_PATH)                                              | `VKV_PATH`             | `kv`    |
+| `-p`, `--path`        | KVv2 Engine path (env var: VKV_PATH)                                              | `VKV_PATH`             | ``      |
 | `-e`, `--engine-path` | Specify the engine path. This flag is only required in case your kv-engine contains special characters such as a `/`. <br/> `vkv` will then append the values of the path-flag to the engine path, if specified (`<engine-path>/<path>`)| `VKV_ENGINE_PATH`      |       |
 
 

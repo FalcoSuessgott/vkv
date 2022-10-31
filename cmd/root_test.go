@@ -109,6 +109,7 @@ func TestOutputFormat(t *testing.T) {
 
 	for _, tc := range testCases {
 		o := &Options{
+			Path:         "kv",
 			FormatString: tc.format,
 			TemplateFile: "o", // needed for testing template format
 		}
@@ -133,42 +134,42 @@ func TestValidateFlags(t *testing.T) {
 		{
 			name: "test: only keys and only paths",
 			err:  true,
-			opts: &Options{OnlyKeys: true, OnlyPaths: true},
+			opts: &Options{Path: "kv", OnlyKeys: true, OnlyPaths: true},
 		},
 		{
 			name: "test: only keys and show secrets ",
 			err:  true,
-			opts: &Options{OnlyKeys: true, ShowValues: true},
+			opts: &Options{Path: "kv", OnlyKeys: true, ShowValues: true},
 		},
 		{
 			name: "test: only paths and show secrets ",
 			err:  true,
-			opts: &Options{OnlyPaths: true, ShowValues: true},
+			opts: &Options{Path: "kv", OnlyPaths: true, ShowValues: true},
 		},
 		{
 			name: "test: no paths",
 			err:  false,
-			opts: &Options{FormatString: "base", Path: ""},
+			opts: &Options{FormatString: "base", Path: "kv"},
 		},
 		{
 			name: "test: template with file",
 			err:  false,
-			opts: &Options{FormatString: "tmpl", TemplateFile: "OK"},
+			opts: &Options{Path: "kv", FormatString: "tmpl", TemplateFile: "OK"},
 		},
 		{
 			name: "test: template with string",
 			err:  false,
-			opts: &Options{FormatString: "tmpl", TemplateString: "OK"},
+			opts: &Options{Path: "kv", FormatString: "tmpl", TemplateString: "OK"},
 		},
 		{
 			name: "test: template no file or string",
 			err:  true,
-			opts: &Options{FormatString: "tmpl"},
+			opts: &Options{Path: "kv", FormatString: "tmpl"},
 		},
 		{
 			name: "test: template file and string",
 			err:  true,
-			opts: &Options{FormatString: "tmpl", TemplateString: "OK", TemplateFile: "OK"},
+			opts: &Options{Path: "kv", FormatString: "tmpl", TemplateString: "OK", TemplateFile: "OK"},
 		},
 	}
 
@@ -199,7 +200,6 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: printer.MaxValueLength,
-				Path:           "kv",
 				FormatString:   "base",
 				OnlyKeys:       true,
 			},
@@ -212,7 +212,6 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: printer.MaxValueLength,
-				Path:           "kv",
 				FormatString:   "base",
 				OnlyPaths:      true,
 			},
@@ -233,7 +232,6 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: 213,
-				Path:           "kv",
 				FormatString:   "base",
 				ShowValues:     true,
 			},
@@ -246,7 +244,6 @@ func TestEnvVars(t *testing.T) {
 			},
 			expected: &Options{
 				MaxValueLength: 12,
-				Path:           "kv",
 				FormatString:   "yaml",
 			},
 		},
