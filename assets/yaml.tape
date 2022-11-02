@@ -1,7 +1,7 @@
 Output assets/yaml.gif
 
 Set FontSize 32
-Set Width 1100
+Set Width 2000
 Set Height 1000
 
 Hide
@@ -13,6 +13,6 @@ Type "export VAULT_TOKEN='root'"
 Enter
 
 Show
-Type@200ms "vkv -p secret -f=yaml --show-values"
+Type "vkv -p secret -f=yaml --show-values"
 Enter
 Sleep 5

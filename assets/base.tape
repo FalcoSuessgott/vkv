@@ -1,7 +1,7 @@
 Output assets/base.gif
 
-Set FontSize 36
-Set Width 1100
+Set FontSize 32
+Set Width 2000
 Set Height 1000
 
 Hide
@@ -13,6 +13,6 @@ Type "export VAULT_TOKEN='root'"
 Enter
 
 Show
-Type@200ms "vkv -p secret --show-values"
+Type "vkv -p secret --show-values"
 Enter
 Sleep 5s
