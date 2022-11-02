@@ -64,7 +64,7 @@ clean: ## clean the development vault
 	@rm -rf coverage.out dist/ $(projectname)
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
 
-ASSETS = base yaml json markdown export template diff policies template
+ASSETS = base yaml json markdown export template diff policies template fzf
 .PHONY: assets
 assets: clean vault ## generate all assets
 	for i in $(ASSETS); do \

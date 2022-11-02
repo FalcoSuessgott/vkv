@@ -2,8 +2,8 @@ name: vhs
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '*'
 
 jobs:
   vhs:
@@ -20,6 +20,9 @@ jobs:
 
       - name: go install
         run: go install
+
+      - name: install vhs deps
+        run: sudo apt install -y fzf jq
 
       - name: install vault
         run: |
@@ -72,6 +75,12 @@ jobs:
         uses: charmbracelet/vhs-action@main
         with:
           path: 'assets/policies.tape'
+          install-fonts: false
+
+      - name: vhs fzf
+        uses: charmbracelet/vhs-action@main
+        with:
+          path: 'assets/fzf.tape'
           install-fonts: false
 
       - name: vhs template

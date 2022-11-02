@@ -81,7 +81,7 @@ Here is an example using `diff`, the `|` indicates the changed entry per line:
 
 ![](assets/diff.gif)
 
-## Generate policies
+## Generate Vault policies
 `vkv` can be used to generate policies from an existing KV path. 
 When using the template output format, all the data is passed to STDOUT as a 
 
@@ -114,6 +114,11 @@ results in:
 
 ![](assets/policies.gif)
 
+## Iterate over all KV-engines and display their secrets the using `fzf` and `jq`
+using `vault secrets list` and a little bit of `jq`-logic (see [assets/fzf.sh](assets/fzf.sh)) we can get a list of all KV-engines visible for the token. If we pipe this into `fzf` we can get a handy little  preview-app:
+
+
+![](assets/fzf.gif)
 
 # Development
 Clone this repository and run:
@@ -135,7 +140,7 @@ The following environment variables are required:
 ```sh
 export VAULT_ADDR="http://127.0.0.1:8200"
 export VAULT_TOKEN="root"
-export VKV_PATHS="secret"
+export VKV_PATH="secret"
 ```
 
 If everything worked fine, you should be able to run:
