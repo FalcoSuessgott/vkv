@@ -71,7 +71,7 @@ func newRootCmd(version string) *cobra.Command {
 
 			rootPath, subPath := o.buildEnginePath()
 			if err := s.ListRecursive(v, rootPath, subPath); err != nil {
-				return fmt.Errorf("error reading secrets: %w", err)
+				return err
 			}
 
 			m[rootPath] = (*s)

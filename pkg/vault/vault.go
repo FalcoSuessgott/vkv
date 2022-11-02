@@ -63,8 +63,8 @@ func (s *Secrets) ListRecursive(v *Vault, rootPath, subPath string) error {
 	keys, err := v.ListSecrets(rootPath, subPath)
 	if err != nil {
 		// no sub directories in here, but lets check for normal kv pairs then..
-		secrets, e := v.ReadSecrets(rootPath, subPath)
-		if e == nil {
+		secrets, err := v.ReadSecrets(rootPath, subPath)
+		if err == nil {
 			(*s)[path.Join(rootPath, subPath)] = secrets
 
 			return nil
@@ -81,9 +81,7 @@ func (s *Secrets) ListRecursive(v *Vault, rootPath, subPath string) error {
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
 			if err != nil {
-				(*s)[path.Join(rootPath, subPath, k)] = map[string]interface{}{}
-
-				continue
+				return fmt.Errorf("error while reading \"%s/%s\": %w", rootPath, subPath, err)
 			}
 
 			(*s)[path.Join(rootPath, subPath, k)] = secrets

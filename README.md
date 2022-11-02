@@ -1,10 +1,10 @@
-<div align="center">
-  <h1> vkv </h1>
-  <img src="assets/base.gif" alt="drawing" height="400" width="550">
-
-  [![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) [![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) [![codecov](https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg)](https://codecov.io/gh/FalcoSuessgott/vkv)
-  [![Github all releases](https://img.shields.io/github/downloads/FalcoSuessgott/vkv/total.svg)](https://GitHub.com/FalcoSuessgott/vkv/releases/)
-</div>
+# vkv
+![](assets/base.gif)
+[![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) 
+[![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) 
+[![codecov](https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg)](https://codecov.io/gh/FalcoSuessgott/vkv)
+[![Github all releases](https://img.shields.io/github/downloads/FalcoSuessgott/vkv/total.svg)](https://GitHub.com/FalcoSuessgott/vkv/releases/)
 
 ---
 
@@ -46,32 +46,32 @@ Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](htt
 `vkv` is being tested on `Windows`, `MacOS` and `Linux` and also against Vault Version >= `v1.8.0` (but it also may work with lower versions).
 
 # Authentication
-`vkv` supports token based authentication. It is clear that you can only see the secrets that are allowed by your token policy.
-
 All of vaults [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) are supported. In order to authenticate to a Vault instance you have to set at least `VAULT_ADDR` and `VAULT_TOKEN`.
+
+⚠️ **Your token policy requires `read` and `list` capabilities on each path/secret that you want to see, otherwise `vkv` errors with `403`**
 
 ---
 
 # Output Formats
-<div align="center">
-  <h2> Base </h2>
-  <img src="assets/base.gif" alt="drawing" height="400" width="550">
 
-  <h2> YAML </h2>
-  <img src="assets/yaml.gif" alt="drawing" height="400" width="550">
+## Base
+![](assets/base.gif)
 
-  <h2> JSON </h2>
-  <img src="assets/json.gif" alt="drawing" height="400" width="550">
+## YAML
+![](assets/yaml.gif)
 
-  <h2> Markdown </h2>
-  <img src="assets/markdown.gif" alt="drawing" height="400" width="550">
+## JSON
+![](assets/json.gif)
 
-  <h2> Export </h2>
-  <img src="assets/export.gif" alt="drawing" height="400" width="550">
+## Markdown
+![](assets/markdown.gif)
 
-  <h2> Template </h2>
-  <img src="assets/export.gif" alt="drawing" height="400" width="550">
-</div>
+## Export
+![](assets/export.gif)
+
+## Template
+![](assets/template.gif)
+
 
 # Advances Examples
 ## Compare KV-Engines and get the diff 
