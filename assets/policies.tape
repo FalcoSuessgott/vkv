@@ -1,7 +1,7 @@
 Output assets/policies.gif
 
 Set FontSize 32
-Set Width 1100
+Set Width 2000
 Set Height 1000
 
 Hide

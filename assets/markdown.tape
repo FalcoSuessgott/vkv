@@ -1,8 +1,8 @@
 Output assets/markdown.gif
 
 Set FontSize 32
-Set Width 1100
-Set Height 800
+Set Width 2000
+Set Height 1000
 
 Hide
 Type "export VAULT_ADDR='http://127.0.0.1:8200'"
@@ -13,6 +13,6 @@ Type "export VAULT_TOKEN='root'"
 Enter
 
 Show
-Type@200ms "vkv -p secret -f=markdown --show-values"
+Type "vkv -p secret -f=markdown --show-values"
 Enter
 Sleep 5
