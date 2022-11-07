@@ -17,6 +17,6 @@ Show
 Type "cat assets/template.tmpl"
 Enter
 
-Type "vkv -f=template --template-file=assets/template.tmpl --show-values"
+Type "vkv -p secret -f=template --template-file=assets/template.tmpl --show-values"
 Enter
 Sleep 5
