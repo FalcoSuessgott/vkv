@@ -20,7 +20,8 @@ run: ## run the app
 
 PHONY: test
 test: clean ## display test coverage
-	go test -json -v ./... | gotestfmt
+	go test -v -race $(shell go list ./... | grep -v /vendor/) -v -coverprofile=coverage.out
+	go tool cover -func=coverage.out
 
 PHONY: fmt
 fmt: ## format go files
@@ -52,6 +53,7 @@ vault: clean ## set up a development vault server and write kv secrets
 	vault kv put secret/admin sub=password
 	vault kv put secret/sub/demo demo="hello world" user=admin password=s3cre5
 	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
+	vault policy write kv assets/kv-policy.hcl
 
 	vault secrets enable -path secret_2 -version=2 kv
 	vault kv put secret_2/demo foo=bar
@@ -64,7 +66,7 @@ clean: ## clean the development vault
 	@rm -rf coverage.out dist/ $(projectname)
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
 
-ASSETS = base yaml json markdown export template diff policies template fzf
+ASSETS = demo base markdown export template diff policies template fzf policy
 .PHONY: assets
 assets: clean vault ## generate all assets
 	for i in $(ASSETS); do \

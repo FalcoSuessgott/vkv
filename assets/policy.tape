@@ -1,4 +1,4 @@
-Output assets/json.gif
+Output assets/policy.gif
 
 Set FontSize 32
 Set Width 2000
@@ -13,6 +13,6 @@ Type "export VAULT_TOKEN='root'"
 Enter
 
 Show
-Type "vkv -p secret -f=json --show-values"
+Type "vkv -p secret -f=policy"
 Enter
 Sleep 5

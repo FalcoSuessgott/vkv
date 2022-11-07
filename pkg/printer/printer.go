@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 )
 
 // OutputFormat enum of valid output formats.
@@ -35,6 +36,9 @@ const (
 
 	// Template renders a given template string or file.
 	Template
+
+	// Policy displays the current token policy capabilities for each path in a matrix.
+	Policy
 )
 
 var (
@@ -56,6 +60,7 @@ type Printer struct {
 	showValues  bool
 	valueLength int
 	template    string
+	vaultClient *vault.Vault
 }
 
 // CustomValueLength option for trimming down the output of secrets.
@@ -128,6 +133,13 @@ func WithTemplate(str, path string) Option {
 	}
 }
 
+// WithVaultClient inject a vault client.
+func WithVaultClient(v *vault.Vault) Option {
+	return func(p *Printer) {
+		p.vaultClient = v
+	}
+}
+
 // NewPrinter return a new printer struct.
 func NewPrinter(opts ...Option) *Printer {
 	p := &Printer{
@@ -173,6 +185,8 @@ func (p *Printer) Out(secrets map[string]interface{}) error {
 		return p.printTemplate(secrets)
 	case Base:
 		return p.printBase(secrets)
+	case Policy:
+		return p.printPolicy(secrets)
 	default:
 		return ErrInvalidFormat
 	}

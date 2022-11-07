@@ -1,5 +1,10 @@
 # vkv
-![](assets/base.gif)
+`vkv` prints out HashiCorp Vault KV-v2 secrets recursively in various formats, such as YAML, JSON, Markdown Table, Export (for shell env vars) or even as Token-Capability-Matrix (format: `policy`). All formats can be chained with different commandline flags like not masking the secrets, or print only paths.
+
+Checkout the [Advanced Examples](https://github.com/FalcoSuessgott/vkv#advances-examples) section to learn more handy `vkv` snippets:
+
+![](assets/demo.gif)
+
 [![Test](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml) 
 [![golangci-lint](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg)](https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml) 
 [![Go Report Card](https://goreportcard.com/badge/github.com/FalcoSuessgott/vkv)](https://goreportcard.com/report/github.com/FalcoSuessgott/vkv) 
@@ -33,7 +38,7 @@ So far `vkv` offers:
 ## [Output flags](https://github.com/FalcoSuessgott/vkv#output-formats)
 | Flag                  | Description                                                                       | Env Var                | Default |
 |-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
-| `-f`, `--format`      | output format (options: `base`, `yaml`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
+| `-f`, `--format`      | output format (options: `base`, `yaml`, `policy`, `json`, `export`, `markdown`, `template`) | `VKV_FORMAT`           | `base`  |
 
 ⚠️ **A flag always precede its environment variable**
 
@@ -43,7 +48,7 @@ You can combine most of those flags in order to receive the desired output.
 Find the corresponding binaries, `.rpm` and `.deb` packages in the [release](https://github.com/FalcoSuessgott/vkv/releases) section.
 
 # Supported OS and Vault Versions
-`vkv` is being tested on `Windows`, `MacOS` and `Linux` and also against Vault Version >= `v1.8.0` (but it also may work with lower versions).
+`vkv` is being tested on `Windows`, `MacOS` and `Linux` and against [**Vaults last 3 major versions**](https://github.com/FalcoSuessgott/vkv/blob/master/.github/workflows/test.yml#L14), with version `v1.8.0` being the first tested one.
 
 # Authentication
 All of vaults [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) are supported. In order to authenticate to a Vault instance you have to set at least `VAULT_ADDR` and `VAULT_TOKEN`.
@@ -53,35 +58,37 @@ All of vaults [environment variables](https://www.vaultproject.io/docs/commands#
 ---
 
 # Output Formats
+`vkv` supports various output formats, such as `yaml` and `json` (which are self-explanatory). Furthermore you can also display KV-secrets recursively as:
 
-## Base
+### Base
+> prints the secrets in a handy tree-view.
 ![](assets/base.gif)
 
-## YAML
-![](assets/yaml.gif)
+### Policy
+> prints the capabilities of the authenticated Vault token in a matrix for each path.
+![](assets/policy.gif)
 
-## JSON
-![](assets/json.gif)
-
-## Markdown
+### Markdown Table
+> prints the secrets in a Markdown table for documenting the structure.
 ![](assets/markdown.gif)
 
-## Export
+### Export
+> prints secrets in `export <KEY>=<VALUE>`. Use `eval` for loading `vkv` output in your shell.
 ![](assets/export.gif)
 
-## Template
+### Template
+> Use custom templates for processing the secrets. (Also see [Advanced Examples](https://github.com/FalcoSuessgott/vkv#generate-vault-policies)).
 ![](assets/template.gif)
 
-
-# Advances Examples
-## Compare KV-Engines and get the diff 
+# Advanced Examples
+### Compare KV-Engines and highlight the difference using `diff` 
 `vkv` can be used to compare secrets across Vault servers or KV engines.
 
 Here is an example using `diff`, the `|` indicates the changed entry per line:
 
 ![](assets/diff.gif)
 
-## Generate Vault policies
+### Generate Vault policies using the `template` output format
 `vkv` can be used to generate policies from an existing KV path. 
 When using the template output format, all the data is passed to STDOUT as a 
 
@@ -114,7 +121,7 @@ results in:
 
 ![](assets/policies.gif)
 
-## Iterate over all KV-engines and display their secrets the using `fzf` and `jq`
+### Iterate over all KV-engines and display their secrets the using `fzf` and `jq`
 using `vault secrets list` and a little bit of `jq`-logic (see [assets/fzf.sh](assets/fzf.sh)) we can get a list of all KV-engines visible for the token. If we pipe this into `fzf` we can get a handy little  preview-app:
 
 

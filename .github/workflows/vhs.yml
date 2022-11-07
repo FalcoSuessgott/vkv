@@ -41,16 +41,10 @@ jobs:
           path: 'assets/base.tape'
           install-fonts: false
 
-      - name: vhs yaml
+      - name: vhs demo
         uses: charmbracelet/vhs-action@main
         with:
-          path: 'assets/yaml.tape'
-          install-fonts: false
-
-      - name: vhs json
-        uses: charmbracelet/vhs-action@main
-        with:
-          path: 'assets/json.tape'
+          path: 'assets/demo.tape'
           install-fonts: false
 
       - name: vhs markdown
@@ -87,6 +81,12 @@ jobs:
         uses: charmbracelet/vhs-action@main
         with:
           path: 'assets/template.tape'
+          install-fonts: false
+
+      - name: vhs policy
+        uses: charmbracelet/vhs-action@main
+        with:
+          path: 'assets/policy.tape'
           install-fonts: false
 
       - uses: stefanzweifel/git-auto-commit-action@v4

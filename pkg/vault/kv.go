@@ -3,60 +3,14 @@ package vault
 import (
 	"fmt"
 	"log"
-	"os"
 	"path"
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/hashicorp/vault/api"
 )
-
-// nolint: gosec
-const (
-	mountEnginePath      = "sys/mounts/%s"
-	readWriteSecretsPath = "%s/data/%s"
-	listSecretsPath      = "%s/metadata/%s"
-)
-
-// Vault represents a vault struct used for reading and writing secrets.
-type Vault struct {
-	Client *api.Client
-}
 
 // Secrets holds all recursive secrets of a certain path.
 type Secrets map[string]interface{}
-
-// NewClient returns a new vault client wrapper.
-func NewClient() (*Vault, error) {
-	_, ok := os.LookupEnv("VAULT_ADDR")
-	if !ok {
-		return nil, fmt.Errorf("VAULT_ADDR required but not set")
-	}
-
-	vaultToken, ok := os.LookupEnv("VAULT_TOKEN")
-	if !ok {
-		return nil, fmt.Errorf("VAULT_TOKEN required but not set")
-	}
-
-	config := api.DefaultConfig()
-	if err := config.ReadEnvironment(); err != nil {
-		return nil, err
-	}
-
-	c, err := api.NewClient(config)
-	if err != nil {
-		return nil, err
-	}
-
-	c.SetToken(vaultToken)
-
-	vaultNamespace, ok := os.LookupEnv("VAULT_NAMESPACE")
-	if ok {
-		c.SetNamespace(vaultNamespace)
-	}
-
-	return &Vault{Client: c}, nil
-}
 
 // ListRecursive returns secrets to a path recursive.
 func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
