@@ -47,7 +47,7 @@ func newRootCmd(version string) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:           "vkv",
+		Use:           "vkv -p <kv-path>",
 		Short:         "recursively list secrets from Vaults KV2 engine in various formats",
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -74,6 +74,7 @@ func newRootCmd(version string) *cobra.Command {
 				printer.ShowValues(o.ShowValues),
 				printer.WithTemplate(o.TemplateString, o.TemplateFile),
 				printer.ToFormat(o.outputFormat),
+				printer.WithVaultClient(v),
 			)
 
 			m, err := o.buildMap(v)
@@ -92,26 +93,27 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().SortFlags = false
 
 	// Input
-	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KVv2 Engine path (env var: VKV_PATH)")
+	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KVv2 Engine path (env: VKV_PATH)")
 	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath,
 		"Specify the engine path using this flag in case your kv-engine contains special characters such as \"/\".\n"+
 			"vkv will then append the values of the path-flag to the engine path, if specified (<engine-path>/<path>)"+
-			"(env var: VKV_ENGINE_PATHS)")
+			"(env: VKV_ENGINE_PATH)")
 
 	// Modify
-	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env var: VKV_ONLY_KEYS)")
-	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env var: VKV_ONLY_PATHS)")
-	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env var: VKV_SHOW_VALUES)")
+	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_ONLY_KEYS)")
+	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env: VKV_ONLY_PATHS)")
+	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_SHOW_VALUES)")
 	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
-		"(env var: VKV_MAX_VALUE_LENGTH)")
+		"(env: VKV_MAX_VALUE_LENGTH)")
 
 	// Template
-	cmd.Flags().StringVar(&o.TemplateFile, "template-file", o.TemplateFile, "path to a file containing Go-template syntax to render the KV entries (env var: VKV_TEMPLATE_FILE)")
-	cmd.Flags().StringVar(&o.TemplateString, "template-string", o.TemplateString, "template string containing Go-template syntax to render KV entries (env var: VKV_TEMPLATE_STRING)")
+	cmd.Flags().StringVar(&o.TemplateFile, "template-file", o.TemplateFile, "path to a file containing Go-template syntax to render the KV entries (env: VKV_TEMPLATE_FILE)")
+	cmd.Flags().StringVar(&o.TemplateString, "template-string", o.TemplateString, "template string containing Go-template syntax to render KV entries (env: VKV_TEMPLATE_STRING)")
 
 	// Output format
-	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "output format: \"base\", \"json\", \"yaml\", \"export\", \"markdown\", \"template\") "+
-		"(env var: VKV_FORMAT)")
+	//nolint: lll
+	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "available output formats: \"base\", \"json\", \"yaml\", \"export\", \"policy\", \"markdown\", \"template\" "+
+		"(env: VKV_FORMAT)")
 
 	// version
 	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
@@ -152,6 +154,11 @@ func (o *Options) validateFlags() error {
 			o.outputFormat = printer.Markdown
 		case "base":
 			o.outputFormat = printer.Base
+		case "policy":
+			o.outputFormat = printer.Policy
+			o.OnlyKeys = false
+			o.OnlyPaths = false
+			o.ShowValues = true
 		case "template", "tmpl":
 			o.outputFormat = printer.Template
 			o.OnlyKeys = false
