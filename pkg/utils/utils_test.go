@@ -6,6 +6,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestReadFile(t *testing.T) {
+	testCases := []struct {
+		name    string
+		path    string
+		content []byte
+		err     bool
+	}{
+		{
+			name:    "valid",
+			path:    "testdata/file_1.txt",
+			content: []byte("Hello World"),
+			err:     false,
+		},
+		{
+			name:    "invalid",
+			path:    "testdata/invalid",
+			content: nil,
+			err:     true,
+		},
+	}
+
+	for _, tc := range testCases {
+		out, err := ReadFile(tc.path)
+
+		if tc.err {
+			assert.Error(t, err, tc.name)
+
+			continue
+		}
+
+		assert.Equal(t, tc.content, out, tc.name)
+	}
+}
+
 func TestTransformMap(t *testing.T) {
 	testCases := []struct {
 		name     string
@@ -317,9 +351,12 @@ func TestToJson(t *testing.T) {
 			name: "test: normal map",
 			s: map[string]interface{}{
 				"key_1": "value",
-				"key_2": 12,
+				"key_2": false,
 			},
-			json: []byte("{\n  \"key_1\": \"value\",\n  \"key_2\": 12\n}"),
+			json: []byte(`{
+  "key_1": "value",
+  "key_2": false
+}`),
 		},
 		{
 			name: "test: empty map",
@@ -330,10 +367,17 @@ func TestToJson(t *testing.T) {
 			name: "test: multiple values",
 			s: map[string]interface{}{
 				"key_1": "value",
-				"key_2": 12,
+				"key_2": false,
 				"key_3": map[string]interface{}{"foo": "bar", "user": "password"},
 			},
-			json: []byte("{\n  \"key_1\": \"value\",\n  \"key_2\": 12,\n  \"key_3\": {\n    \"foo\": \"bar\",\n    \"user\": \"password\"\n  }\n}"),
+			json: []byte(`{
+  "key_1": "value",
+  "key_2": false,
+  "key_3": {
+    "foo": "bar",
+    "user": "password"
+  }
+}`),
 		},
 	}
 
@@ -344,6 +388,42 @@ func TestToJson(t *testing.T) {
 			assert.Error(t, err)
 		} else {
 			assert.Equal(t, string(tc.json), string(out), tc.name)
+		}
+	}
+}
+
+func TestFromJSON(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []byte
+		expected map[string]interface{}
+		err      bool
+	}{
+		{
+			name: "test: normal map",
+			input: []byte(`{
+  "key_1": "value",
+  "key_2": false
+}`),
+			expected: map[string]interface{}{
+				"key_1": "value",
+				"key_2": false,
+			},
+		},
+		{
+			name:     "test: empty map",
+			input:    []byte("{}"),
+			expected: map[string]interface{}{},
+		},
+	}
+
+	for _, tc := range testCases {
+		out, err := FromJSON(tc.input)
+
+		if tc.err {
+			assert.Error(t, err)
+		} else {
+			assert.Equal(t, tc.expected, out, tc.name)
 		}
 	}
 }
@@ -395,5 +475,122 @@ key_3:
 		} else {
 			assert.Equal(t, tc.yaml, out, tc.name)
 		}
+	}
+}
+
+func TestFromYAML(t *testing.T) {
+	testCases := []struct {
+		name     string
+		expected map[string]interface{}
+		input    []byte
+		err      bool
+	}{
+		{
+			name: "test: normal map",
+			input: []byte(`key_1: value
+key_2: false
+`),
+			expected: map[string]interface{}{
+				"key_1": "value",
+				"key_2": false,
+			},
+		},
+		{
+			name: "test: multiple values ",
+			input: []byte(`key_1: value
+key_2: false
+key_3:
+  foo: bar
+  user: password
+`),
+			expected: map[string]interface{}{
+				"key_1": "value",
+				"key_2": false,
+				"key_3": map[string]interface{}{"foo": "bar", "user": "password"},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		out, err := FromYAML(tc.input)
+
+		if tc.err {
+			assert.Error(t, err)
+		} else {
+			assert.Equal(t, tc.expected, out, tc.name)
+		}
+	}
+}
+
+func TestMergeMap(t *testing.T) {
+	testCases := []struct {
+		name             string
+		m1, m2, expected map[string]interface{}
+	}{
+		{
+			name: "simple maps",
+			m1: map[string]interface{}{
+				"a": "b",
+				"c": 12,
+			},
+			m2: map[string]interface{}{
+				"d": map[string]interface{}{
+					"12": false,
+				},
+			},
+			expected: map[string]interface{}{
+				"a": "b",
+				"c": 12,
+				"d": map[string]interface{}{
+					"12": false,
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expected, DeepMergeMaps(tc.m1, tc.m2), tc.name)
+	}
+}
+
+func TestHandleEnginePath(t *testing.T) {
+	testCases := []struct {
+		name             string
+		enginePath       string
+		path             string
+		expectedRootPath string
+		expectedSubPath  string
+	}{
+		{
+			name:             "only path",
+			path:             "1/2/3/4",
+			expectedRootPath: "1",
+			expectedSubPath:  "2/3/4",
+		},
+		{
+			name:             "one element path",
+			path:             "1",
+			expectedRootPath: "1",
+			expectedSubPath:  "",
+		},
+		{
+			name:             "engine path and path",
+			enginePath:       "1/2/3/4",
+			path:             "5/6",
+			expectedRootPath: "1/2/3/4",
+			expectedSubPath:  "5/6",
+		},
+		{
+			name:             " only engine path",
+			enginePath:       "1/2/3/4",
+			expectedRootPath: "1/2/3/4",
+		},
+	}
+
+	for _, tc := range testCases {
+		rootPath, subPath := HandleEnginePath(tc.enginePath, tc.path)
+
+		assert.Equal(t, tc.expectedRootPath, rootPath, tc.name)
+		assert.Equal(t, tc.expectedSubPath, subPath, tc.name)
 	}
 }

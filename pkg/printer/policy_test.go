@@ -37,6 +37,7 @@ func TestPrintPolicy(t *testing.T) {
 		tc.opts = append(tc.opts, WithWriter(&b))
 
 		p := NewPrinter(tc.opts...)
+
 		require.NoError(t, p.printCapabilities(tc.caps))
 
 		expected := header + tc.output

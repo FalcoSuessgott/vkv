@@ -8,23 +8,22 @@ Hide
 Type "export VAULT_ADDR='http://127.0.0.1:8200'"
 Enter
 
-Hide
 Type "export VAULT_TOKEN='root'"
 Enter
 
+Type "echo 'recursively list all secrets from KV-engine 'secret' in various output formats'"
+Enter
+Sleep 2s
+
 Show
-Type "vkv -p secret --show-values"
+Type "vkv --path secret"
 Enter
 Sleep 3s
 
-Type "vkv -p secret --show-values -f=policy"
+Type "export secrets and copy them to another secret engine using vkv import"
 Enter
-Sleep 3s
+Sleep 2s
 
-Type "vkv -p secret --show-values -f=export"
-Enter
-Sleep 3s
-
-Type "vkv -p secret --show-values -f=markdown"
+Type "vkv -p secret/sub --show-values --format=json | vkv import - -p copy_path"
 Enter
 Sleep 3s

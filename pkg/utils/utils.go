@@ -117,6 +117,16 @@ func ToJSON(m map[string]interface{}) ([]byte, error) {
 	return out, nil
 }
 
+// FromJSON takes a json byte array and marshalls it into a map.
+func FromJSON(b []byte) (map[string]interface{}, error) {
+	m := make(map[string]interface{})
+	if err := json.Unmarshal(b, &m); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
 // ToYAML marshalls a given map to yaml.
 func ToYAML(m map[string]interface{}) ([]byte, error) {
 	out, err := yaml.Marshal(m)
@@ -125,6 +135,16 @@ func ToYAML(m map[string]interface{}) ([]byte, error) {
 	}
 
 	return out, nil
+}
+
+// FromYAML takes a yaml byte array and marshalls it into a map.
+func FromYAML(b []byte) (map[string]interface{}, error) {
+	m := make(map[string]interface{})
+	if err := yaml.Unmarshal(b, &m); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 // SortMapKeys sorts the keys of a map.
@@ -155,4 +175,41 @@ func (k Keys) Less(i, j int) bool {
 	k2 := strings.ReplaceAll(k[j], "/", "\x00")
 
 	return k1 < k2
+}
+
+// DeepMergeMaps takes two maps and deeply merges them together.
+// https://stackoverflow.com/questions/62953360/golang-merge-deeply-two-maps/62954592#62954592
+func DeepMergeMaps(a, b map[string]interface{}) map[string]interface{} {
+	out := make(map[string]interface{}, len(a))
+	for k, v := range a {
+		out[k] = v
+	}
+
+	for k, v := range b {
+		// If you use map[string]interface{}, ok is always false here.
+		// Because yaml.Unmarshal will give you map[interface{}]interface{}.
+		if v, ok := v.(map[string]interface{}); ok {
+			if bv, ok := out[k]; ok {
+				if bv, ok := bv.(map[string]interface{}); ok {
+					out[k] = DeepMergeMaps(bv, v)
+
+					continue
+				}
+			}
+		}
+
+		out[k] = v
+	}
+
+	return out
+}
+
+// HandleEnginePath handles the engine path if one is specified.
+func HandleEnginePath(enginePath, path string) (string, string) {
+	// if engine path has been specified use that value as the root path and append the path
+	if enginePath != "" {
+		return enginePath, path
+	}
+
+	return SplitPath(path)
 }

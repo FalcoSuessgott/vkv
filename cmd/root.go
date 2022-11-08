@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"path"
 	"strings"
 
@@ -35,11 +37,9 @@ type Options struct {
 	FormatString string `env:"FORMAT" envDefault:"base"`
 
 	outputFormat printer.OutputFormat
-
-	version bool
 }
 
-func newRootCmd(version string) *cobra.Command {
+func newRootCmd(version string, writer io.Writer) *cobra.Command {
 	o := &Options{}
 
 	if err := o.parseEnvs(); err != nil {
@@ -52,21 +52,18 @@ func newRootCmd(version string) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if o.version {
-				fmt.Fprintf(cmd.OutOrStdout(), "vkv %s\n", version)
-
-				return nil
-			}
-
+			// validate flags
 			if err := o.validateFlags(); err != nil {
 				return err
 			}
 
+			// vault auth
 			v, err := vault.NewClient()
 			if err != nil {
 				return err
 			}
 
+			// prepare printer
 			printer := printer.NewPrinter(
 				printer.OnlyKeys(o.OnlyKeys),
 				printer.OnlyPaths(o.OnlyPaths),
@@ -75,13 +72,16 @@ func newRootCmd(version string) *cobra.Command {
 				printer.WithTemplate(o.TemplateString, o.TemplateFile),
 				printer.ToFormat(o.outputFormat),
 				printer.WithVaultClient(v),
+				printer.WithWriter(writer),
 			)
 
+			// prepare map
 			m, err := o.buildMap(v)
 			if err != nil {
 				return err
 			}
 
+			// print secrets
 			if err := printer.Out(m); err != nil {
 				return err
 			}
@@ -115,16 +115,19 @@ func newRootCmd(version string) *cobra.Command {
 	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "available output formats: \"base\", \"json\", \"yaml\", \"export\", \"policy\", \"markdown\", \"template\" "+
 		"(env: VKV_FORMAT)")
 
-	// version
-	cmd.Flags().BoolVarP(&o.version, "version", "v", o.version, "display version")
+	// sub commands
+	cmd.AddCommand(
+		newVersionCmd(version),
+		newImportCmd(),
+	)
 
 	return cmd
 }
 
 // Execute invokes the command.
 func Execute(version string) error {
-	if err := newRootCmd(version).Execute(); err != nil {
-		return fmt.Errorf("%w", err)
+	if err := newRootCmd(version, os.Stdout).Execute(); err != nil {
+		return fmt.Errorf("[ERROR] %w", err)
 	}
 
 	return nil
@@ -132,13 +135,11 @@ func Execute(version string) error {
 
 // nolint: cyclop
 func (o *Options) validateFlags() error {
-	var err error
-
 	switch {
 	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):
-		err = errInvalidFlagCombination
+		return errInvalidFlagCombination
 	case o.EnginePath == "" && o.Path == "":
-		err = fmt.Errorf("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
+		return fmt.Errorf("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
 	case true:
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":
@@ -165,37 +166,26 @@ func (o *Options) validateFlags() error {
 			o.OnlyPaths = false
 
 			if o.TemplateFile != "" && o.TemplateString != "" {
-				err = fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
+				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
 			}
 
 			if o.TemplateFile == "" && o.TemplateString == "" {
-				err = fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
+				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
 			}
 		default:
-			err = printer.ErrInvalidFormat
+			return printer.ErrInvalidFormat
 		}
 	}
 
-	return err
-}
-
-func (o *Options) buildEnginePath() (string, string) {
-	// if engine path has been specified use that value as the root path and append the path
-	if o.EnginePath != "" {
-		return o.EnginePath, o.Path
-	}
-
-	return utils.SplitPath(o.Path)
+	return nil
 }
 
 func (o *Options) buildMap(v *vault.Vault) (map[string]interface{}, error) {
 	var isSecretPath bool
 
-	m := map[string]interface{}{}
+	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
 	// read recursive all secrets
-	rootPath, subPath := o.buildEnginePath()
-
 	s, err := v.ListRecursive(rootPath, subPath)
 	if err != nil {
 		return nil, err
@@ -213,10 +203,10 @@ func (o *Options) buildMap(v *vault.Vault) (map[string]interface{}, error) {
 
 	// prepare the output map
 	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
+	m := pathMap
+
 	if o.EnginePath != "" {
 		m[o.EnginePath] = pathMap
-	} else {
-		m = pathMap
 	}
 
 	return m, nil

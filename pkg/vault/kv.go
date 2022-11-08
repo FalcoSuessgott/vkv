@@ -21,7 +21,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
 		// no sub directories in here, but lets check for normal kv pairs then..
 		secrets, err := v.ReadSecrets(rootPath, subPath)
 		if err != nil {
-			log.Fatalf("could not read secrets from %s/%s: %v", rootPath, subPath, err)
+			return nil, fmt.Errorf("could not read secrets from %s/%s: %w", rootPath, subPath, err)
 		}
 
 		return (*Secrets)(&secrets), nil
@@ -135,6 +135,35 @@ func (v *Vault) DisableKV2Engine(rootPath string) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+// EnableKV2EngineErrorIfNotForced enables a KVv2 Engine and errors if
+// already enabled, unless force is set to true.
+func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
+	rootPath, _ := utils.SplitPath(path)
+
+	if len(strings.Split(path, utils.Delimiter)) > 1 {
+		//nolint: nilerr
+		if err := v.EnableKV2Engine(rootPath); err != nil {
+			return nil
+		}
+	}
+
+	if v.EnableKV2Engine(rootPath) != nil && !force {
+		return fmt.Errorf("a secret engine under \"%s\" is already enabled. Use --force for overwriting", rootPath)
+	}
+
+	if err := v.DisableKV2Engine(rootPath); err != nil {
+		return fmt.Errorf("error disabling secret engine \"%s\": %w", rootPath, err)
+	}
+
+	if err := v.EnableKV2Engine(rootPath); err != nil {
+		return fmt.Errorf("error enabling secret engine \"%s\": %w", rootPath, err)
+	}
+
+	fmt.Printf("enabling secret engine \"%s\"\n", rootPath)
 
 	return nil
 }
