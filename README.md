@@ -1,7 +1,7 @@
 # vkv
-`vkv` prints out HashiCorp Vault KV-v2 secrets recursively in various formats, such as YAML, JSON, Markdown Table, Export (for shell env vars) or even as Token-Capability-Matrix (format: `policy`). All formats can be chained with different commandline flags like not masking the secrets, or print only paths.
+`vkv` prints out HashiCorp Vault KV-v2 secrets recursively in various [formats](https://github.com/FalcoSuessgott/vkv#output-formats), such as `yaml`, `json`, `markdown`, `export` (for shell env vars) or even as Token-Capability-Matrix (format: `policy`). All formats can be chained with different commandline flags like not masking the secrets, or print only paths.
 
-Checkout the [Advanced Examples](https://github.com/FalcoSuessgott/vkv#advances-examples) section to learn more handy `vkv` snippets:
+Checkout the [Advanced Examples](https://github.com/FalcoSuessgott/vkv#advanced-examples) section to learn more handy `vkv` snippets:
 
 ![](assets/demo.gif)
 
@@ -13,10 +13,8 @@ Checkout the [Advanced Examples](https://github.com/FalcoSuessgott/vkv#advances-
 
 ---
 
-# Description
-`vkv` recursively list you all key-value entries from Vaults KV2 secret engine in various formats. `vkv` flags can be divided into input, modifying and output format flags.
-
-So far `vkv` offers:
+# Usage
+`vkv` flags can be divided into input, modifying and output format flags.
 
 ## Input flags
 | Flag                  | Description                                                                       | Env Var                | Default |
