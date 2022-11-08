@@ -1,48 +1,13 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"testing"
 
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestVersion(t *testing.T) {
-	testCases := []struct {
-		name     string
-		version  string
-		expected string
-	}{
-		{
-			name:     "v1.0.0",
-			version:  "v1.0.0",
-			expected: "vkv v1.0.0\n",
-		},
-		{
-			name:     "empty",
-			version:  "",
-			expected: "vkv \n",
-		},
-	}
-
-	for _, tc := range testCases {
-		c := newRootCmd(tc.version)
-		b := bytes.NewBufferString("")
-
-		c.SetArgs([]string{"-v"})
-		c.SetOut(b)
-
-		err := c.Execute()
-		assert.NoError(t, err)
-
-		out, _ := io.ReadAll(b)
-		assert.Equal(t, tc.expected, string(out), tc.name)
-	}
-}
 
 func TestOutputFormat(t *testing.T) {
 	testCases := []struct {
@@ -302,54 +267,5 @@ func TestEnvVars(t *testing.T) {
 
 		assert.NoError(t, err, tc.name)
 		assert.Equal(t, tc.expected, o, tc.name)
-	}
-}
-
-func TestBuildEnginePath(t *testing.T) {
-	testCases := []struct {
-		name             string
-		expectedRootPath string
-		expectedSubPath  string
-		opts             *Options
-	}{
-		{
-			name: "only path",
-			opts: &Options{
-				Path: "1/2/3/4",
-			},
-			expectedRootPath: "1",
-			expectedSubPath:  "2/3/4",
-		},
-		{
-			name: "one element path",
-			opts: &Options{
-				Path: "1",
-			},
-			expectedRootPath: "1",
-			expectedSubPath:  "",
-		},
-		{
-			name: "engine path and path",
-			opts: &Options{
-				EnginePath: "1/2/3/4",
-				Path:       "5/6",
-			},
-			expectedRootPath: "1/2/3/4",
-			expectedSubPath:  "5/6",
-		},
-		{
-			name: " only engine path",
-			opts: &Options{
-				EnginePath: "1/2/3/4",
-			},
-			expectedRootPath: "1/2/3/4",
-		},
-	}
-
-	for _, tc := range testCases {
-		rootPath, subPath := tc.opts.buildEnginePath()
-
-		assert.Equal(t, tc.expectedRootPath, rootPath, tc.name)
-		assert.Equal(t, tc.expectedSubPath, subPath, tc.name)
 	}
 }

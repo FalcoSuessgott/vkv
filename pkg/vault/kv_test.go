@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func (s *VaultSuite) TestWriteReadSecrets() {
@@ -152,6 +153,60 @@ func (s *VaultSuite) TestListSecrets() {
 
 		// disable kv engine, expect no error
 		assert.NoError(s.Suite.T(), s.v.DisableKV2Engine(tc.rootPath))
+	}
+}
+
+func (s *VaultSuite) TestEnableKV2EngineErrorIfNotForced() {
+	testCases := []struct {
+		name    string
+		force   bool
+		path    string
+		prepare bool
+		err     bool
+	}{
+		{
+			name:  "engine does not exist, no force",
+			force: false,
+			path:  "case-1",
+			err:   false,
+		},
+		{
+			name:    "engine does exist, no force",
+			force:   false,
+			prepare: true,
+			path:    "case-2",
+			err:     true,
+		},
+		{
+			name:    "engine does exist, force",
+			force:   true,
+			prepare: true,
+			path:    "case-3",
+			err:     false,
+		},
+		{
+			name:    "engine does exist, no force",
+			force:   false,
+			prepare: true,
+			path:    "case-4",
+			err:     true,
+		},
+	}
+
+	for _, tc := range testCases {
+		if tc.prepare {
+			//nolint: errcheck
+			s.v.EnableKV2Engine(tc.path)
+		}
+
+		err := s.v.EnableKV2EngineErrorIfNotForced(tc.force, tc.path)
+		if tc.err {
+			require.Error(s.Suite.T(), err, tc.name)
+
+			continue
+		}
+
+		require.NoError(s.Suite.T(), err, tc.name)
 	}
 }
 

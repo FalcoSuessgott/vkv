@@ -30,3 +30,7 @@ linters:
     - nolintlint
     - maintidx
     - dupl
+    - goimports
+    - gci
+    - gofmt
+    - gofumpt
