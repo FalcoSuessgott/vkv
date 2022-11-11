@@ -66,9 +66,13 @@ clean: ## clean the development vault
 	@rm -rf coverage.out dist/ $(projectname)
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
 
-ASSETS = demo base markdown export template diff policies template fzf policy
+ASSETS = demo base markdown export template diff policies template fzf policy json yaml import-export
 .PHONY: assets
 assets: clean vault ## generate all assets
 	for i in $(ASSETS); do \
 		vhs < assets/$$i.tape; \
 	done
+
+.PHONY: www
+www: ## build and server docs
+	hugo server -s www

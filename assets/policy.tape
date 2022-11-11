@@ -1,4 +1,4 @@
-Output assets/policy.gif
+Output www/static/images/policy.gif
 
 Set FontSize 32
 Set Width 2000

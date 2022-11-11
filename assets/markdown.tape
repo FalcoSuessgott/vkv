@@ -1,4 +1,4 @@
-Output assets/markdown.gif
+Output www/static/images/markdown.gif
 
 Set FontSize 32
 Set Width 2000

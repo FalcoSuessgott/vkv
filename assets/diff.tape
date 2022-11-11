@@ -1,4 +1,4 @@
-Output assets/diff.gif
+Output www/static/images/diff.gif
 
 Set FontSize 30
 Set Width 2000

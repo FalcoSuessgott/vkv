@@ -89,6 +89,24 @@ jobs:
           path: 'assets/policy.tape'
           install-fonts: false
 
+      - name: vhs yaml
+        uses: charmbracelet/vhs-action@main
+        with:
+          path: 'assets/yaml.tape'
+          install-fonts: false
+
+      - name: vhs json
+        uses: charmbracelet/vhs-action@main
+        with:
+          path: 'assets/json.tape'
+          install-fonts: false
+
+      - name: vhs import export
+        uses: charmbracelet/vhs-action@main
+        with:
+          path: 'assets/import-export.tape'
+          install-fonts: false
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

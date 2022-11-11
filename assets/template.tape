@@ -1,5 +1,4 @@
-
-Output assets/template.gif
+Output www/static/images/template.gif
 
 Set FontSize 32
 Set Width 2000

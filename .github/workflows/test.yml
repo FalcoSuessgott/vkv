@@ -2,6 +2,8 @@ name: Test and coverage
 
 on:
   push:
+    paths:
+      - '**/*.go'
     branches:
       - master
   pull_request:

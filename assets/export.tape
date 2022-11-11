@@ -1,4 +1,4 @@
-Output assets/export.gif
+Output www/static/images/export.gif
 
 Set FontSize 32
 Set Width 2000

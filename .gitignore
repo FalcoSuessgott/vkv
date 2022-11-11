@@ -10,3 +10,5 @@ vkv
 vendor/
 coverage.out
 /dist
+.hugo_build.lock
+docs/
