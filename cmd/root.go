@@ -151,6 +151,7 @@ func (o *Options) validateFlags() error {
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.ShowValues = true
+			o.MaxValueLength = -1
 		case "markdown":
 			o.outputFormat = printer.Markdown
 		case "base":
@@ -164,6 +165,7 @@ func (o *Options) validateFlags() error {
 			o.outputFormat = printer.Template
 			o.OnlyKeys = false
 			o.OnlyPaths = false
+			o.MaxValueLength = -1
 
 			if o.TemplateFile != "" && o.TemplateString != "" {
 				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")

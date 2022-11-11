@@ -1,0 +1,47 @@
+baseURL = "https://falcosuessgott.github.io/vkv/"
+
+languageCode = "en-us"
+DefaultContentLanguage = "en"
+title = "vkv"
+theme = "hugo-theme-techdoc"
+
+hasCJKLanguage = true
+metaDataFormat = "yaml"
+
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir= false
+enableMissingTranslationPlaceholders = false
+
+[params]
+    description = " export/import secrets from Vaults KV2 engine"
+    github_repository = "https://github.com/FalcoSuessgott/vkv"
+    version = "v0.1.1"
+
+    github_doc_repository = "https://github.com/FalcoSuessgott/vkv"
+    github_doc_repository_path = "www/content/"
+
+    title = "Hugo Techdoc Theme"
+    images = ["images/og-image.png"]
+
+    custom_font_color = ""
+    custom_background_color = ""
+
+    menu_style = "slide-menu"
+
+    dateformat = ""
+
+[menu]
+    [[menu.main]]
+        name = ""
+        url = "/"
+        weight = 1
+        identifier = 'home'
+
+[markup]
+    defaultMarkdownHandler = "goldmark"
+    [markup.goldmark.renderer]
+        unsafe= true
+    [markup.tableOfContents]
+        startLevel = 2
+        endLevel = 6
+        ordered = false

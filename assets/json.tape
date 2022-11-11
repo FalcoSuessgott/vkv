@@ -1,4 +1,4 @@
-Output www/static/images/policies.gif
+Output www/static/images/json.gif
 
 Set FontSize 32
 Set Width 2000
@@ -13,9 +13,6 @@ Type "export VAULT_TOKEN='root'"
 Enter
 
 Show
-Type "cat assets/policies.tmpl"
+Type "vkv -p secret --show-values --format=json"
 Enter
-
-Type "vkv -p secret -f=template --template-file=assets/policies.tmpl"
-Enter
-Sleep 5
+Sleep 5s

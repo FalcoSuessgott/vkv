@@ -1,4 +1,4 @@
-Output assets/base.gif
+Output www/static/images/base.gif
 
 Set FontSize 32
 Set Width 2000
