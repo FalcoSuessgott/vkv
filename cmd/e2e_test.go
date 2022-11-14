@@ -109,7 +109,8 @@ func (s *VaultSuite) TestE2E() {
 		enginePath string
 		rootPath   string
 		expected   string
-		err        bool
+		importErr  bool
+		exportErr  bool
 		importArgs []string
 		exportArgs []string
 	}{
@@ -127,6 +128,14 @@ func (s *VaultSuite) TestE2E() {
 			exportArgs: []string{"-p=json", "-f=json", "--show-values"},
 			expected:   "testdata/2.json",
 		},
+		{
+			name:       "dryrun",
+			rootPath:   "json",
+			exportErr:  true,
+			importArgs: []string{"-f=testdata/2.json", "-d", "-p=json"},
+			exportArgs: []string{"-p=json", "-f=json", "--show-values"},
+			expected:   "testdata/2.json",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -136,7 +145,12 @@ func (s *VaultSuite) TestE2E() {
 		importCmd.SetOut(io.Discard)
 		importCmd.SetArgs(tc.importArgs)
 
-		require.NoError(s.Suite.T(), importCmd.Execute())
+		err := importCmd.Execute()
+		if tc.importErr {
+			require.Error(s.Suite.T(), err, tc.name)
+		}
+
+		require.NoError(s.Suite.T(), err, tc.name)
 
 		// 2. read secrets and compare
 		b := bytes.NewBufferString("")
@@ -145,8 +159,8 @@ func (s *VaultSuite) TestE2E() {
 		rootCmd.SetOut(b)
 		rootCmd.SetArgs(tc.exportArgs)
 
-		err := rootCmd.Execute()
-		if tc.err {
+		err = rootCmd.Execute()
+		if tc.importErr {
 			require.NoError(s.Suite.T(), err, tc.name)
 
 			continue
