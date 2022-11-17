@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// ImportOptions struct holding all import option flags.
 type ImportOptions struct {
 	Force          bool   `env:"IMPORT_FORCE"`
 	DryRun         bool   `env:"IMPORT_DRY_RUN"`
@@ -39,6 +40,11 @@ func newImportCmd() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// parse envs
+			if err := o.parseEnvs(); err != nil {
+				return err
+			}
+
 			// validate flags
 			if err := o.validateFlags(args); err != nil {
 				return err
@@ -208,6 +214,9 @@ func (o *ImportOptions) dryRun(v *vault.Vault, secrets map[string]interface{}) e
 		printer.ToFormat(printer.Base),
 		printer.WithVaultClient(v),
 		printer.WithWriter(o.writer),
+		printer.WithEnginePath(o.Path),
+		printer.ShowVersion(true),
+		printer.ShowMetadata(true),
 	)
 
 	fmt.Fprintln(o.writer, "")
@@ -248,6 +257,9 @@ func (o *ImportOptions) printResult(v *vault.Vault) error {
 		printer.ToFormat(printer.Base),
 		printer.WithVaultClient(v),
 		printer.WithWriter(o.writer),
+		printer.ShowVersion(true),
+		printer.ShowMetadata(true),
+		printer.WithEnginePath(o.Path),
 	)
 
 	fmt.Fprintln(o.writer, "")

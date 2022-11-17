@@ -2,7 +2,7 @@ package printer
 
 import (
 	"fmt"
-	"log"
+	"path"
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -10,41 +10,34 @@ import (
 )
 
 func (p *Printer) printBase(secrets map[string]interface{}) error {
+	var tree gotree.Tree
+
+	m := make(map[string]interface{})
+
 	for _, k := range utils.SortMapKeys(secrets) {
-		tree := gotree.New(k)
-		m := utils.ToMapStringInterface(secrets[k])
-
-		for _, i := range utils.SortMapKeys(m) {
-			subMap, ok := m[i].(map[string]interface{})
-			if !ok {
-				log.Fatalf("cannot convert %T to map[string]interface", m[i])
-			}
-
-			tree.AddTree(p.printTree(i, subMap))
-		}
-
-		fmt.Fprint(p.writer, tree.Print())
+		tree = gotree.New(p.enginePath + utils.Delimiter)
+		m = utils.ToMapStringInterface(secrets[k])
 	}
+
+	for _, i := range utils.SortMapKeys(m) {
+		//nolint: forcetypeassert
+		tree.AddTree(p.printTree(p.enginePath, i, m[i].(map[string]interface{})))
+	}
+
+	fmt.Fprint(p.writer, tree.Print())
 
 	return nil
 }
 
-func (p *Printer) printTree(path string, m map[string]interface{}) gotree.Tree {
-	var tree gotree.Tree
+func (p *Printer) printTree(rootPath, subPath string, m map[string]interface{}) gotree.Tree {
+	tree := gotree.New(p.buildTreeName(rootPath, subPath))
 
-	if strings.HasSuffix(path, utils.Delimiter) {
-		tree = gotree.New(path)
-
+	if strings.HasSuffix(subPath, utils.Delimiter) {
 		for _, i := range utils.SortMapKeys(m) {
-			subMap, ok := m[i].(map[string]interface{})
-			if !ok {
-				log.Fatalf("cannot convert %T to map[string]interface", m[i])
-			}
-
-			tree.AddTree(p.printTree(i, subMap))
+			//nolint: forcetypeassert
+			tree.AddTree(p.printTree(rootPath, subPath+i, m[i].(map[string]interface{})))
 		}
 	} else {
-		tree = gotree.New(path)
 		for _, k := range utils.SortMapKeys(m) {
 			if p.onlyKeys {
 				tree.Add(k)
@@ -57,4 +50,36 @@ func (p *Printer) printTree(path string, m map[string]interface{}) gotree.Tree {
 	}
 
 	return tree
+}
+
+func (p *Printer) buildTreeName(rootPath, subPath string) string {
+	name := subPath
+
+	subPathParts := strings.Split(strings.TrimSuffix(subPath, utils.Delimiter), utils.Delimiter)
+	if len(subPathParts) > 1 {
+		name = path.Base(subPath)
+	}
+
+	if p.showVersion {
+		if v, err := p.vaultClient.ReadSecretVersion(rootPath, subPath); err == nil {
+			name = fmt.Sprintf("v%v: %s", v, name)
+		}
+	}
+
+	if p.showMetadata {
+		if v, err := p.vaultClient.ReadSecretMetadata(rootPath, subPath); err == nil {
+			md := ""
+			metadata, ok := v.(map[string]interface{})
+
+			if ok {
+				for k, v := range metadata {
+					md = fmt.Sprintf("%v %s=%v", md, k, v)
+				}
+
+				name = fmt.Sprintf("%s [%v]", name, strings.TrimPrefix(md, " "))
+			}
+		}
+	}
+
+	return name
 }

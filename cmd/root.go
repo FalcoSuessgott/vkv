@@ -29,6 +29,8 @@ type Options struct {
 	OnlyKeys       bool `env:"ONLY_KEYS"`
 	OnlyPaths      bool `env:"ONLY_PATHS"`
 	ShowValues     bool `env:"SHOW_VALUES"`
+	ShowVersion    bool `env:"SHOW_VERSION" envDefault:"true"`
+	ShowMetadata   bool `env:"SHOW_METADATA" envDefault:"true"`
 	MaxValueLength int  `env:"MAX_VALUE_LENGTH" envDefault:"12"`
 
 	TemplateFile   string `env:"TEMPLATE_FILE"`
@@ -64,6 +66,8 @@ func newRootCmd(version string, writer io.Writer) *cobra.Command {
 			}
 
 			// prepare printer
+			rootPath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
+
 			printer := printer.NewPrinter(
 				printer.OnlyKeys(o.OnlyKeys),
 				printer.OnlyPaths(o.OnlyPaths),
@@ -73,6 +77,9 @@ func newRootCmd(version string, writer io.Writer) *cobra.Command {
 				printer.ToFormat(o.outputFormat),
 				printer.WithVaultClient(v),
 				printer.WithWriter(writer),
+				printer.ShowVersion(o.ShowVersion),
+				printer.ShowMetadata(o.ShowMetadata),
+				printer.WithEnginePath(rootPath),
 			)
 
 			// prepare map
@@ -102,6 +109,8 @@ func newRootCmd(version string, writer io.Writer) *cobra.Command {
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_ONLY_KEYS)")
 	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env: VKV_ONLY_PATHS)")
+	cmd.Flags().BoolVar(&o.ShowVersion, "show-version", o.ShowVersion, "show the secret version (env: VKV_VERSION)")
+	cmd.Flags().BoolVar(&o.ShowMetadata, "show-metadata", o.ShowMetadata, "show the secrets metadata (env: VKV_METADATA)")
 	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_SHOW_VALUES)")
 	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
 		"(env: VKV_MAX_VALUE_LENGTH)")
@@ -144,8 +153,14 @@ func (o *Options) validateFlags() error {
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":
 			o.outputFormat = printer.YAML
+			o.OnlyKeys = false
+			o.OnlyPaths = false
+			o.MaxValueLength = -1
 		case "json":
 			o.outputFormat = printer.JSON
+			o.OnlyKeys = false
+			o.OnlyPaths = false
+			o.MaxValueLength = -1
 		case "export":
 			o.outputFormat = printer.Export
 			o.OnlyKeys = false
@@ -205,13 +220,14 @@ func (o *Options) buildMap(v *vault.Vault) (map[string]interface{}, error) {
 
 	// prepare the output map
 	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
-	m := pathMap
 
 	if o.EnginePath != "" {
-		m[o.EnginePath] = pathMap
+		return map[string]interface{}{
+			o.EnginePath: pathMap,
+		}, nil
 	}
 
-	return m, nil
+	return pathMap, nil
 }
 
 func (o *Options) parseEnvs() error {

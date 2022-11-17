@@ -53,14 +53,17 @@ type Option func(*Printer)
 
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
-	format      OutputFormat
-	writer      io.Writer
-	onlyKeys    bool
-	onlyPaths   bool
-	showValues  bool
-	valueLength int
-	template    string
-	vaultClient *vault.Vault
+	format       OutputFormat
+	writer       io.Writer
+	enginePath   string
+	onlyKeys     bool
+	onlyPaths    bool
+	showVersion  bool
+	showValues   bool
+	showMetadata bool
+	valueLength  int
+	template     string
+	vaultClient  *vault.Vault
 }
 
 // CustomValueLength option for trimming down the output of secrets.
@@ -111,6 +114,24 @@ func ShowValues(b bool) Option {
 	}
 }
 
+// ShowVersion flag for unmasking secrets in output.
+func ShowVersion(b bool) Option {
+	return func(p *Printer) {
+		if b {
+			p.showVersion = true
+		}
+	}
+}
+
+// ShowMetadata flag for unmasking secrets in output.
+func ShowMetadata(b bool) Option {
+	return func(p *Printer) {
+		if b {
+			p.showMetadata = true
+		}
+	}
+}
+
 // WithTemplate sets the template file.
 func WithTemplate(str, path string) Option {
 	return func(p *Printer) {
@@ -137,6 +158,13 @@ func WithTemplate(str, path string) Option {
 func WithVaultClient(v *vault.Vault) Option {
 	return func(p *Printer) {
 		p.vaultClient = v
+	}
+}
+
+// WithEnginePath specified engine path.
+func WithEnginePath(s string) Option {
+	return func(p *Printer) {
+		p.enginePath = s
 	}
 }
 
