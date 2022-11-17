@@ -47,12 +47,15 @@ vault: export VAULT_TOKEN = root
 .PHONY: vault
 vault: clean ## set up a development vault server and write kv secrets
 	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
-	sleep 5
+	sleep 3
 
 	vault kv put secret/demo foo=bar
 	vault kv put secret/admin sub=password
 	vault kv put secret/sub/demo demo="hello world" user=admin password=s3cre5
 	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
+	vault kv put secret/sub/sub2/demo admin=key foo=bar user=user password=password
+	vault kv metadata put -mount=secret -custom-metadata=key=value admin
+	vault kv metadata put -mount=secret -custom-metadata=key=value -custom-metadata=admin=false sub/sub2/demo
 	vault policy write kv assets/kv-policy.hcl
 
 	vault secrets enable -path secret_2 -version=2 kv

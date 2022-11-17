@@ -14,10 +14,7 @@ vkv --path <path> --format=json
 ### Optional flags
 | Flag                  | Description                                                                       | Env                    | Default |
 |-----------------------|-----------------------------------------------------------------------------------|------------------------|---------|
-| `--only-keys`         | show only keys                                                                    | `VKV_ONLY_KEYS`        | `false` |
-| `--only-paths`        | show only paths                                                                   | `VKV_ONLY_PATHS`       | `false` |
 | `--show-values`       | don't mask values                                                                 | `VKV_SHOW_VALUES`      | `false` |
-| `--max-value-length`  | maximum char length of values (set to `-1` for disabling)                         | `VKV_MAX_VALUE_LENGTH` | `12`    |
 
 ### Demo
 <div align="center">

@@ -95,7 +95,7 @@ func TestPrintBase(t *testing.T) {
 
 	for _, tc := range testCases {
 		var b bytes.Buffer
-		tc.opts = append(tc.opts, WithWriter(&b))
+		tc.opts = append(tc.opts, WithEnginePath(tc.rootPath), WithWriter(&b))
 
 		p := NewPrinter(tc.opts...)
 

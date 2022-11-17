@@ -84,8 +84,8 @@ func TestOutputFormat(t *testing.T) {
 		if tc.err {
 			assert.ErrorIs(t, err, printer.ErrInvalidFormat, tc.name)
 		} else {
-			assert.NoError(t, err, tc.name)
-			assert.Equal(t, tc.expected, o.outputFormat)
+			assert.NoError(t, err, tc.name, tc.name)
+			assert.Equal(t, tc.expected, o.outputFormat, tc.name)
 		}
 	}
 }
@@ -167,6 +167,8 @@ func TestEnvVars(t *testing.T) {
 				MaxValueLength: printer.MaxValueLength,
 				FormatString:   "base",
 				OnlyKeys:       true,
+				ShowVersion:    true,
+				ShowMetadata:   true,
 			},
 		},
 		{
@@ -179,6 +181,8 @@ func TestEnvVars(t *testing.T) {
 				MaxValueLength: printer.MaxValueLength,
 				FormatString:   "base",
 				OnlyPaths:      true,
+				ShowVersion:    true,
+				ShowMetadata:   true,
 			},
 		},
 		{
@@ -199,6 +203,8 @@ func TestEnvVars(t *testing.T) {
 				MaxValueLength: 213,
 				FormatString:   "base",
 				ShowValues:     true,
+				ShowVersion:    true,
+				ShowMetadata:   true,
 			},
 		},
 		{
@@ -210,6 +216,8 @@ func TestEnvVars(t *testing.T) {
 			expected: &Options{
 				MaxValueLength: 12,
 				FormatString:   "yaml",
+				ShowVersion:    true,
+				ShowMetadata:   true,
 			},
 		},
 		{
@@ -223,6 +231,8 @@ func TestEnvVars(t *testing.T) {
 				MaxValueLength: 213,
 				Path:           "kv1",
 				FormatString:   "base",
+				ShowVersion:    true,
+				ShowMetadata:   true,
 			},
 		},
 		{
@@ -240,6 +250,8 @@ func TestEnvVars(t *testing.T) {
 				FormatString:   "template",
 				TemplateFile:   "path",
 				TemplateString: "string",
+				ShowVersion:    true,
+				ShowMetadata:   true,
 			},
 		},
 	}

@@ -129,6 +129,42 @@ func (v *Vault) EnableKV2Engine(rootPath string) error {
 	return nil
 }
 
+// ReadSecretVersion read the version of the secret.
+func (v *Vault) ReadSecretVersion(rootPath, subPath string) (interface{}, error) {
+	data, err := v.Client.Logical().Read(fmt.Sprintf(listSecretsPath, rootPath, subPath))
+	if err != nil {
+		return nil, err
+	}
+
+	if data == nil {
+		return nil, fmt.Errorf("could not read secret %s version", path.Join(rootPath, subPath))
+	}
+
+	if d, ok := data.Data["current_version"]; ok {
+		return d, nil
+	}
+
+	return nil, fmt.Errorf("could not read secret %s version", path.Join(rootPath, subPath))
+}
+
+// ReadSecretMetadata read the metadata of the secret.
+func (v *Vault) ReadSecretMetadata(rootPath, subPath string) (interface{}, error) {
+	data, err := v.Client.Logical().Read(fmt.Sprintf(listSecretsPath, rootPath, subPath))
+	if err != nil {
+		return nil, err
+	}
+
+	if data == nil {
+		return nil, fmt.Errorf("could not read secret %s metadata", path.Join(rootPath, subPath))
+	}
+
+	if d, ok := data.Data["custom_metadata"]; ok {
+		return d, nil
+	}
+
+	return nil, fmt.Errorf("could not read secret %s metadata", path.Join(rootPath, subPath))
+}
+
 // DisableKV2Engine disables the kv2 engine at a specified path.
 func (v *Vault) DisableKV2Engine(rootPath string) error {
 	_, err := v.Client.Logical().Delete(fmt.Sprintf(mountEnginePath, rootPath))

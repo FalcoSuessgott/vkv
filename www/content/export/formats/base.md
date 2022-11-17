@@ -17,6 +17,8 @@ vkv --path <path>
 | `--only-keys`         | show only keys                                                                    | `VKV_ONLY_KEYS`        | `false` |
 | `--only-paths`        | show only paths                                                                   | `VKV_ONLY_PATHS`       | `false` |
 | `--show-values`       | don't mask values                                                                 | `VKV_SHOW_VALUES`      | `false` |
+| `--show-version`      | show the secrets version                                                          | `VKV_SHOW_VERSION`     | `true`  |
+| `--show-metadata`     | show the secrets custom metadata                                                  | `VKV_SHOW_METADATA`    | `true`  |
 | `--max-value-length`  | maximum char length of values (set to `-1` for disabling)                         | `VKV_MAX_VALUE_LENGTH` | `12`    |
 
 ### Demo

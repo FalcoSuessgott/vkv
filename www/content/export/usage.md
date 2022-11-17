@@ -18,6 +18,8 @@ weight: 1
 | `--only-keys`         | show only keys                                                                    | `VKV_ONLY_KEYS`        | `false` |
 | `--only-paths`        | show only paths                                                                   | `VKV_ONLY_PATHS`       | `false` |
 | `--show-values`       | don't mask values                                                                 | `VKV_SHOW_VALUES`      | `false` |
+| `--show-version`      | show the secrets version                                                          | `VKV_SHOW_VERSION`     | `true`  |
+| `--show-metadata`     | show the secrets custom metadata                                                  | `VKV_SHOW_METADATA`    | `true`  |
 | `--max-value-length`  | maximum char length of values (set to `-1` for disabling)                         | `VKV_MAX_VALUE_LENGTH` | `12`    |
 | `--template-file`     | path to a file containing Go-template syntax to render the KV entries             | `VKV_TEMPLATE_FILE`    |         |
 | `--template-string`   | string containing Go-template syntax to render KV entries                         | `VKV_TEMPLATE_STRING`  |         |
