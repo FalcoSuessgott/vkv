@@ -20,7 +20,7 @@ run: ## run the app
 
 PHONY: test
 test: clean ## display test coverage
-	go test -v -race $(shell go list ./... | grep -v /vendor/) -v -coverprofile=coverage.out
+	go test --cover -parallel=1 -v -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 
 PHONY: fmt
@@ -40,38 +40,40 @@ pre-commit:	## run pre-commit hooks
 bootstrap: ## install build deps
 	go generate -tags tools tools/tools.go
 
-vault: export VAULT_ADDR = http://127.0.0.1:8200
-vault: export VAULT_SKIP_VERIFY = true
-vault: export VAULT_TOKEN = root
-
 .PHONY: vault
 vault: clean ## set up a development vault server and write kv secrets
 	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
 	sleep 3
 
-	vault kv put secret/demo foo=bar
-	vault kv put secret/admin sub=password
-	vault kv put secret/sub/demo demo="hello world" user=admin password=s3cre5
-	vault kv put secret/sub/sub2/demo foo=bar user=user password=password
-	vault kv put secret/sub/sub2/demo admin=key foo=bar user=user password=password
-	vault kv metadata put -mount=secret -custom-metadata=key=value admin
-	vault kv metadata put -mount=secret -custom-metadata=key=value -custom-metadata=admin=false sub/sub2/demo
-	vault policy write kv assets/kv-policy.hcl
+	./scripts/prepare-vault.sh
 
-	vault secrets enable -path secret_2 -version=2 kv
-	vault kv put secret_2/demo foo=bar
-	vault kv put secret_2/admin sub=password
-	vault kv put secret_2/sub/demo demo="hello world" user=admin password=s3cre5
-	vault kv put secret_2/sub/sub2/demo foo=bar-updated user=user password=password
+.PHONY: vault-ent
+vault-ent: clean ## set up a development vault enterprise server and write kv secrets
+	nohup vault-ent server -dev -dev-root-token-id=root 2> /dev/null &
+	sleep 3
+
+	./scripts/prepare-vault.sh
+
+	vault namespace create sub
+	VAULT_NAMESPACE="sub" ./scripts/prepare-vault-ent.sh
+
+	VAULT_NAMESPACE="sub" vault namespace create sub2
+	VAULT_NAMESPACE="sub/sub2" ./scripts/prepare-vault-ent.sh
+
+	vault namespace create test
+	VAULT_NAMESPACE="test" vault namespace create test2
+	VAULT_NAMESPACE="test/test2" vault namespace create test3
+	VAULT_NAMESPACE="test/test2/test3" ./scripts/prepare-vault-ent.sh
 
 .PHONY: clean
 clean: ## clean the development vault
 	@rm -rf coverage.out dist/ $(projectname)
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
+	@kill -9 $(shell pgrep -x vault-ent) 2> /dev/null || true
 
-ASSETS = demo base markdown export template diff policies template fzf policy json yaml import-export
+ASSETS = diff demo fzf
 .PHONY: assets
-assets: clean vault ## generate all assets
+assets: clean vault-ent ## generate all assets
 	for i in $(ASSETS); do \
 		vhs < assets/$$i.tape; \
 	done

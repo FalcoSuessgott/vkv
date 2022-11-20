@@ -28,25 +28,27 @@ func (s *VaultSuite) TestGetCapabilities() {
 	}
 
 	for _, tc := range testCases {
-		// enable kv engine
-		assert.NoError(s.Suite.T(), s.v.EnableKV2Engine(tc.rootPath))
+		s.Run(tc.name, func() {
+			// enable kv engine
+			assert.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
 
-		// enable kv engine again, so it erros
-		assert.Error(s.Suite.T(), s.v.EnableKV2Engine(tc.rootPath))
+			// enable kv engine again, so it erros
+			assert.Error(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
 
-		// read secrets- find none, so it errors
-		_, err := s.v.ReadSecrets(tc.rootPath, tc.subPath)
-		assert.Error(s.Suite.T(), err)
+			// read secrets- find none, so it errors
+			_, err := s.client.ReadSecrets(tc.rootPath, tc.subPath)
+			assert.Error(s.Suite.T(), err)
 
-		// actual write the secrets
-		if err = s.v.WriteSecrets(tc.rootPath, tc.subPath, tc.s); err != nil {
-			s.Suite.T().Fail()
-		}
+			// actual write the secrets
+			if err = s.client.WriteSecrets(tc.rootPath, tc.subPath, tc.s); err != nil {
+				s.Suite.T().Fail()
+			}
 
-		caps, err := s.v.GetCapabilities(tc.rootPath)
-		assert.NoError(s.Suite.T(), err)
+			caps, err := s.client.GetCapabilities(tc.rootPath)
+			assert.NoError(s.Suite.T(), err)
 
-		assert.Equal(s.Suite.T(), tc.expected, caps, tc.name)
+			assert.Equal(s.Suite.T(), tc.expected, caps, tc.name)
+		})
 	}
 }
 

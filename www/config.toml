@@ -13,9 +13,9 @@ defaultContentLanguageInSubdir= false
 enableMissingTranslationPlaceholders = false
 
 [params]
-    description = " export/import secrets from Vaults KV2 engine"
+    description = "the swiss army knife when working with Vault KVv2 engines"
     github_repository = "https://github.com/FalcoSuessgott/vkv"
-    version = "v0.1.1"
+    version = "v0.2.0"
 
     github_doc_repository = "https://github.com/FalcoSuessgott/vkv"
     github_doc_repository_path = "www/content/"

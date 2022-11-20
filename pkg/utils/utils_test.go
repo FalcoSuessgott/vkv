@@ -6,38 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReadFile(t *testing.T) {
-	testCases := []struct {
-		name    string
-		path    string
-		content []byte
-		err     bool
-	}{
-		{
-			name:    "valid",
-			path:    "testdata/file_1.txt",
-			content: []byte("Hello World"),
-			err:     false,
-		},
-		{
-			name:    "invalid",
-			path:    "testdata/invalid",
-			content: nil,
-			err:     true,
-		},
-	}
+func TestRemoveExtension(t *testing.T) {
+	s := "path/to/file.txt"
+	assert.Equal(t, "path/to/file", RemoveExtension(s))
+}
 
-	for _, tc := range testCases {
-		out, err := ReadFile(tc.path)
-
-		if tc.err {
-			assert.Error(t, err, tc.name)
-
-			continue
-		}
-
-		assert.Equal(t, tc.content, out, tc.name)
-	}
+func TestRemoveCarriageReturn(t *testing.T) {
+	s := "new line\r\n"
+	assert.Equal(t, "new line\n", RemoveCarriageReturns(s))
 }
 
 func TestTransformMap(t *testing.T) {
@@ -247,6 +223,12 @@ func TestRemoveEmptyElements(t *testing.T) {
 	for _, tc := range testCases {
 		assert.Equal(t, tc.expected, removeEmptyElements(tc.parts), tc.name)
 	}
+}
+
+func TestRemoveDuplicates(t *testing.T) {
+	l := []string{"a", "a", "b", "c", "c"}
+
+	assert.Equal(t, []string{"a", "b", "c"}, RemoveDuplicates(l))
 }
 
 // nolint: dupword

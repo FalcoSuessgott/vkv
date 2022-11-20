@@ -15,6 +15,8 @@ const (
 	capDelete = "delete"
 	capList   = "list"
 	capRoot   = "root"
+
+	capabilities = "sys/capabilities-self"
 )
 
 // Capability represents a tokens caps for a specific path.
@@ -27,6 +29,7 @@ type Capability struct {
 	Root   bool
 }
 
+// GetCapabilities returns the current authenticated tokens capabilities for a given path.
 func (v *Vault) GetCapabilities(path string) (*Capability, error) {
 	options := map[string]interface{}{
 		"paths": []string{path},

@@ -7,21 +7,13 @@ import (
 	"github.com/hashicorp/vault/api"
 )
 
-// nolint: gosec
-const (
-	mountEnginePath      = "sys/mounts/%s"
-	readWriteSecretsPath = "%s/data/%s"
-	listSecretsPath      = "%s/metadata/%s"
-	capabilities         = "sys/capabilities-self"
-)
-
 // Vault represents a vault struct used for reading and writing secrets.
 type Vault struct {
 	Client *api.Client
 }
 
-// NewClient returns a new vault client wrapper.
-func NewClient() (*Vault, error) {
+// NewDefaultClient returns a new vault client wrapper.
+func NewDefaultClient() (*Vault, error) {
 	_, ok := os.LookupEnv("VAULT_ADDR")
 	if !ok {
 		return nil, fmt.Errorf("VAULT_ADDR required but not set")
@@ -48,6 +40,22 @@ func NewClient() (*Vault, error) {
 	if ok {
 		c.SetNamespace(vaultNamespace)
 	}
+
+	return &Vault{Client: c}, nil
+}
+
+// NewClient returns a new vault client wrapper.
+func NewClient(addr, token string) (*Vault, error) {
+	cfg := &api.Config{
+		Address: addr,
+	}
+
+	c, err := api.NewClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	c.SetToken(token)
 
 	return &Vault{Client: c}, nil
 }

@@ -19,13 +19,16 @@ description: Text about this post
 </div>
 
 ### Features
-* recursively print secrets of any KVv2 Engine in `json`, `yaml`, `markdown` and [other formats](https://falcosuessgott.github.io/vkv/export/formats/)
-* show a secret version as well as its [custom metadata](https://developer.hashicorp.com/vault/docs/commands/kv/metadata)
-* customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/export/usage/)
-* print the CRUD-capabilities of the authenticated token for each KV-path (format: [`policy`](https://falcosuessgott.github.io/vkv/export/formats/token_policy/))
-* print secrets in `export <key>=<value>` format for variable exporting (format: [`export`](https://falcosuessgott.github.io/vkv/export/formats/export/))
-* [import](https://falcosuessgott.github.io/vkv/import/usage/) secrets back to Vault from `vkv`'s `json` or `yaml` format 
-* handy [snippets](https://falcosuessgott.github.io/vkv/export/advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
+* recursively print secrets of any KVv2 Engine in `json`, `yaml`, `markdown` and [other formats](https://falcosuessgott.github.io/vkv/04_export/formats/)
+* engine export shows the secret version as well as its [custom metadata](https://developer.hashicorp.com/vault/docs/commands/kv/metadata)
+* customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/04_export/)
+* print the CRUD-capabilities of the authenticated token for each KV-path (format: `policy`)
+* print secrets in `export <key>=<value>` format for variable exporting (format: `export`)
+* [import](https://falcosuessgott.github.io/vkv/05_import/) secrets back to Vault from `vkv`'s `json` or `yaml` format 
+* save and restore KVv2 snapshots (including namespaces)
+* list all engines or namespaces for scripting purposes
+* handy [snippets](https://falcosuessgott.github.io/08_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
 
 
-Checkout the [Docs](https://falcosuessgott.github.io/vkv/) to learn more about `vkv`
+
+Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Guide to learn more about `vkv`
