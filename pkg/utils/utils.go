@@ -3,9 +3,9 @@ package utils
 // nolint: staticcheck
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -19,16 +19,6 @@ const (
 
 // Keys type for receiving all keys of a map.
 type Keys []string
-
-// ReadFile reads from a file.
-func ReadFile(path string) ([]byte, error) {
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	return content, nil
-}
 
 // TransformMap takes a multi leveled map and returns a map with its combined paths
 // as the keys and the map as its value. Also see TestTransformMap().
@@ -108,7 +98,7 @@ func ToMapStringInterface(i interface{}) map[string]interface{} {
 }
 
 // ToJSON marshalls a given map to json.
-func ToJSON(m map[string]interface{}) ([]byte, error) {
+func ToJSON(m interface{}) ([]byte, error) {
 	out, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
 		return nil, err
@@ -128,7 +118,7 @@ func FromJSON(b []byte) (map[string]interface{}, error) {
 }
 
 // ToYAML marshalls a given map to yaml.
-func ToYAML(m map[string]interface{}) ([]byte, error) {
+func ToYAML(m interface{}) ([]byte, error) {
 	out, err := yaml.Marshal(m)
 	if err != nil {
 		return nil, err
@@ -159,6 +149,16 @@ func SortMapKeys(m map[string]interface{}) []string {
 	return keys
 }
 
+// RemoveExtension removes the extension of a specified filename.
+func RemoveExtension(file string) string {
+	return strings.TrimSuffix(file, filepath.Ext(file))
+}
+
+// RemoveCarriageReturns removes \r mostly used for unit tests on windows OS.
+func RemoveCarriageReturns(s string) string {
+	return strings.ReplaceAll(s, "\r", "")
+}
+
 // Len returns the length of Keys.
 func (k Keys) Len() int {
 	return len(k)
@@ -175,6 +175,23 @@ func (k Keys) Less(i, j int) bool {
 	k2 := strings.ReplaceAll(k[j], "/", "\x00")
 
 	return k1 < k2
+}
+
+// RemoveDuplicates removes duplicate elements from a string slice.
+func RemoveDuplicates(s []string) []string {
+	allKeys := make(map[string]bool)
+
+	list := []string{}
+
+	for _, item := range s {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+
+			list = append(list, item)
+		}
+	}
+
+	return list
 }
 
 // DeepMergeMaps takes two maps and deeply merges them together.

@@ -1,14 +1,8 @@
 vkv
-/.idea
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-*.test
 *.out
 vendor/
 coverage.out
 /dist
 .hugo_build.lock
-docs/
+.envrc
+.vscode/

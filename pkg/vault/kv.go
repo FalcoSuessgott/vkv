@@ -9,6 +9,13 @@ import (
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
+const (
+	//nolint: gosec
+	readWriteSecretsPath = "%s/data/%s"
+	//nolint: gosec
+	listSecretsPath = "%s/metadata/%s"
+)
+
 // Secrets holds all recursive secrets of a certain path.
 type Secrets map[string]interface{}
 
@@ -111,22 +118,22 @@ func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interf
 	return nil
 }
 
-// EnableKV2Engine enables the kv2 engine at a specified path.
-func (v *Vault) EnableKV2Engine(rootPath string) error {
-	options := map[string]interface{}{
-		"type": "kv",
-		"options": map[string]interface{}{
-			"path":    rootPath,
-			"version": 2,
-		},
-	}
-
-	_, err := v.Client.Logical().Write(fmt.Sprintf(mountEnginePath, rootPath), options)
+// ReadSecretMetadata read the metadata of the secret.
+func (v *Vault) ReadSecretMetadata(rootPath, subPath string) (interface{}, error) {
+	data, err := v.Client.Logical().Read(fmt.Sprintf(listSecretsPath, rootPath, subPath))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	if data == nil {
+		return nil, fmt.Errorf("could not read secret %s metadata", path.Join(rootPath, subPath))
+	}
+
+	if d, ok := data.Data["custom_metadata"]; ok {
+		return d, nil
+	}
+
+	return nil, fmt.Errorf("could not read secret %s metadata", path.Join(rootPath, subPath))
 }
 
 // ReadSecretVersion read the version of the secret.
@@ -147,59 +154,12 @@ func (v *Vault) ReadSecretVersion(rootPath, subPath string) (interface{}, error)
 	return nil, fmt.Errorf("could not read secret %s version", path.Join(rootPath, subPath))
 }
 
-// ReadSecretMetadata read the metadata of the secret.
-func (v *Vault) ReadSecretMetadata(rootPath, subPath string) (interface{}, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(listSecretsPath, rootPath, subPath))
-	if err != nil {
-		return nil, err
-	}
-
-	if data == nil {
-		return nil, fmt.Errorf("could not read secret %s metadata", path.Join(rootPath, subPath))
-	}
-
-	if d, ok := data.Data["custom_metadata"]; ok {
-		return d, nil
-	}
-
-	return nil, fmt.Errorf("could not read secret %s metadata", path.Join(rootPath, subPath))
-}
-
 // DisableKV2Engine disables the kv2 engine at a specified path.
 func (v *Vault) DisableKV2Engine(rootPath string) error {
 	_, err := v.Client.Logical().Delete(fmt.Sprintf(mountEnginePath, rootPath))
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-// EnableKV2EngineErrorIfNotForced enables a KVv2 Engine and errors if
-// already enabled, unless force is set to true.
-func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
-	rootPath, _ := utils.SplitPath(path)
-
-	if len(strings.Split(path, utils.Delimiter)) > 1 {
-		//nolint: nilerr
-		if err := v.EnableKV2Engine(rootPath); err != nil {
-			return nil
-		}
-	}
-
-	if v.EnableKV2Engine(rootPath) != nil && !force {
-		return fmt.Errorf("a secret engine under \"%s\" is already enabled. Use --force for overwriting", rootPath)
-	}
-
-	if err := v.DisableKV2Engine(rootPath); err != nil {
-		return fmt.Errorf("error disabling secret engine \"%s\": %w", rootPath, err)
-	}
-
-	if err := v.EnableKV2Engine(rootPath); err != nil {
-		return fmt.Errorf("error enabling secret engine \"%s\": %w", rootPath, err)
-	}
-
-	fmt.Printf("enabling secret engine \"%s\"\n", rootPath)
 
 	return nil
 }

@@ -1,15 +1,15 @@
 repos:
-  # golang pre commits
-  - repo: https://github.com/dnephin/pre-commit-golang.git
-    rev: v0.5.1
+  - repo: https://github.com/tekwizely/pre-commit-golang
+    rev: v1.0.0-rc.1
     hooks:
-      - id: go-fmt
-      - id: go-vet
-      - id: go-lint
-      - id: go-imports
-      - id: no-go-testing
-      - id: golangci-lint
-        args: ["--skip-dirs=vendor -c .golang-ci.yml ."]
-      - id: go-unit-tests
-      - id: go-build
+      - id: go-build-mod
       - id: go-mod-tidy
+      - id: go-test-mod
+      - id: go-vet-mod
+      - id: go-staticcheck-mod
+      - id: go-fmt
+      - id: go-fumpt
+      - id: go-imports
+      - id: go-lint
+      - id: golangci-lint-mod
+        args: [-c.golang-ci.yml]

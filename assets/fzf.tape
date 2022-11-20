@@ -4,20 +4,8 @@ Set FontSize 32
 Set Width 2000
 Set Height 1000
 
-Hide
-Type "export VAULT_ADDR='http://127.0.0.1:8200'"
-Enter
-
-Hide
-Type "export VAULT_TOKEN='root'"
-Enter
-
 Show
-Type "cat assets/fzf.sh"
-Enter
-Sleep 2
-
-Type './assets/fzf.sh'
+Type "vkv list engines --all --include-ns-prefix | fzf --preview 'vkv export -e ${}'"
 Enter
 Sleep 3
 
