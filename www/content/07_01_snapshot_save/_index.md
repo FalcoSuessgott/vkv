@@ -1,6 +1,6 @@
 ---
 title: "vkv snapshot save"
-weight: 6
+weight: 7
 ---
 
 create a snapshot of all visible KV engines recursively for all namespaces

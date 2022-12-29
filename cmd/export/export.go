@@ -102,10 +102,7 @@ func NewExportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 
 	// Input
 	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KVv2 Engine path (env: VKV_EXPORT_PATH)")
-	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath,
-		"Specify the engine path using this flag in case your kv-engine contains special characters such as \"/\".\n"+
-			"vkv will then append the values of the path-flag to the engine path, if specified (<engine-path>/<path>)"+
-			"(env: VKV_EXPORT_ENGINE_PATH)")
+	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path value will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_EXPORT_ENGINE_PATH)")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")

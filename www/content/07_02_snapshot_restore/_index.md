@@ -1,6 +1,6 @@
 ---
 title: "vkv snapshot restore"
-weight: 6
+weight: 8
 ---
 
 restore the KV engines defined in the specified snapshot

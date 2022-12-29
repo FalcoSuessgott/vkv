@@ -6,3 +6,5 @@ coverage.out
 .hugo_build.lock
 .envrc
 .vscode/
+manpages/
+dist/

@@ -8,6 +8,7 @@ import (
 	"github.com/FalcoSuessgott/vkv/cmd/export"
 	imp "github.com/FalcoSuessgott/vkv/cmd/imp"
 	"github.com/FalcoSuessgott/vkv/cmd/list"
+	"github.com/FalcoSuessgott/vkv/cmd/manpage"
 	"github.com/FalcoSuessgott/vkv/cmd/snapshot"
 	"github.com/FalcoSuessgott/vkv/cmd/version"
 	"github.com/spf13/cobra"
@@ -32,6 +33,7 @@ func NewRootCmd(v string, writer io.Writer) *cobra.Command {
 		snapshot.NewSnapshotCmd(writer, nil),
 		version.NewVersionCmd(v),
 		imp.NewImportCmd(writer, nil),
+		manpage.NewManCmd().Cmd,
 	)
 
 	return cmd

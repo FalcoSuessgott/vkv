@@ -1,6 +1,6 @@
 ---
 title: "Development"
-weight: 40
+weight: 12
 ---
 
 Clone this repository and run:
