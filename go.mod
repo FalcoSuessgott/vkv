@@ -8,6 +8,8 @@ require (
 	github.com/gotesttools/gotestfmt/v2 v2.4.1
 	github.com/hashicorp/vault/api v1.8.1
 	github.com/juju/ansiterm v1.0.0
+	github.com/muesli/mango-cobra v1.2.0
+	github.com/muesli/roff v0.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.2-0.20221102114659-1333b5d3bda8
 	github.com/testcontainers/testcontainers-go v0.14.0
@@ -134,6 +136,8 @@ require (
 	github.com/moby/sys/mountinfo v0.6.2 // indirect
 	github.com/moricho/tparallel v0.2.1 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/muesli/mango v0.1.0 // indirect
+	github.com/muesli/mango-pflag v0.1.0 // indirect
 	github.com/nakabonne/nestif v0.3.1 // indirect
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354 // indirect
 	github.com/nishanths/exhaustive v0.8.3 // indirect

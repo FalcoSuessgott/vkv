@@ -1,6 +1,6 @@
 ---
 title: "vkv list namespaces"
-weight: 7
+weight: 9
 ---
 
 list all namespaces

@@ -1,6 +1,6 @@
 ---
 title: "vkv export"
-weight: 4
+weight: 5
 ---
 
 recursively list secrets from Vaults KV2 engine in various formats
