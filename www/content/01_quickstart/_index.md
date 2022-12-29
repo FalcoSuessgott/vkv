@@ -10,7 +10,7 @@ In order to perform all of the described tasks, you will need the following tool
 
 * a Linux/MacOS Shell
 * `docker` installed and running (alternatively `vault` CLI can be used)
-* `vkv` installed (follow https://falcosuessgott.github.io/vkv/installation/)
+* `vkv` installed (follow https://falcosuessgott.github.io/vkv/02_installation/)
 
 ### 01. Spin up a development Vault server
 First, we setup a development Vault server. 

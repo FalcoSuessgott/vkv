@@ -19,7 +19,7 @@ vault secrets enable -path=sops transit
 vault write sops/keys/vkv type=rsa-4096
 
 # export secrets as yaml and write to file
-vkv -p secret --show-values -f=yaml > export.yaml
+vkv export -p secret --show-values -f=yaml > export.yaml
 
 # configure sops
 cat <<EOF > .sops.yaml

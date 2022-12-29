@@ -8,7 +8,7 @@ using `vault secrets list` and a little bit of `jq`-logic, we can get a list of 
 If we pipe this into `fzf` we can get a handy little  preview-app:
 
 ```bash
-vault secrets list -format=json | jq -r 'to_entries | map(select(.value.type=="kv")) | from_entries | keys[]' | fzf --preview 'vkv -p ${}'
+vkv list engines --all --include-ns-prefix | fzf --preview 'vkv export -e ${}'
 ```
 
 ### Demo

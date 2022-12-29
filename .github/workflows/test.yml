@@ -2,6 +2,8 @@ name: Test and coverage
 
 on:
   push:
+    paths:
+      - '**.go'
     branches:
       - master
   pull_request:
@@ -12,6 +14,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         vault-version: [1.11-ent, 1.12-ent, latest]
+      max-parallel: 1
 
     runs-on: ${{ matrix.os }}
 

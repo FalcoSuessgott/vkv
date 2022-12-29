@@ -27,7 +27,7 @@ description: Text about this post
 * [import](https://falcosuessgott.github.io/vkv/05_import/) secrets back to Vault from `vkv`'s `json` or `yaml` format 
 * save and restore KVv2 snapshots (including namespaces)
 * list all engines or namespaces for scripting purposes
-* handy [snippets](https://falcosuessgott.github.io/08_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
+* handy [snippets](https://falcosuessgott.github.io/vkv/08_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
 
 
 

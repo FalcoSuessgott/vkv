@@ -21,7 +21,7 @@ run: ## run the app
 PHONY: test
 test: clean ## display test coverage
 	go test --cover -parallel=1 -v -coverprofile=coverage.out ./...
-	go tool cover -func=coverage.out
+	go tool cover -func=coverage.out | sort -rnk3
 
 PHONY: fmt
 fmt: ## format go files

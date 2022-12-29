@@ -1,5 +1,5 @@
 ---
-title: "Advanced Examples"
+title: "advanced examples"
 weight: 8
 ---
 
