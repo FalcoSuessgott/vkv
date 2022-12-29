@@ -4,7 +4,7 @@ description: Text about this post
 ---
 
 <div align="center">
-<img src="images/logo.png" alt="drawing" width="200"/>
+<img src="https://media.githubusercontent.com/media/FalcoSuessgott/vkv/master/www/static/images/logo.png" alt="drawing" width="200"/>
 <br>
 <img src="https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg" alt="drawing"/>
 <img src="https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg" alt="drawing"/>

@@ -4,13 +4,11 @@ weight: 2
 ---
 
 ### cURL
-Download vkv using curl for Linux x86_64 machines:
 ```bash
-curl -0L https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.2.0_$(uname)_$(uname -m).tar.gz
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.2.0_$(uname)_$(uname -m).tar.gz
 tar xzf vkv_0.2.0_Linux_x86_64.tar.gz
 chmod u+x vkv
 ./vkv version
-vkv 0.2.0
 ```
 
 ### Packages

@@ -1,7 +1,5 @@
 <div align="center">
-
-<div align="center">
-<img src="images/logo.png" alt="drawing" width="200"/>
+<img src="https://raw.githubusercontent.com/FalcoSuessgott/vkv/master/www/static/images/logo.png" alt="drawing" width="200"/>
 <br>
 <img src="https://github.com/FalcoSuessgott/vkv/actions/workflows/test.yml/badge.svg" alt="drawing"/>
 <img src="https://github.com/FalcoSuessgott/vkv/actions/workflows/lint.yml/badge.svg" alt="drawing"/>
@@ -15,7 +13,7 @@
 
 </div>
 
-### Features
+## Features
 * recursively print secrets of any KVv2 Engine in `json`, `yaml`, `markdown` and [other formats](https://falcosuessgott.github.io/vkv/04_export/formats/)
 * engine export shows the secret version as well as its [custom metadata](https://developer.hashicorp.com/vault/docs/commands/kv/metadata)
 * customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/04_export/)
@@ -27,5 +25,54 @@
 * handy [snippets](https://falcosuessgott.github.io/vkv/08_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
 
 
-
 Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Guide to learn more about `vkv`
+
+## Quickstart
+
+```bash
+# Installation
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.2.0_$(uname)_$(uname -m).tar.gz
+tar xzf vkv_0.2.0_Linux_x86_64.tar.gz
+chmod u+x vkv
+./vkv version
+vkv 0.2.0
+
+# set required env vars
+export VAULT_ADDR=https://vault-server:8200
+export VAULT_TOKEN=<your-vault-token>
+
+# verify connection
+vault status
+Key             Value
+---             -----
+Seal Type       shamir
+Initialized     true
+Sealed          false
+Total Shares    1
+Threshold       1
+Version         1.12.1
+Build Date      2022-10-27T12:32:05Z
+Storage Type    inmem
+Cluster Name    vault-cluster-ffd05212
+Cluster ID      42ef92d5-eb21-0cb5-dd0b-804dac04e505
+HA Enabled      false
+
+# list secrets recursively of a KVv2 engine
+vkv export --path <KVv2-engine path>
+secret/
+├── v1: admin [key=value]   # v1 -> secret version; "admin" -> secrets name; "[key=value]" -> secrets custom metadata
+│   └── sub=********        # "sub" -> key; "*****" -> masked value (disable with --show-values)
+├── v1: demo
+│   └── foo=***
+└── sub/
+    ├── v1: demo
+    │   ├── demo=***********
+    │   ├── password=******
+    │   └── user=*****
+    └── sub2
+        └── v2: demo [admin=false key=value]
+            ├── admin=***
+            ├── foo=***
+            ├── password=********
+            └── user=****
+```
