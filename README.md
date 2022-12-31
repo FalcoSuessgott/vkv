@@ -6,6 +6,7 @@
 <img src="https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg" alt="drawing"/>
 <img src="https://img.shields.io/github/downloads/FalcoSuessgott/vkv/total.svg" alt="drawing"/>
 <img src="https://img.shields.io/github/v/release/FalcoSuessgott/vkv" alt="drawing"/>
+<img src="https://img.shields.io/docker/pulls/falcosuessgott/vkv" alt="drawing"/>
 
 `vkv` is a little CLI tool written in Go, which enables you to list, compare, import, document, backup & encrypt secrets from a [HashiCorp Vault KV-v2 engine](https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2):
 
@@ -31,11 +32,11 @@ Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Gu
 
 ```bash
 # Installation
-curl -OL https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.2.0_$(uname)_$(uname -m).tar.gz
-tar xzf vkv_0.2.0_Linux_x86_64.tar.gz
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.2.1_$(uname)_$(uname -m).tar.gz
+tar xzf vkv_0.2.1_Linux_x86_64.tar.gz
 chmod u+x vkv
 ./vkv version
-vkv 0.2.0
+vkv 0.2.1
 
 # set required env vars
 export VAULT_ADDR=https://vault-server:8200

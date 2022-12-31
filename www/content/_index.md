@@ -11,6 +11,7 @@ description: Text about this post
 <img src="https://codecov.io/gh/FalcoSuessgott/vkv/branch/master/graph/badge.svg" alt="drawing"/>
 <img src="https://img.shields.io/github/downloads/FalcoSuessgott/vkv/total.svg" alt="drawing"/>
 <img src="https://img.shields.io/github/v/release/FalcoSuessgott/vkv" alt="drawing"/>
+<img src="https://img.shields.io/docker/pulls/falcosuessgott/vkv" alt="drawing"/>
 
 `vkv` is a little CLI tool written in Go, which enables you to list, compare, import, document, backup & encrypt secrets from a [HashiCorp Vault KV-v2 engine](https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2):
 
