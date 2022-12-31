@@ -19,7 +19,7 @@ builds:
     goarch:
       - amd64
       - arm64
-
+      
 archives:
   -
     builds:
@@ -63,6 +63,63 @@ nfpms:
         dst:  /usr/share/zsh/vendor-completions/_vkv
         file_info:
           mode: 0644
+
+dockers:
+- image_templates:
+  - 'falcosuessgott/{{.ProjectName}}:{{ .Tag }}-amd64'
+  - 'ghcr.io/falcosuessgott/{{.ProjectName}}:{{ .Tag }}-amd64'
+  dockerfile: Dockerfile.goreleaser
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/FalcoSuessgott/vkv/master/README.md"
+  - "--label=io.artifacthub.package.logo-url=https://raw.githubusercontent.com/FalcoSuessgott/vkv/master/www/static/images/logo.png"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Tom Morelly\",\"email\":\"tommorelly@gmail.com\"}]"
+  - "--label=io.artifacthub.package.license=MIT"
+  - "--label=org.opencontainers.image.description=the swiss army knife when working with Vault KVv2 engines"
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/amd64"
+- image_templates:
+  - 'falcosuessgott/{{.ProjectName}}:{{ .Tag }}-arm64'
+  - 'ghcr.io/falcosuessgott/{{.ProjectName}}:{{ .Tag }}-arm64'
+  dockerfile:  Dockerfile.goreleaser
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/FalcoSuessgott/vkv/master/README.md"
+  - "--label=io.artifacthub.package.logo-url=https://raw.githubusercontent.com/FalcoSuessgott/vkv/master/www/static/images/logo.png"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Tom Morelly\",\"email\":\"tommorelly@gmail.com\"}]"
+  - "--label=io.artifacthub.package.license=MIT"
+  - "--label=org.opencontainers.image.description=the swiss army knife when working with Vault KVv2 engines"
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/arm64"
+  goarch: arm64
+
+docker_manifests:
+- name_template: 'falcosuessgott/{{.ProjectName}}:{{ .Tag }}'
+  image_templates:
+  - 'falcosuessgott/{{.ProjectName}}:{{ .Tag }}-amd64'
+  - 'falcosuessgott/{{.ProjectName}}:{{ .Tag }}-arm64'
+- name_template: 'ghcr.io/falcosuessgott/{{.ProjectName}}:{{ .Tag }}'
+  image_templates:
+  - 'ghcr.io/falcosuessgott/{{.ProjectName}}:{{ .Tag }}-amd64'
+  - 'ghcr.io/falcosuessgott/{{.ProjectName}}:{{ .Tag }}-arm64'
+- name_template: 'falcosuessgott/{{.ProjectName}}:latest'
+  image_templates:
+  - 'falcosuessgott/{{.ProjectName}}:{{ .Tag }}-amd64'
+  - 'falcosuessgott/{{.ProjectName}}:{{ .Tag }}-arm64'
+- name_template: 'ghcr.io/falcosuessgott/{{.ProjectName}}:latest'
+  image_templates:
+  - 'ghcr.io/falcosuessgott/{{.ProjectName}}:{{ .Tag }}-amd64'
+  - 'ghcr.io/falcosuessgott/{{.ProjectName}}:{{ .Tag }}-arm64'
 
 checksum:
   name_template: "checksums.txt"

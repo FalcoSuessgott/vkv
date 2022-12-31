@@ -7,4 +7,5 @@ coverage.out
 .envrc
 .vscode/
 manpages/
+completions/
 dist/

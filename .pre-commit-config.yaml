@@ -13,3 +13,8 @@ repos:
       - id: go-lint
       - id: golangci-lint-mod
         args: [-c.golang-ci.yml]
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
