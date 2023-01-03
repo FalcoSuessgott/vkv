@@ -67,7 +67,7 @@ vault-ent: clean ## set up a development vault enterprise server and write kv se
 
 .PHONY: clean
 clean: ## clean the development vault
-	@rm -rf coverage.out dist/ $(projectname)
+	@rm -rf coverage.out dist/ $(projectname) manpages/ dist/ completions/ || true
 	@kill -9 $(shell pgrep -x vault) 2> /dev/null || true
 	@kill -9 $(shell pgrep -x vault-ent) 2> /dev/null || true
 
