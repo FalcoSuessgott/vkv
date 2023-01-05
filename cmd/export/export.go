@@ -139,11 +139,13 @@ func (o *exportOptions) validateFlags() error {
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.MaxValueLength = -1
+			o.ShowValues = true
 		case "json":
 			o.outputFormat = printer.JSON
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.MaxValueLength = -1
+			o.ShowValues = true
 		case "export":
 			o.outputFormat = printer.Export
 			o.OnlyKeys = false

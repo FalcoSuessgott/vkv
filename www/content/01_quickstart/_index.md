@@ -210,7 +210,7 @@ Meanwhile `vkv export` can be used to store secrets, `vkv import` is used to imp
 Knowing this, we can copy a secret engine to another secret engine:
 
 ```bash
-vkv export -p secret -f=yaml --show-values | vkv import - -p copy
+vkv export -p secret -f=yaml | vkv import - -p copy
 reading secrets from STDIN
 parsing secrets from YAML
 writing secret "copy/db/dev" 
@@ -238,11 +238,9 @@ copy/
 Or even to another Vault instance:
 
 ```bash
-vkv export -p secret -f=yaml --show-values| VAULT_ADDR="..." VAULT_TOKEN="..." vkv import - -p copy
+vkv export -p secret -f=yaml | VAULT_ADDR="..." VAULT_TOKEN="..." vkv import - -p copy
 [...]
 ```
-
-Dont forget to set `--show-values` otherwise `vkv` will import masked `secrets`.
 
 The `-` tells `vkv` to read the secrets from STDIN. You cal also specifiy a file using the `--file` parameter.
 
