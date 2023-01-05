@@ -75,7 +75,7 @@ ASSETS = diff demo fzf
 .PHONY: assets
 assets: clean vault-ent ## generate all assets
 	for i in $(ASSETS); do \
-		vhs < assets/$$i.tape; \
+		vhs < assets/tapes/$$i.tape; \
 	done
 
 .PHONY: www
