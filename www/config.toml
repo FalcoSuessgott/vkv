@@ -15,7 +15,7 @@ enableMissingTranslationPlaceholders = false
 [params]
     description = "the swiss army knife when working with Vault KVv2 engines"
     github_repository = "https://github.com/FalcoSuessgott/vkv"
-    version = "v0.2.1"
+    version = "v0.2.2"
 
     github_doc_repository = "https://github.com/FalcoSuessgott/vkv"
     github_doc_repository_path = "www/content/"
