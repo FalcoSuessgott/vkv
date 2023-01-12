@@ -15,16 +15,15 @@
 </div>
 
 ## Features
-* recursively print secrets of any KVv2 Engine in `json`, `yaml`, `markdown` and [other formats](https://falcosuessgott.github.io/vkv/04_export/formats/)
+* recursively print secrets of any KVv2 Engine in `json`, `yaml`, `markdown` and [other formats](https://falcosuessgott.github.io/vkv/05_export/formats/)
 * engine export shows the secret version as well as its [custom metadata](https://developer.hashicorp.com/vault/docs/commands/kv/metadata)
-* customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/04_export/)
+* customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/05_export/)
 * print the CRUD-capabilities of the authenticated token for each KV-path (format: `policy`)
 * print secrets in `export <key>=<value>` format for variable exporting (format: `export`)
-* [import](https://falcosuessgott.github.io/vkv/05_import/) secrets back to Vault from `vkv`'s `json` or `yaml` format 
-* save and restore KVv2 snapshots (including namespaces)
+* [import](https://falcosuessgott.github.io/vkv/06_import/) secrets back to Vault from `vkv`'s `json` or `yaml` format 
+* save and restore KVv2 snapshots (including namespaces) and running on [kubernetes](https://falcosuessgott.github.io/vkv/09_advanced_examples/kubernetes/)
 * list all engines or namespaces for scripting purposes
-* handy [snippets](https://falcosuessgott.github.io/vkv/08_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
-
+* handy [snippets](https://falcosuessgott.github.io/vkv/09_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
 
 Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Guide to learn more about `vkv`
 
