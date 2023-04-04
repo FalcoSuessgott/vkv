@@ -216,7 +216,7 @@ require (
 require (
 	github.com/daixiang0/gci v0.8.2
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/docker/docker v20.10.18+incompatible // indirect
+	github.com/docker/docker v20.10.24+incompatible // indirect
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/golangci/golangci-lint v1.50.0
 	github.com/hashicorp/go-plugin v1.4.5 // indirect
