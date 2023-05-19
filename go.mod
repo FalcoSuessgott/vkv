@@ -11,7 +11,7 @@ require (
 	github.com/muesli/mango-cobra v1.2.0
 	github.com/muesli/roff v0.1.0
 	github.com/spf13/cobra v1.6.1
-	github.com/stretchr/testify v1.8.2-0.20221102114659-1333b5d3bda8
+	github.com/stretchr/testify v1.8.3
 	github.com/testcontainers/testcontainers-go v0.14.0
 )
 
