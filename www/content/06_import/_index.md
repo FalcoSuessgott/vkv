@@ -30,7 +30,7 @@ The `-` in `vkv import -`, tells `vkv` do read data via STDIN. The idea of `vkv 
 
 ```bash
 # dont forget to use --show-values, otherwise the secrets will be uploaded masked.
-vkv -p <source> --show-values -f=yaml | vkv import - -p <destination>
+vkv export -p <source> --show-values -f=yaml | vkv import - -p <destination>
 ```
 
 ### A few notes:
