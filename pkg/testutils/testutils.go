@@ -3,7 +3,7 @@ package testutils
 import (
 	"context"
 	"fmt"
-	"net"
+	//"net"
 	"os"
 	"time"
 
@@ -48,18 +48,19 @@ func StartTestContainer() (*TestContainer, error) {
 		return nil, err
 	}
 
-	ip, err := c.Host(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// ip, err := c.Host(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	mappedPort, err := c.MappedPort(ctx, "8200")
-	if err != nil {
-		return nil, err
-	}
+	// mappedPort, err := c.MappedPort(ctx, "8200")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	uri := fmt.Sprintf("http://%s", net.JoinHostPort(ip, mappedPort.Port()))
+	// uri := fmt.Sprintf("http://%s", net.JoinHostPort(ip, mappedPort.Port()))
 
+	uri := ("http://127.0.0.1:8200")
 	fmt.Printf("started container: %s (%s)\n", c.GetContainerID(), uri)
 
 	time.Sleep(1 * time.Second)

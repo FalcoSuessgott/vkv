@@ -16,7 +16,25 @@ const (
 // Engines struct that hols all engines key is the namespace.
 type Engines map[string][]string
 
-// EnableKV2Engine enables the kv2 engine at a specified path.
+// EnableKV1Engine enables the kvv1 engine at a specified path.
+func (v *Vault) EnableKV1Engine(rootPath string) error {
+	options := map[string]interface{}{
+		"type": "kv",
+		"options": map[string]interface{}{
+			"path":    rootPath,
+			"version": 1,
+		},
+	}
+
+	_, err := v.Client.Logical().Write(fmt.Sprintf(mountEnginePath, rootPath), options)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// EnableKV2Engine enables the kvv2 engine at a specified path.
 func (v *Vault) EnableKV2Engine(rootPath string) error {
 	options := map[string]interface{}{
 		"type": "kv",
@@ -59,6 +77,26 @@ func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
 	}
 
 	return nil
+}
+
+// IsKV2 returns true if the specified path is a KVv2 engine.
+func (v *Vault) IsKV2(rootPath string) (bool, error) {
+	data, err := v.Client.Logical().Read(fmt.Sprintf("sys/mounts/%s", rootPath))
+	if err != nil {
+		return false, fmt.Errorf("error detecting KV version: %v", err)
+	}
+
+	if data.Data["type"].(string) != "kv" {
+		return false, fmt.Errorf("%s is not a KV mount", rootPath)
+	}
+
+	options := data.Data["options"].(map[string]interface{})
+
+	if options["version"] == "1" {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 // ListKVSecretEngines returns a list of all visible KV secret engines.

@@ -8,6 +8,50 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO: test if no kv mount and expected error
+func (s *VaultSuite) TestIsKVv2() {
+	testCases := []struct {
+		name     string
+		rootPath string
+		version2 bool
+		err      bool
+	}{
+		{
+			name:     "v2",
+			rootPath: "v2",
+			version2: true,
+			err:      false,
+		},
+		{
+			name:     "v1",
+			rootPath: "v1",
+			version2: false,
+			err:      false,
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			if tc.version2 {
+				require.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
+			} else {
+				require.NoError(s.Suite.T(), s.client.EnableKV1Engine(tc.rootPath))
+			}
+
+			isKV2, err := s.client.IsKV2(tc.rootPath)
+
+			if tc.err {
+				assert.Error(s.Suite.T(), err)
+			} else {
+				assert.NoError(s.Suite.T(), err)
+				assert.Equal(s.Suite.T(), tc.version2, isKV2)
+			}
+
+			assert.NoError(s.Suite.T(), s.client.DisableKV2Engine(tc.rootPath))
+		})
+	}
+}
+
 func (s *VaultSuite) TestListRecursive() {
 	testCases := []struct {
 		name     string
