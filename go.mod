@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/disiqueira/gotree/v3 v3.0.2
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
-	github.com/gotesttools/gotestfmt/v2 v2.4.1
+	github.com/gotesttools/gotestfmt/v2 v2.5.0
 	github.com/hashicorp/vault/api v1.8.1
 	github.com/juju/ansiterm v1.0.0
 	github.com/muesli/mango-cobra v1.2.0
