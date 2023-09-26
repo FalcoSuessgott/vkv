@@ -1,15 +1,14 @@
 ### cURL
 ```bash
-curl -OL https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.2.1_$(uname)_$(uname -m).tar.gz
-tar xzf vkv_0.2.1_Linux_x86_64.tar.gz
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.3.0_$(uname)_$(uname -m).tar.gz
+tar xzf vkv_0.3.0_Linux_x86_64.tar.gz
 chmod u+x vkv
 ./vkv version
-vkv 0.2.1
+vkv 0.3.0
 ```
 
 ### Packages
 `vkv` is releases RPM- & DEB packages and Windows & MacOS Binaries.
-
 
 You can find and download all artifacts in the [release](https://github.com/FalcoSuessgott/vkv/releases) section.
 
@@ -46,7 +45,4 @@ go install
 ```bash
 # ghcr.io
 docker run -e VAULT_ADDR="${VAULT_ADDR}" -e VAULT_TOKEN="${VAULT_TOKEN}" ghcr.io/falcosuessgott/vkv
-
-# docker.hub
-docker run  -e VAULT_ADDR="${VAULT_ADDR}" -e VAULT_TOKEN="${VAULT_TOKEN}" falcosuessgott/vkv
 ```
