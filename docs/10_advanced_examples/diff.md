@@ -7,8 +7,5 @@
 
 Here is an example using `diff`, the `|` indicates the changed entry per line:
 
-### Demo
-<div align="center">
-<br>
-<img src="https://media.githubusercontent.com/media/FalcoSuessgott/vkv/master/www/static/images/diff.gif" alt="drawing" width="1000"/>
-</div>
+## Demo
+![gif](../assets/diff.gif)
