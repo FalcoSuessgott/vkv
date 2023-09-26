@@ -30,8 +30,8 @@ Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Gu
 
 ```bash
 # Installation
-curl -OL https://github.com/FalcoSuessgott/vkv/releases/latest/download/vkv_0.3.0_$(uname)_$(uname -m).tar.gz
-tar xzf vkv_0.3.0_Linux_x86_64.tar.gz
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.3.0/vkv_$(uname)_$(uname -m).tar.gz
+tar xzf vkv_$(uname)_$(uname -m).tar.gz
 chmod u+x vkv
 ./vkv version
 vkv 0.3.0
