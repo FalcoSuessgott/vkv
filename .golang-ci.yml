@@ -34,3 +34,6 @@ linters:
     - gci
     - gofmt
     - gofumpt
+    - revive
+    - depguard
+    - tagalign

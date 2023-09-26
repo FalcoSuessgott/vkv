@@ -3,7 +3,6 @@ repos:
     rev: v1.0.0-rc.1
     hooks:
       - id: go-build-mod
-      - id: go-mod-tidy
       - id: go-test-mod
       - id: go-vet-mod
       - id: go-staticcheck-mod
