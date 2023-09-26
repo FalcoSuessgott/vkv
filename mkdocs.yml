@@ -1,0 +1,119 @@
+site_name: vkv
+site_description: "recursively list secrets from Vaults KV2 engine in various formats"
+site_author: FalcoSuessgott
+
+repo_name: FalcoSuessgott/vkv
+repo_url: https://github.com/FalcoSuessgott/vkv
+
+docs_dir: docs/
+
+plugins:
+  - search
+  - git-authors
+  - git-revision-date-localized:
+      locale: en
+      enable_creation_date: false
+
+nav:
+  - Home: 
+    - index.md
+    - Quickstart: 
+      - 01_quickstart/index.md
+    - Installation: 
+      - 02_installation/index.md
+    - Authentication: 
+      - 03_authentication/index.md
+    - Configuration:
+      - 04_configuration/index.md
+    - Export: 
+      - 05_export/index.md
+      - 05_export/formats.md
+    - Import:
+      - 06_import/index.md
+    - Snapshots:
+      - Save: 07_snapshot/save.md
+      - Restore: 07_snapshot/restore.md
+    - List Namespaces: 
+      - 08_namespaces/index.md
+    - List Engines:
+      - 09_engines/index.md
+    - Advanced Examples: 
+      - 10_advanced_examples/diff.md
+      - 10_advanced_examples/fzf.md
+      - 10_advanced_examples/kubernetes.md
+      - 10_advanced_examples/sops.md
+      - 10_advanced_examples/direnv.md
+    - Development: 
+      - 11_development/index.md
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.snippets
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - admonition
+  - def_list
+  - footnotes
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - footnotes
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/svalabs
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/sva-system-vertrieb-alexander-gmbh
+
+theme:
+  icon:
+    edit: material/pencil
+    view: material/eye
+    repo: fontawesome/brands/github
+  name: material
+  favicon: assets/favicon.ico
+  #logo: assets/logo.png
+  language: en
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/eye
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/eye-outline
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - content.code.copy
+    - content.action.edit
+    - navigation.top
+    - navigation.expand
+    - navigation.footer
