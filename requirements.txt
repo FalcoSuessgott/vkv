@@ -1,0 +1,12 @@
+markdown
+mkdocs
+mkdocs-material
+mkdocs-macros-plugin
+mkdocs_puml
+mkdocs-include-dir-to-nav
+mkdocs-with-pdf
+mkdocs-git-revision-date-localized-plugin
+mkdocs-git-authors-plugin
+requests
+weasyprint
+markdown-include
