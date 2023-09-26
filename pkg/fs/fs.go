@@ -1,13 +1,12 @@
 package fs
 
 import (
-	"io/ioutil"
 	"os"
 )
 
 // ReadFile reads from a file.
 func ReadFile(path string) ([]byte, error) {
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
