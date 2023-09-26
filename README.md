@@ -8,7 +8,7 @@
 <img src="https://img.shields.io/github/v/release/FalcoSuessgott/vkv" alt="drawing"/>
 <img src="https://img.shields.io/docker/pulls/falcosuessgott/vkv" alt="drawing"/>
 
-`vkv` is a little CLI tool written in Go, which enables you to list, compare, import, document, backup & encrypt secrets from a [HashiCorp Vault KV-v2 engine](https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2):
+vkv is a little CLI tool written in Go, which enables you to list, compare, import, document, backup & encrypt secrets from a [HashiCorp Vault KV-v2 engine](https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2):
 
 <img src="https://media.githubusercontent.com/media/FalcoSuessgott/vkv/master/www/static/images/demo.gif" alt="drawing" width="1000" />
 
