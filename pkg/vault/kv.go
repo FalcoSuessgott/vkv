@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"path"
@@ -15,6 +16,9 @@ const (
 	//nolint: gosec
 	listSecretsPath = "%s/metadata/%s"
 )
+
+// ErrNoSecretsFound is returned when no secrets are found at a given path.
+var ErrNoSecretsFound = errors.New("no secrets found")
 
 // Secrets holds all recursive secrets of a certain path.
 type Secrets map[string]interface{}
@@ -44,7 +48,8 @@ func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
 			(s)[k] = secrets
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
-			if err != nil {
+			// In recurvice, ignore if no secrets are found
+			if err != nil && !errors.Is(err, ErrNoSecretsFound) {
 				return nil, err
 			}
 
@@ -92,7 +97,7 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 	}
 
 	if data == nil {
-		return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
+		return nil, fmt.Errorf("no secrets in %s found: %w", path.Join(rootPath, subPath), ErrNoSecretsFound)
 	}
 
 	if d, ok := data.Data["data"]; ok {
@@ -101,7 +106,7 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 		}
 	}
 
-	return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
+	return nil, fmt.Errorf("no secrets in %s found: %w", path.Join(rootPath, subPath), ErrNoSecretsFound)
 }
 
 // WriteSecrets writes kv secrets to a specified path.
