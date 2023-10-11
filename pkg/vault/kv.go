@@ -39,13 +39,14 @@ func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
 	}
 
 	for _, k := range keys {
+		fullPath := path.Join(rootPath, subPath, k)
 		if strings.HasSuffix(k, utils.Delimiter) {
 			secrets, err := v.ListRecursive(rootPath, path.Join(subPath, k))
 			if err != nil {
 				return &s, err
 			}
 
-			(s)[k] = secrets
+			(s)[fullPath] = secrets
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
 			// In recurvice, ignore if no secrets are found
@@ -53,7 +54,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
 				return nil, err
 			}
 
-			(s)[k] = secrets
+			(s)[fullPath] = secrets
 		}
 	}
 
