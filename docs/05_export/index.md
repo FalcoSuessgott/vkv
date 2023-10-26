@@ -1,3 +1,5 @@
+## vkv export
+
 recursively list secrets from Vaults KV2 engine in various formats
 
 ```
@@ -8,8 +10,8 @@ vkv export [flags]
 
 ```
   -p, --path string              KVv2 Engine path (env: VKV_EXPORT_PATH)
-  -e, --engine-path string       Specify the engine path using this flag in case your kv-engine contains special characters such as "/".
-                                 vkv will then append the values of the path-flag to the engine path, if specified (<engine-path>/<path>)(env: VKV_EXPORT_ENGINE_PATH)
+  -e, --engine-path string       engine path in case your KV-engine contains special characters such as "/", the path value will then be appended if specified ("<engine-path>/<path>") (env: VKV_EXPORT_ENGINE_PATH)
+      --skip-errors              dont exit on errors (permission denied, deleted secrets)
       --only-keys                show only keys (env: VKV_EXPORT_ONLY_KEYS)
       --only-paths               show only paths (env: VKV_EXPORT_ONLY_PATHS)
       --show-version             show the secret version (env: VKV_EXPORT_VERSION) (default true)
