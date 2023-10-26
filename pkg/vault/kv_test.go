@@ -55,7 +55,7 @@ func (s *VaultSuite) TestListRecursive() {
 
 			// read secrets
 			res := make(Secrets)
-			secrets, err := s.client.ListRecursive(tc.rootPath, tc.subPath)
+			secrets, err := s.client.ListRecursive(tc.rootPath, tc.subPath, false)
 			assert.NoError(s.Suite.T(), err)
 
 			res[tc.rootPath] = *secrets

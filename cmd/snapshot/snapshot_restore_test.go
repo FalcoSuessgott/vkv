@@ -53,7 +53,7 @@ func (s *VaultSuite) TestSnapShotRestoreCommand() {
 						continue
 					}
 
-					secret, err := s.client.ListRecursive(path.Join(expNS, engine), "")
+					secret, err := s.client.ListRecursive(path.Join(expNS, engine), "", false)
 					require.NoError(s.Suite.T(), err)
 
 					out, err := fs.ReadFile(path.Join("testdata/vkv-snapshot-export", expNS, strings.TrimSuffix(engine, "/")+".yaml"))
