@@ -234,7 +234,7 @@ func (o *importOptions) dryRun(v *vault.Vault, secrets map[string]interface{}) e
 	rootPath, _ := utils.SplitPath(o.Path)
 	existingSecrets := make(map[string]interface{})
 
-	tmp, err := v.ListRecursive(rootPath, "")
+	tmp, err := v.ListRecursive(rootPath, "", false)
 	if err == nil {
 		existingSecrets = utils.PathMap(rootPath, utils.ToMapStringInterface(tmp), false)
 	}
@@ -274,7 +274,7 @@ func (o *importOptions) printResult(v *vault.Vault) error {
 
 	rootPath, _ := utils.SplitPath(o.Path)
 
-	s, err := v.ListRecursive(rootPath, "")
+	s, err := v.ListRecursive(rootPath, "", false)
 	if err != nil {
 		return err
 	}

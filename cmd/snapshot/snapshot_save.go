@@ -78,7 +78,7 @@ func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string
 		for _, e := range engines[ns] {
 			enginePath := path.Join(ns, e)
 
-			out, err := v.ListRecursive(enginePath, "")
+			out, err := v.ListRecursive(enginePath, "", false)
 			if err != nil {
 				return err
 			}

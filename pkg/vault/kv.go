@@ -20,7 +20,7 @@ const (
 type Secrets map[string]interface{}
 
 // ListRecursive returns secrets to a path recursive.
-func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
+func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secrets, error) {
 	s := make(Secrets)
 
 	keys, err := v.ListKeys(rootPath, subPath)
@@ -36,7 +36,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
 
 	for _, k := range keys {
 		if strings.HasSuffix(k, utils.Delimiter) {
-			secrets, err := v.ListRecursive(rootPath, path.Join(subPath, k))
+			secrets, err := v.ListRecursive(rootPath, path.Join(subPath, k), skipErrors)
 			if err != nil {
 				return &s, err
 			}
@@ -44,8 +44,13 @@ func (v *Vault) ListRecursive(rootPath, subPath string) (*Secrets, error) {
 			(s)[k] = secrets
 		} else {
 			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
-			if err != nil {
+			if !skipErrors && err != nil {
 				return nil, err
+			}
+
+			// do not exit on errors, just an empty map, so json/yaml export still works
+			if skipErrors && secrets == nil {
+				secrets = make(Secrets)
 			}
 
 			(s)[k] = secrets

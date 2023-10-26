@@ -49,7 +49,7 @@ vault: clean ## set up a development vault server and write kv secrets
 
 .PHONY: vault-ent
 vault-ent: clean ## set up a development vault enterprise server and write kv secrets
-	nohup vault-ent server -dev -dev-root-token-id=root 2> /dev/null &
+	nohup vault server -dev -dev-root-token-id=root 2> /dev/null &
 	sleep 3
 
 	./scripts/prepare-vault.sh
