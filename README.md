@@ -22,7 +22,7 @@
 * [import](https://falcosuessgott.github.io/vkv/06_import/) secrets back to Vault from `vkv`'s `json` or `yaml` format 
 * save and restore KVv2 snapshots (including namespaces) and running on [kubernetes](https://falcosuessgott.github.io/vkv/09_advanced_examples/kubernetes/)
 * list all engines or namespaces for scripting purposes
-* handy [snippets](https://falcosuessgott.github.io/vkv/09_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
+* handy [snippets](https://falcosuessgott.github.io/vkv/09_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`, [gitlab-CI Examples](https://falcosuessgott.github.io/vkv/10_advanced_examples/gitlab/)
 
 Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Guide to learn more about `vkv`
 
@@ -30,11 +30,11 @@ Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Gu
 
 ```bash
 # Installation
-curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.3.0/vkv_$(uname)_$(uname -m).tar.gz
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.4.0/vkv_$(uname)_$(uname -m).tar.gz
 tar xzf vkv_$(uname)_$(uname -m).tar.gz
 chmod u+x vkv
 ./vkv version
-vkv 0.3.0
+vkv 0.4.0
 
 # set required env vars
 export VAULT_ADDR=https://vault-server:8200

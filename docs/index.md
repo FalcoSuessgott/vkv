@@ -23,5 +23,6 @@
 * save and restore KVv2 snapshots (including namespaces) and running on [kubernetes](https://falcosuessgott.github.io/vkv/09_advanced_examples/kubernetes/)
 * list all engines or namespaces for scripting purposes
 * handy [snippets](https://falcosuessgott.github.io/vkv/09_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`
+* [Gitlab-CI Example](https://falcosuessgott.github.io/vkv/10_advanced_examples/gitlab/)
 
 Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Guide to learn more about `vkv`
