@@ -80,9 +80,13 @@ secret/
 ```
 
 Here are some explanations:
+
 * `vkv` masks the secrets per default, you can disable this by using `--show-values` or `VKV_EXPORT_SHOW_VALUES=true`
+  
 * `vkv` limits the length of the secrets per default to `12` for readability purposes (You can set you own value length by using `--max-value-length=XX` or `VKV_EXPORT_MAX_VALUE_LENGTH=XX`)
-* `v1` indicates the secret version (disable by using `--show-version` or `VKV_EXPORT_SHOW_VERSION=false` 
+  
+* `v1` indicates the secret version (disable by using `--show-version` or `VKV_EXPORT_SHOW_VERSION=false`
+  
 * `[key=value]` represents the custom metadata that we added to the secret in step 3. (disable by `--show-metadata` or (`VKV_EXPORT_SHOW_METADATA=false`)
 
 
