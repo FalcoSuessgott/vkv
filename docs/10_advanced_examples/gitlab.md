@@ -1,7 +1,5 @@
 # Gitlab CI
 
-**This works for alpine based jobs**
-
 Gitlab-CI Example for reading Secrets from Vault using vkv 
 
 ```yaml
@@ -9,37 +7,38 @@ variables:
   # vaults env vars
   # all of vault env vars are supported (https://developer.hashicorp.com/vault/docs/commands#environment-variables)
   # required:
-  VAULT_ADDR: ""
+  VAULT_ADDR: https://prod.vault.d4.sva.dev
+  VAULT_NAMESPACE: "${CI_PROJECT_ROOT_NAMESPACE}"
 
-  # optional
-  VAULT_NAMESPACE: ""
-  VAULT_TLS_SKIP_VERIFY: "true"
+  # command vkv uses to authenticate to vault, all vars are available
+  VKV_LOGIN_COMMAND: vault write -field=token auth/jwt/login jwt="${VAULT_JWT_TOKEN}"
 
-  # vkv env vars
-  VKV_VERSION: "0.4.0" # https://github.com/FalcoSuessgott/vkv/releases/tag/v0.4.0
-  VKV_EXPORT_PATH: "secrets"
-  VKV_EXPORT_FORMAT: "export"
+  # vault kv path to read secrets from
+  VKV_SERVER_PATH: "secrets"
 
 # default sets global default settings that are inherited to all jobs
 default:
+  # spin up a vkv service container in server mode, configure using variables/env vars
+  services:
+    - name: ghcr.io/falcosuessgott/vkv:v0.5.0
+      command: ["server"]
+      alias: vkv
   # global before_scripts block
-  before_script:
-    # download vkv
+  before_script: 
+    # install curl, or wget in your job container   
     - apk add --no-cache curl
-    - curl -LO "https://github.com/FalcoSuessgott/vkv/releases/download/v${VKV_VERSION}/vkv_${VKV_VERSION}_linux_amd64.apk"
-    # install vkv
-    - apk add --allow-untrusted ./vkv_${VKV_VERSION}_linux_amd64.apk
-    # auth to vault (requires jwt auth configuration, https://docs.gitlab.com/ee/ci/examples/authenticating-with-hashicorp-vault/)
-    - export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role="${CI_PROJECT_ROOT_NAMESPACE}" jwt="${VAULT_JWT_TOKEN}")"
-    # source env vars into shell
-    - eval $(vkv export)
-  # global jwt token 
+
+    # curl/wget vkv on /export, which will expot all secrets from VKV_SERVER_PATH, eval the output into your shell
+    - eval $(curl http://vkv:8080/export)
+  # global jwt token (https://docs.gitlab.com/ee/ci/examples/authenticating-with-hashicorp-vault/#example)
   id_tokens:
     # set jwt aud field to gitlab ci server host
     VAULT_JWT_TOKEN:
       aud: "${CI_SERVER_HOST}"
 
 # job
+# this job inherits the service container and before script block,
+# hence all secrets in VKV_SERVER_PATH are available in your shell
 test:
   stage: test
   script:
