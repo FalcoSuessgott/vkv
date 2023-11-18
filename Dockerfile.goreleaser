@@ -5,6 +5,6 @@ COPY vkv /usr/bin/vkv
 EXPOSE 8080
 
 # preinstall vault for VKV_LOGIN_COMMAND
-RUN apk add --no-cache vault libcap && setcap -r /usr/sbin/vault
+RUN apk add --no-cache bash vault libcap && setcap -r /usr/sbin/vault
 
 ENTRYPOINT ["/usr/bin/vkv"]
