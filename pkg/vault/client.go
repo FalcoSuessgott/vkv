@@ -3,7 +3,9 @@ package vault
 import (
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/FalcoSuessgott/vkv/pkg/exec"
 	"github.com/hashicorp/vault/api"
 )
 
@@ -19,8 +21,21 @@ func NewDefaultClient() (*Vault, error) {
 		return nil, fmt.Errorf("VAULT_ADDR required but not set")
 	}
 
-	vaultToken, ok := os.LookupEnv("VAULT_TOKEN")
-	if !ok {
+	vaultToken, tokenExported := os.LookupEnv("VAULT_TOKEN")
+
+	cmd, ok := os.LookupEnv("VKV_LOGIN_COMMAND")
+	if !tokenExported && ok {
+		cmdParts := strings.Split(cmd, " ")
+
+		token, err := exec.Run(cmdParts)
+		if err != nil {
+			return nil, fmt.Errorf("error running VKV_LOGIN_CMD (%s): %w", cmd, err)
+		}
+
+		vaultToken = strings.TrimSpace(string(token))
+	}
+
+	if vaultToken == "" {
 		return nil, fmt.Errorf("VAULT_TOKEN required but not set")
 	}
 
@@ -39,6 +54,11 @@ func NewDefaultClient() (*Vault, error) {
 	vaultNamespace, ok := os.LookupEnv("VAULT_NAMESPACE")
 	if ok {
 		c.SetNamespace(vaultNamespace)
+	}
+
+	_, err = c.Auth().Token().Lookup(vaultToken)
+	if err != nil {
+		return nil, fmt.Errorf("not authenticated. Perhaps not a valid token")
 	}
 
 	return &Vault{Client: c}, nil

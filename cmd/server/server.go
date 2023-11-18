@@ -2,10 +2,10 @@ package server
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"path"
-	"fmt"
 
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -18,10 +18,11 @@ import (
 const envVarExportPrefix = "VKV_SERVER_"
 
 type serverOptions struct {
-	Port       string `env:"PORT" envDefault:"8080"`
-	Path       string `env:"PATH"`
-	EnginePath string `env:"ENGINE_PATH"`
-	SkipErrors bool   `env:"SKIP_ERRORS" envDefault:"false"`
+	Port         string `env:"PORT" envDefault:"8080"`
+	Path         string `env:"PATH"`
+	EnginePath   string `env:"ENGINE_PATH"`
+	SkipErrors   bool   `env:"SKIP_ERRORS" envDefault:"false"`
+	LoginCommand string `env:"LoginCommand"`
 }
 
 // NewServerCmd export subcommand.

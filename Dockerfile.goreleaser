@@ -4,4 +4,7 @@ COPY vkv /usr/bin/vkv
 # required for vkv server
 EXPOSE 8080
 
+# preinstall vault for VKV_LOGIN_COMMAND
+RUN apk add --no-cache vault
+
 ENTRYPOINT ["/usr/bin/vkv"]

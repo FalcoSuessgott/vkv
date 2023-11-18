@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/disiqueira/gotree/v3 v3.0.2
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
+	github.com/gin-gonic/gin v1.9.1
 	github.com/gotesttools/gotestfmt/v2 v2.5.0
 	github.com/hashicorp/vault/api v1.10.0
 	github.com/juju/ansiterm v1.0.0
@@ -74,7 +75,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/ghostiam/protogetter v0.2.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.9.1 // indirect
 	github.com/go-critic/go-critic v0.9.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
