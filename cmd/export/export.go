@@ -84,7 +84,6 @@ func NewExportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 			)
 
 			// prepare map
-
 			m, err := o.buildMap(vaultClient)
 			if err != nil {
 				return err
@@ -106,7 +105,7 @@ func NewExportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	// Input
 	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KVv2 Engine path (env: VKV_EXPORT_PATH)")
 	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path value will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_EXPORT_ENGINE_PATH)")
-	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "dont exit on errors (permission denied, deleted secrets)")
+	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "dont exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")
