@@ -36,7 +36,7 @@ func NewDefaultClient() (*Vault, error) {
 	}
 
 	if vaultToken == "" {
-		return nil, fmt.Errorf("VAULT_TOKEN required but not set")
+		return nil, fmt.Errorf("VKV_LOGIN_COMMAND or VAULT_TOKEN required but not set")
 	}
 
 	config := api.DefaultConfig()
@@ -56,9 +56,9 @@ func NewDefaultClient() (*Vault, error) {
 		c.SetNamespace(vaultNamespace)
 	}
 
-	_, err = c.Auth().Token().Lookup(vaultToken)
+	_, err = c.Auth().Token().LookupSelf()
 	if err != nil {
-		return nil, fmt.Errorf("not authenticated. Perhaps not a valid token")
+		return nil, fmt.Errorf("not authenticated. Perhaps not a valid token: %w", err)
 	}
 
 	return &Vault{Client: c}, nil
