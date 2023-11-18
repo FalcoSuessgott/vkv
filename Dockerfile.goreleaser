@@ -1,3 +1,7 @@
 FROM alpine:3.17
 COPY vkv /usr/bin/vkv
+
+# required for vkv server
+EXPOSE 8080
+
 ENTRYPOINT ["/usr/bin/vkv"]
