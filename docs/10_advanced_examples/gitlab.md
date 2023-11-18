@@ -7,7 +7,7 @@ variables:
   # vaults env vars
   # all of vault env vars are supported (https://developer.hashicorp.com/vault/docs/commands#environment-variables)
   # required:
-  VAULT_ADDR: https://prod.vault.d4.sva.dev
+  VAULT_ADDR: https://prod.vault.de
   VAULT_NAMESPACE: "${CI_PROJECT_ROOT_NAMESPACE}"
 
   # command vkv uses to authenticate to vault, all vars are available
