@@ -175,6 +175,10 @@ func NewPrinter(opts ...Option) *Printer {
 	return p
 }
 
+func (p *Printer) WithOption(opt Option) {
+	opt(p)
+}
+
 // Out prints out the secrets according all configured options.
 //nolint: cyclop
 func (p *Printer) Out(enginePath string, secrets map[string]interface{}) error {

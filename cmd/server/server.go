@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"path"
+	"strings"
 
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -17,12 +18,25 @@ import (
 
 const envVarExportPrefix = "VKV_SERVER_"
 
+var (
+	prt *printer.Printer
+	vc  *vault.Vault
+)
+
 type serverOptions struct {
 	Port         string `env:"PORT" envDefault:"8080"`
 	Path         string `env:"PATH"`
 	EnginePath   string `env:"ENGINE_PATH"`
 	SkipErrors   bool   `env:"SKIP_ERRORS" envDefault:"false"`
 	LoginCommand string `env:"LoginCommand"`
+
+	writer *bytes.Buffer
+}
+
+func defaultServerOptions() *serverOptions {
+	return &serverOptions{
+		writer: bytes.NewBufferString(""),
+	}
 }
 
 // NewServerCmd export subcommand.
@@ -30,7 +44,7 @@ type serverOptions struct {
 func NewServerCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	var err error
 
-	o := &serverOptions{}
+	o := defaultServerOptions()
 
 	if err := o.parseEnvs(); err != nil {
 		log.Fatal(err)
@@ -42,37 +56,20 @@ func NewServerCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// vault auth
 			if vaultClient == nil {
-				if vaultClient, err = vault.NewDefaultClient(); err != nil {
+				if vc, err = vault.NewDefaultClient(); err != nil {
 					return err
 				}
 			}
 
-			b := bytes.NewBufferString("")
-
-			// prepare printer
-			printer := printer.NewPrinter(
+			prt = printer.NewPrinter(
 				printer.ShowValues(true),
 				printer.ToFormat(printer.Export),
 				printer.WithVaultClient(vaultClient),
-				printer.WithWriter(b),
+				printer.WithWriter(o.writer),
 			)
 
-			// prepare map
-			m, err := o.buildMap(vaultClient)
-			if err != nil {
-				return err
-			}
-
-			// print secrets
-			enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
-
-			if err := printer.Out(enginePath, m); err != nil {
-				return err
-			}
-
-			return o.serve(b.Bytes())
+			return o.serve()
 		},
 	}
 
@@ -87,19 +84,19 @@ func NewServerCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	return cmd
 }
 
-func (o *serverOptions) buildMap(v *vault.Vault) (map[string]interface{}, error) {
+func (o *serverOptions) buildMap() (map[string]interface{}, error) {
 	var isSecretPath bool
 
 	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
 	// read recursive all secrets
-	s, err := v.ListRecursive(rootPath, subPath, o.SkipErrors)
+	s, err := vc.ListRecursive(rootPath, subPath, o.SkipErrors)
 	if err != nil {
 		return nil, err
 	}
 
 	// check if path is a directory or secret path
-	if _, isSecret := v.ReadSecrets(rootPath, subPath); isSecret == nil {
+	if _, isSecret := vc.ReadSecrets(rootPath, subPath); isSecret == nil {
 		isSecretPath = true
 	}
 
@@ -130,13 +127,51 @@ func (o *serverOptions) parseEnvs() error {
 	return nil
 }
 
-func (o *serverOptions) serve(secrets []byte) error {
+func (o *serverOptions) serve() error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	r.GET("/export", func(c *gin.Context) {
-		c.Data(200, "text/plain", secrets)
+		// get format specified per request via url query param
+		format, ok := c.GetQuery("format")
+		if ok {
+			switch strings.ToLower(format) {
+			case "yaml", "yml":
+				prt.WithOption(printer.ToFormat(printer.YAML))
+			case "json":
+				prt.WithOption(printer.ToFormat(printer.JSON))
+			case "export":
+				prt.WithOption(printer.ToFormat(printer.Export))
+			case "markdown":
+				prt.WithOption(printer.ToFormat(printer.Markdown))
+			case "base":
+				prt.WithOption(printer.ToFormat(printer.Base))
+			case "policy":
+				prt.WithOption(printer.ToFormat(printer.Policy))
+			case "template", "tmpl":
+				prt.WithOption(printer.ToFormat(printer.Template))
+			}
+		}
+
+		c.Data(200, "text/plain", o.readSecrets())
 	})
 
 	return r.Run(fmt.Sprintf(":%s", o.Port))
+}
+
+func (o *serverOptions) readSecrets() []byte {
+	o.writer.Reset()
+
+	m, err := o.buildMap()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
+
+	if err := prt.Out(enginePath, m); err != nil {
+		log.Fatal(err)
+	}
+
+	return o.writer.Bytes()
 }
