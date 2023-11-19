@@ -1,6 +1,6 @@
 # Gitlab CI
 
-Gitlab-CI Example for reading Secrets from Vault using vkv 
+Gitlab-CI Example for reading Secrets from Vault using `vkv`:
 
 ```yaml
 variables:
@@ -20,7 +20,7 @@ variables:
 default:
   # spin up a vkv service container in server mode, configure using variables/env vars
   services:
-    - name: ghcr.io/falcosuessgott/vkv:v0.5.0
+    - name: ghcr.io/falcosuessgott/vkv:latest
       command: ["server"]
       alias: vkv
   # global before_scripts block

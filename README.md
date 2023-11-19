@@ -14,15 +14,17 @@
 </div>
 
 ## Features
+* **CI/CD Integrations for [Gitlab, GitHub, Azure Devops](https://falcosuessgott.github.io/vkv/11_cicd/gitlab/)**
+* support all Vault Auth Env Vars and `VKV_LOGIN_COMMAND` for avoiding having to hardcode the `VAULT_TOKEN` ([example](https://falcosuessgott.github.io/vkv/03_authentication/#special-env-var-vkv_login_command))
 * recursively print secrets of any KVv2 Engine in `json`, `yaml`, `markdown` and [other formats](https://falcosuessgott.github.io/vkv/05_export/formats/)
 * engine export shows the secret version as well as its [custom metadata](https://developer.hashicorp.com/vault/docs/commands/kv/metadata)
 * customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/05_export/)
 * print the CRUD-capabilities of the authenticated token for each KV-path (format: `policy`)
-* print secrets in `export <key>=<value>` format for variable exporting (format: `export`)
-* [import](https://falcosuessgott.github.io/vkv/06_import/) secrets back to Vault from `vkv`'s `json` or `yaml` format 
-* save and restore KVv2 snapshots (including namespaces) and running on [kubernetes](https://falcosuessgott.github.io/vkv/09_advanced_examples/kubernetes/)
-* list all engines or namespaces for scripting purposes
-* handy [snippets](https://falcosuessgott.github.io/vkv/09_advanced_examples/) for managing KVv2 engines using `fzf`, `sops` & `diff`, [gitlab-CI Examples](https://falcosuessgott.github.io/vkv/10_advanced_examples/gitlab/)
+* print secrets in `export <key>=<value>` format for env var exporting (format: `export`)
+* [import](https://falcosuessgott.github.io/vkv/06_import/) secrets back to Vault from `vkv`'s `json` or `yaml` format output
+* save and restore KVv2 snapshots (including namespaces) ([kubernetes](https://falcosuessgott.github.io/vkv/10_advanced_examples/kubernetes/) example)
+* list all KVv2-engines or namespaces for scripting purposes ([fzf](https://falcosuessgott.github.io/vkv/10_advanced_examples/fzf/) example)
+* more handy [snippets](https://falcosuessgott.github.io/vkv/09_advanced_examples/) using `fzf`, `sops` & `diff`,
 
 Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Guide to learn more about `vkv`
 
@@ -30,11 +32,11 @@ Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/01_quickstart) Gu
 
 ```bash
 # Installation
-curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.4.0/vkv_$(uname)_$(uname -m).tar.gz
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.5.0/vkv_$(uname)_$(uname -m).tar.gz
 tar xzf vkv_$(uname)_$(uname -m).tar.gz
 chmod u+x vkv
 ./vkv version
-vkv 0.4.0
+vkv 0.5.0
 
 # set required env vars
 export VAULT_ADDR=https://vault-server:8200
