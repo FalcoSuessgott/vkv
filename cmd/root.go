@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/FalcoSuessgott/vkv/cmd/export"
 	imp "github.com/FalcoSuessgott/vkv/cmd/imp"
@@ -16,6 +17,7 @@ import (
 )
 
 // NewRootCmd vkv root command.
+//nolint:cyclop
 func NewRootCmd(v string, writer io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "vkv",
@@ -23,6 +25,40 @@ func NewRootCmd(v string, writer io.Writer) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			mode, ok := os.LookupEnv("VKV_MODE")
+			if !ok {
+				return cmd.Help()
+			}
+
+			switch strings.ToUpper(mode) {
+			case "EXPORT":
+				return export.NewExportCmd(writer, nil).Execute()
+			case "IMPORT":
+				return imp.NewImportCmd(writer, nil).Execute()
+			case "SERVER":
+				return server.NewServerCmd(writer, nil).Execute()
+			case "LIST":
+				return list.NewListCmd(writer, nil).Execute()
+			case "SNAPSHOT_RESTORE":
+				cmd := snapshot.NewSnapshotCmd(writer, nil)
+
+				for _, c := range cmd.Commands() {
+					if c.Name() == "restore" {
+						return c.Execute()
+					}
+				}
+			case "SNAPSHOT_SAVE":
+				cmd := snapshot.NewSnapshotCmd(writer, nil)
+
+				for _, c := range cmd.Commands() {
+					if c.Name() == "save" {
+						return c.Execute()
+					}
+				}
+			default:
+				return fmt.Errorf("invalid value for VKV_MODE")
+			}
+
 			return cmd.Help()
 		},
 	}
