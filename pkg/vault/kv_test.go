@@ -14,12 +14,13 @@ func (s *VaultSuite) TestListRecursive() {
 		rootPath string
 		subPath  string
 		err      bool
+		v1       bool
 		secrets  Secrets
 		expected Secrets
 	}{
 		{
 			name:     "simple secret",
-			rootPath: "kv",
+			rootPath: "kvv2",
 			subPath:  "subpath",
 			secrets: map[string]interface{}{
 				"sub": map[string]interface{}{
@@ -30,7 +31,31 @@ func (s *VaultSuite) TestListRecursive() {
 				},
 			},
 			expected: map[string]interface{}{
-				"kv": Secrets{
+				"kvv2": Secrets{
+					"sub": map[string]interface{}{
+						"user": "password",
+					},
+					"sub2": map[string]interface{}{
+						"user": false,
+					},
+				},
+			},
+		},
+		{
+			name:     "simple secret",
+			rootPath: "kvv1",
+			v1:       true,
+			subPath:  "subpath",
+			secrets: map[string]interface{}{
+				"sub": map[string]interface{}{
+					"user": "password",
+				},
+				"sub2": map[string]interface{}{
+					"user": false,
+				},
+			},
+			expected: map[string]interface{}{
+				"kvv1": Secrets{
 					"sub": map[string]interface{}{
 						"user": "password",
 					},
@@ -45,7 +70,12 @@ func (s *VaultSuite) TestListRecursive() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			// write secrets
-			assert.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
+
+			if tc.v1 {
+				assert.NoError(s.Suite.T(), s.client.EnableKV1Engine(tc.rootPath))
+			} else {
+				assert.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
+			}
 
 			for k, secrets := range tc.secrets {
 				if m, ok := secrets.(map[string]interface{}); ok {

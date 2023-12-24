@@ -10,10 +10,13 @@ import (
 )
 
 const (
-	//nolint: gosec
-	readWriteSecretsPath = "%s/data/%s"
-	//nolint: gosec
-	listSecretsPath = "%s/metadata/%s"
+	kvv1ReadWriteSecretsPath = "%s/%s"
+	kvv1ListSecretsPath      = "%s/%s"
+
+	kvv2ReadWriteSecretsPath = "%s/data/%s"
+	kvv2ListSecretsPath      = "%s/metadata/%s"
+
+	mountDetailsPath = "sys/internal/ui/mounts/%s"
 )
 
 // Secrets holds all recursive secrets of a certain path.
@@ -62,7 +65,18 @@ func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secre
 
 // ListKeys returns all keys from vault kv secret path.
 func (v *Vault) ListKeys(rootPath, subPath string) ([]string, error) {
-	data, err := v.Client.Logical().List(fmt.Sprintf(listSecretsPath, rootPath, subPath))
+	apiPath := fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath)
+
+	isV1, err := v.IsKVv1(rootPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if isV1 {
+		apiPath = fmt.Sprintf(kvv1ListSecretsPath, rootPath, subPath)
+	}
+
+	data, err := v.Client.Logical().List(apiPath)
 	if err != nil {
 		return nil, err
 	}
@@ -89,15 +103,52 @@ func (v *Vault) ListKeys(rootPath, subPath string) ([]string, error) {
 	return nil, fmt.Errorf("no keys found in \"%s\"", path.Join(rootPath, subPath))
 }
 
+// IsKVv1 returns true if the current path is a KVv2 Engine.
+func (v *Vault) IsKVv1(rootPath string) (bool, error) {
+	data, err := v.Client.Logical().Read(fmt.Sprintf(mountDetailsPath, rootPath))
+	if err != nil {
+		return false, err
+	}
+
+	if data == nil {
+		return false, fmt.Errorf("cannot lookup mount type")
+	}
+
+	if opt, ok := data.Data["options"]; ok {
+		if version, ok := opt.(map[string]interface{})["version"]; ok {
+			if version.(string) == "1" {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
 // ReadSecrets returns a map with all secrets from a kv engine path.
 func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(readWriteSecretsPath, rootPath, subPath))
+	apiPath := fmt.Sprintf(kvv2ReadWriteSecretsPath, rootPath, subPath)
+
+	isV1, err := v.IsKVv1(rootPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if isV1 {
+		apiPath = fmt.Sprintf(kvv1ReadWriteSecretsPath, rootPath, subPath)
+	}
+
+	data, err := v.Client.Logical().Read(apiPath)
 	if err != nil {
 		return nil, err
 	}
 
 	if data == nil {
 		return nil, fmt.Errorf("no secrets in %s found", path.Join(rootPath, subPath))
+	}
+
+	if isV1 {
+		return data.Data, nil
 	}
 
 	if d, ok := data.Data["data"]; ok {
@@ -111,11 +162,22 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 
 // WriteSecrets writes kv secrets to a specified path.
 func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interface{}) error {
-	options := map[string]interface{}{
-		"data": secrets,
+	apiPath := fmt.Sprintf(kvv2ReadWriteSecretsPath, rootPath, subPath)
+	options := map[string]interface{}{}
+
+	isV1, err := v.IsKVv1(rootPath)
+	if err != nil {
+		return err
 	}
 
-	_, err := v.Client.Logical().Write(fmt.Sprintf(readWriteSecretsPath, rootPath, subPath), options)
+	if isV1 {
+		apiPath = fmt.Sprintf(kvv1ReadWriteSecretsPath, rootPath, subPath)
+		options = secrets
+	} else {
+		options["data"] = secrets
+	}
+
+	_, err = v.Client.Logical().Write(apiPath, options)
 	if err != nil {
 		return err
 	}
@@ -125,7 +187,7 @@ func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interf
 
 // ReadSecretMetadata read the metadata of the secret.
 func (v *Vault) ReadSecretMetadata(rootPath, subPath string) (interface{}, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(listSecretsPath, rootPath, subPath))
+	data, err := v.Client.Logical().Read(fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +205,7 @@ func (v *Vault) ReadSecretMetadata(rootPath, subPath string) (interface{}, error
 
 // ReadSecretVersion read the version of the secret.
 func (v *Vault) ReadSecretVersion(rootPath, subPath string) (interface{}, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(listSecretsPath, rootPath, subPath))
+	data, err := v.Client.Logical().Read(fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,11 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-var vaultVersion = "latest"
+var (
+	vaultVersion = "latest"
+	image        = fmt.Sprintf("hashicorp/vault:%s", vaultVersion)
+	envs         = map[string]string{}
+)
 
 // TestContainer vault dev container wrapper.
 type TestContainer struct {
@@ -29,15 +33,20 @@ func StartTestContainer() (*TestContainer, error) {
 		vaultVersion = v
 	}
 
+	// use OSS image per default, if license is available use enterprise
+	if license, ok := os.LookupEnv("VAULT_LICENSE"); ok {
+		fmt.Println(license)
+		envs["VAULT_LICENSE"] = license
+		image = fmt.Sprintf("hashicorp/vault-enterprise:%s", vaultVersion)
+	}
+
 	req := testcontainers.ContainerRequest{
-		Image:        fmt.Sprintf("hashicorp/vault-enterprise:%s", vaultVersion),
+		Image:        image,
 		ExposedPorts: []string{"8200/tcp"},
 		WaitingFor:   wait.ForListeningPort("8200/tcp"),
 		Cmd:          []string{"server", "-dev", "-dev-root-token-id", "root"},
 		AutoRemove:   true,
-		Env: map[string]string{
-			"VAULT_LICENSE": os.Getenv("VAULT_LICENSE"),
-		},
+		Env:          envs,
 	}
 
 	c, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
@@ -61,8 +70,6 @@ func StartTestContainer() (*TestContainer, error) {
 	uri := fmt.Sprintf("http://%s", net.JoinHostPort(ip, mappedPort.Port()))
 
 	fmt.Printf("started container: %s (%s)\n", c.GetContainerID(), uri)
-
-	time.Sleep(1 * time.Second)
 
 	return &TestContainer{Container: c, ctx: ctx, URI: uri, Token: "root"}, nil
 }

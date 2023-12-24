@@ -34,6 +34,24 @@ func (v *Vault) EnableKV2Engine(rootPath string) error {
 	return nil
 }
 
+// EnableKV1Engine enables the kv1 engine at a specified path.
+func (v *Vault) EnableKV1Engine(rootPath string) error {
+	options := map[string]interface{}{
+		"type": "kv",
+		"options": map[string]interface{}{
+			"path":    rootPath,
+			"version": 1,
+		},
+	}
+
+	_, err := v.Client.Logical().Write(fmt.Sprintf(mountEnginePath, rootPath), options)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // EnableKV2EngineErrorIfNotForced enables a KVv2 Engine and errors if
 // already enabled, unless force is set to true.
 func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
