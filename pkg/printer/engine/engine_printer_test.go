@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPrintEngines(t *testing.T) {
@@ -135,7 +136,7 @@ p/b
 		err := p.Out(tc.ns)
 
 		if tc.err {
-			assert.Error(t, err)
+			require.Error(t, err)
 		} else {
 			assert.Equal(t, tc.expected, b.String(), tc.name)
 		}

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRemoveExtension(t *testing.T) {
@@ -367,7 +368,7 @@ func TestToJson(t *testing.T) {
 		out, err := ToJSON(tc.s)
 
 		if tc.err {
-			assert.Error(t, err)
+			require.Error(t, err)
 		} else {
 			assert.Equal(t, string(tc.json), string(out), tc.name)
 		}
@@ -403,7 +404,7 @@ func TestFromJSON(t *testing.T) {
 		out, err := FromJSON(tc.input)
 
 		if tc.err {
-			assert.Error(t, err)
+			require.Error(t, err)
 		} else {
 			assert.Equal(t, tc.expected, out, tc.name)
 		}
@@ -453,7 +454,7 @@ key_3:
 		out, err := ToYAML(tc.s)
 
 		if tc.err {
-			assert.Error(t, err)
+			require.Error(t, err)
 		} else {
 			assert.Equal(t, tc.yaml, out, tc.name)
 		}
@@ -497,7 +498,7 @@ key_3:
 		out, err := FromYAML(tc.input)
 
 		if tc.err {
-			assert.Error(t, err)
+			require.Error(t, err)
 		} else {
 			assert.Equal(t, tc.expected, out, tc.name)
 		}

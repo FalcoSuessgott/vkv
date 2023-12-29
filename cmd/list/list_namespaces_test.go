@@ -155,9 +155,9 @@ func TestNamespaceOutputFormat(t *testing.T) {
 		err := o.validateFlags()
 
 		if tc.err {
-			assert.ErrorIs(t, err, printer.ErrInvalidFormat, tc.name)
+			require.ErrorIs(t, err, printer.ErrInvalidFormat, tc.name)
 		} else {
-			assert.NoError(t, err, tc.name, tc.name)
+			require.NoError(t, err, tc.name, tc.name)
 			assert.Equal(t, tc.expected, o.outputFormat, tc.name)
 		}
 	}

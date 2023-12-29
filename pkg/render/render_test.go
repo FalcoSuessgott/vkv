@@ -34,5 +34,5 @@ func TestRenderExpectError(t *testing.T) {
 		"WrongValue": "values",
 	})
 
-	assert.Error(t, err)
+	require.Error(t, err)
 }

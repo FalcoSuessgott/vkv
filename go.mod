@@ -194,11 +194,7 @@ require (
 	github.com/sashamelentyev/usestdlibvars v1.24.0 // indirect
 	github.com/securego/gosec/v2 v2.18.2 // indirect
 	github.com/shazow/go-diff v0.0.0-20160112020656-b6b7b6733b8c // indirect
-<<<<<<< HEAD
 	github.com/shirou/gopsutil/v3 v3.23.11 // indirect
-=======
-	github.com/shirou/gopsutil/v3 v3.23.10 // indirect
->>>>>>> e849de2 (feat(deps): bump github.com/golangci/golangci-lint from 1.55.1 to 1.55.2)
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sivchari/containedctx v1.0.3 // indirect
