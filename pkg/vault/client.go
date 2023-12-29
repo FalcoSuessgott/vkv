@@ -16,13 +16,16 @@ type Vault struct {
 
 // NewDefaultClient returns a new vault client wrapper.
 func NewDefaultClient() (*Vault, error) {
+	// error if no VAULT_ADDR exported
 	_, ok := os.LookupEnv("VAULT_ADDR")
 	if !ok {
 		return nil, fmt.Errorf("VAULT_ADDR required but not set")
 	}
 
+	// get vault token
 	vaultToken, tokenExported := os.LookupEnv("VAULT_TOKEN")
 
+	// if none exported, check for VKV_LOGIN_COMMAND, execute it, and set the output as token
 	cmd, ok := os.LookupEnv("VKV_LOGIN_COMMAND")
 	if !tokenExported && ok {
 		cmdParts := strings.Split(cmd, " ")
@@ -35,29 +38,27 @@ func NewDefaultClient() (*Vault, error) {
 		vaultToken = strings.TrimSpace(string(token))
 	}
 
+	// if toke is still empty, error
 	if vaultToken == "" {
 		return nil, fmt.Errorf("VKV_LOGIN_COMMAND or VAULT_TOKEN required but not set")
 	}
 
-	config := api.DefaultConfig()
-	if err := config.ReadEnvironment(); err != nil {
-		return nil, err
-	}
-
-	c, err := api.NewClient(config)
+	// read all other vault env vars
+	c, err := api.NewClient(api.DefaultConfig())
 	if err != nil {
 		return nil, err
 	}
 
+	// set token
 	c.SetToken(vaultToken)
 
-	vaultNamespace, ok := os.LookupEnv("VAULT_NAMESPACE")
-	if ok {
+	// and namespace
+	if vaultNamespace, ok := os.LookupEnv("VAULT_NAMESPACE"); ok {
 		c.SetNamespace(vaultNamespace)
 	}
 
-	_, err = c.Auth().Token().LookupSelf()
-	if err != nil {
+	// self lookup current auth for verification
+	if _, err := c.Auth().Token().LookupSelf(); err != nil {
 		return nil, fmt.Errorf("not authenticated. Perhaps not a valid token: %w", err)
 	}
 

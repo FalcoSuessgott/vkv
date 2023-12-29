@@ -9,6 +9,7 @@ import (
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
+//nolint: gosec
 const (
 	kvv1ReadWriteSecretsPath = "%s/%s"
 	kvv1ListSecretsPath      = "%s/%s"
@@ -116,6 +117,7 @@ func (v *Vault) IsKVv1(rootPath string) (bool, error) {
 
 	if opt, ok := data.Data["options"]; ok {
 		if version, ok := opt.(map[string]interface{})["version"]; ok {
+			//nolint: forcetypeassert
 			if version.(string) == "1" {
 				return true, nil
 			}
