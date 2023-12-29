@@ -1,10 +1,11 @@
 ### cURL
 ```bash
-curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.3.0/vkv_$(uname)_$(uname -m).tar.gz
+// latest version: https://github.com/FalcoSuessgott/vkv/releases
+curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.5.0/vkv_$(uname)_$(uname -m).tar.gz
 tar xzf vkv_$(uname)_$(uname -m).tar.gz
 chmod u+x vkv
 ./vkv version
-vkv 0.3.0
+vkv 0.5.0
 ```
 
 ### Packages

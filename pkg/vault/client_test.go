@@ -41,60 +41,79 @@ func (s *VaultSuite) SetupSubTest() {
 
 func (s *VaultSuite) TestNewClient() {
 	testCases := []struct {
-		name    string
-		envVars map[string]string
-		err     bool
+		name                           string
+		envVars                        map[string]string
+		addTestContainerURIAsVaultAddr bool
+		err                            bool
 	}{
 		{
-			name: "test: valid options",
+			name: "valid options",
 			envVars: map[string]string{
-				"VAULT_ADDR":  "localhost",
 				"VAULT_TOKEN": "root",
 			},
-			err: false,
+			addTestContainerURIAsVaultAddr: true,
+			err:                            false,
 		},
 		{
-			name: "test: vault addr missing",
+			name: "vault address missing",
 			envVars: map[string]string{
 				"VAULT_TOKEN": "root",
 			},
 			err: true,
 		},
 		{
-			name: "test: vault token missing",
+			name: "vault token missing",
 			envVars: map[string]string{
 				"VAULT_ADDR": "root",
 			},
 			err: true,
 		},
 		{
-			name:    "test: vault token and address missing",
+			name:    "vault token and address missing",
 			envVars: map[string]string{},
 			err:     true,
+		},
+		{
+			name: "vkv login command",
+			envVars: map[string]string{
+				"VKV_LOGIN_COMMAND": "echo root",
+			},
+			addTestContainerURIAsVaultAddr: true,
+			err:                            false,
 		},
 	}
 
 	for _, tc := range testCases {
-		os.Unsetenv("VAULT_ADDR")
-		os.Unsetenv("VAULT_TOKEN")
+		s.Run(tc.name, func() {
+			// unset any VAULT env vars
+			os.Unsetenv("VAULT_ADDR")
+			os.Unsetenv("VAULT_TOKEN")
 
-		for k, v := range tc.envVars {
-			os.Setenv(k, v)
-		}
+			// dirty hack since the uri is not available in the testcase declaration
+			if tc.addTestContainerURIAsVaultAddr {
+				tc.envVars["VAULT_ADDR"] = s.c.URI
+			}
 
-		_, err := NewDefaultClient()
+			// set the test case env vars
+			for k, v := range tc.envVars {
+				assert.NoError(s.Suite.T(), os.Setenv(k, v), "error settings env var")
+			}
 
-		if tc.err {
-			assert.Error(s.Suite.T(), err, tc.name)
+			// auth
+			_, err := NewDefaultClient()
 
-			continue
-		}
+			// assertions
+			if tc.err {
+				assert.Error(s.Suite.T(), err, tc.name)
+			} else {
+				assert.NoError(s.Suite.T(), err, tc.name)
+			}
 
-		assert.NoError(s.Suite.T(), err, tc.name)
-
-		for k := range tc.envVars {
-			os.Unsetenv(k)
-		}
+			// unsert test case env vars
+			for k := range tc.envVars {
+				os.Unsetenv(k)
+			}
+		})
 	}
 }
 

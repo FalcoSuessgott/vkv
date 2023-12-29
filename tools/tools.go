@@ -7,14 +7,14 @@ package tools
 //go:generate go install github.com/golangci/golangci-lint/cmd/golangci-lint
 //go:generate go install mvdan.cc/gofumpt
 //go:generate go install github.com/daixiang0/gci
-//go:generate go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt
+//go:generate go install gotest.tools/gotestsum
 import (
 	// gci
 	_ "github.com/daixiang0/gci"
 	// golangci-lint
 	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"
-	// gotestfmt
-	_ "github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt"
+	// gotestsum
+	_ "gotest.tools/gotestsum"
 	// gofumpt
 	_ "mvdan.cc/gofumpt"
 )

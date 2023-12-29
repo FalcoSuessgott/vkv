@@ -78,22 +78,7 @@ assets: clean vault-ent ## generate all assets
 		vhs < assets/tapes/$$i.tape; \
 	done
 
-.PHONY: www
-www: ## build and server docs
-	hugo server -s www
+.PHONY: docs
+docs: ## build and serve docs
+	mkdocs serve
 
-.PHONY: docker/build
-docker/build: ## build docker images
-	docker build \
-		--pull \
-		--no-cache \
-		-t vkv:latest \
-		.
-
-.PHONY: docker/run
-docker/run: ## run docker image
-	@docker run \
-		--network=host \
-		-e VAULT_ADDR=${VAULT_ADDR} \
-		-e VAULT_TOKEN=${VAULT_TOKEN} \
-		vkv export -p secret

@@ -9,6 +9,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      - run: go generate -tags tools tools/tools.go
 
       - uses: actions/setup-go@v5
         with:
@@ -19,10 +21,13 @@ jobs:
         run: go get ./...
 
       - name: Run coverage
-        run: go test -v -race -coverprofile="coverage.out" -covermode=atomic ./...
+        run: |
+          gotestsum -- -v -race -coverprofile="coverage.out" -covermode=atomic ./...
         env:
           VAULT_VERSION: latest
           VAULT_LICENSE: ${{ secrets.VAULT_LICENSE }}
+          # https://github.com/testcontainers/testcontainers-go/issues/1782
+          TESTCONTAINERS_RYUK_DISABLED: true
 
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest'
