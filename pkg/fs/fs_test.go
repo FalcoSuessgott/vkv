@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestReadFile(t *testing.T) {
@@ -32,7 +33,7 @@ func TestReadFile(t *testing.T) {
 		out, err := ReadFile(tc.path)
 
 		if tc.err {
-			assert.Error(t, err, tc.name)
+			require.Error(t, err, tc.name)
 
 			continue
 		}
@@ -42,8 +43,8 @@ func TestReadFile(t *testing.T) {
 }
 
 func TestCreateDirectory(t *testing.T) {
-	assert.NoError(t, CreateDirectory("a/b/c"))
+	require.NoError(t, CreateDirectory("a/b/c"))
 
 	_, err := os.Stat("a/b/c")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

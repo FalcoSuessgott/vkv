@@ -197,9 +197,9 @@ func TestOutputFormat(t *testing.T) {
 		err := o.validateFlags()
 
 		if tc.err {
-			assert.ErrorIs(t, err, printer.ErrInvalidFormat, tc.name)
+			require.ErrorIs(t, err, printer.ErrInvalidFormat, tc.name)
 		} else {
-			assert.NoError(t, err, tc.name, tc.name)
+			require.NoError(t, err, tc.name, tc.name)
 			assert.Equal(t, tc.expected, o.outputFormat, tc.name)
 		}
 	}
@@ -256,11 +256,11 @@ func TestValidateFlags(t *testing.T) {
 	for _, tc := range testCases {
 		err := tc.opts.validateFlags()
 		if tc.err {
-			assert.Error(t, err, tc.name)
+			require.Error(t, err, tc.name)
 
 			continue
 		}
 
-		assert.NoError(t, err, tc.name)
+		require.NoError(t, err, tc.name)
 	}
 }

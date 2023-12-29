@@ -1,7 +1,6 @@
 package vault
 
 import (
-	"fmt"
 	"path"
 
 	"github.com/stretchr/testify/assert"
@@ -79,26 +78,26 @@ func (s *VaultSuite) TestListRecursive() {
 
 			for k, secrets := range tc.secrets {
 				if m, ok := secrets.(map[string]interface{}); ok {
-					assert.NoError(s.Suite.T(), s.client.WriteSecrets(tc.rootPath, path.Join(tc.subPath, k), m))
+					require.NoError(s.Suite.T(), s.client.WriteSecrets(tc.rootPath, path.Join(tc.subPath, k), m))
 				}
 			}
 
 			// read secrets
 			res := make(Secrets)
 			secrets, err := s.client.ListRecursive(tc.rootPath, tc.subPath, false)
-			assert.NoError(s.Suite.T(), err)
+			require.NoError(s.Suite.T(), err)
 
 			res[tc.rootPath] = *secrets
 
 			// assert
 			if tc.err {
-				assert.Error(s.Suite.T(), err)
+				require.Error(s.Suite.T(), err)
 			} else {
-				assert.NoError(s.Suite.T(), err)
+				require.NoError(s.Suite.T(), err)
 				assert.Equal(s.Suite.T(), tc.expected, res, tc.name)
 			}
 
-			assert.NoError(s.Suite.T(), s.client.DisableKV2Engine(tc.rootPath))
+			require.NoError(s.Suite.T(), s.client.DisableKV2Engine(tc.rootPath))
 		})
 	}
 }
@@ -150,7 +149,7 @@ func (s *VaultSuite) TestReadSecretMetadataVersion() {
 				require.NoError(s.Suite.T(), err, tc.name)
 
 				// assert
-				require.EqualValues(s.Suite.T(), fmt.Sprintf("%v", tc.version), fmt.Sprintf("%v", v), "version")
+				require.EqualValues(s.Suite.T(), tc.version, v, "version")
 			}
 
 			require.NoError(s.Suite.T(), s.client.DisableKV2Engine(tc.rootPath))

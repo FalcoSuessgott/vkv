@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestVersion(t *testing.T) {
@@ -33,7 +34,7 @@ func TestVersion(t *testing.T) {
 		c.SetOut(b)
 
 		err := c.Execute()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		out, _ := io.ReadAll(b)
 		assert.Equal(t, tc.expected, string(out), tc.name)

@@ -2,6 +2,7 @@ package vault
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 //nolint: errcheck
@@ -24,19 +25,19 @@ func (s *VaultSuite) TestNamespaces() {
 		s.Run(tc.name, func() {
 			for k, v := range tc.ns {
 				for _, n := range v {
-					assert.NoError(s.Suite.T(), s.client.CreateNamespaceErrorIfNotForced(k, n, true), tc.name)
+					require.NoError(s.Suite.T(), s.client.CreateNamespaceErrorIfNotForced(k, n, true), tc.name)
 				}
 			}
 
 			res, err := s.client.ListAllNamespaces("")
-			assert.NoError(s.Suite.T(), err)
+			require.NoError(s.Suite.T(), err)
 
 			for parent, subs := range res {
 				assert.ElementsMatch(s.Suite.T(), tc.ns[parent], subs, tc.name)
 			}
 
 			for _, ns := range res["a/a1"] {
-				assert.NoError(s.Suite.T(), s.client.DeleteNamespace("a/a1", ns))
+				require.NoError(s.Suite.T(), s.client.DeleteNamespace("a/a1", ns))
 			}
 		})
 	}

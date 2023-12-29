@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMatchRegex(t *testing.T) {
@@ -39,7 +40,7 @@ func TestMatchRegex(t *testing.T) {
 		res, err := MatchRegex(tc.pattern, tc.str)
 
 		if tc.err {
-			assert.Error(t, err)
+			require.Error(t, err)
 
 			continue
 		}

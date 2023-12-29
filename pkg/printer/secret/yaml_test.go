@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPrintYAML(t *testing.T) {
@@ -67,7 +68,7 @@ func TestPrintYAML(t *testing.T) {
 		m := map[string]interface{}{}
 
 		m[tc.rootPath+"/"] = tc.s
-		assert.NoError(t, p.Out(tc.rootPath, m))
+		require.NoError(t, p.Out(tc.rootPath, m))
 		assert.Equal(t, tc.output, b.String(), tc.name)
 	}
 }

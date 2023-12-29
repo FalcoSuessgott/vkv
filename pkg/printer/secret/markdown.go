@@ -75,7 +75,7 @@ func (p *Printer) buildMarkdownTable(enginePath string, secrets map[string]inter
 								}
 							}
 
-							d = append(d, fmt.Sprintf("%v", strings.TrimPrefix(m, " "))) // metadata
+							d = append(d, strings.TrimPrefix(m, " ")) // metadata
 						}
 					}
 				} else {

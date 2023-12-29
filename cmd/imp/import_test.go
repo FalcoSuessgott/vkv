@@ -160,12 +160,12 @@ func TestValidateImportFlags(t *testing.T) {
 	for _, tc := range testCases {
 		err := tc.opts.validateFlags([]string{})
 		if tc.err {
-			assert.Error(t, err, tc.name)
+			require.Error(t, err, tc.name)
 
 			continue
 		}
 
-		assert.NoError(t, err, tc.name)
+		require.NoError(t, err, tc.name)
 	}
 }
 
@@ -235,12 +235,12 @@ func TestGetInput(t *testing.T) {
 		out, err := o.getInput(cmd)
 
 		if tc.err {
-			assert.Error(t, err, tc.name)
+			require.Error(t, err, tc.name)
 
 			continue
 		}
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		assert.Equal(t, tc.expected, utils.RemoveCarriageReturns(string(out)), tc.name)
 	}

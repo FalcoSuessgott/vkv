@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/FalcoSuessgott/vkv/pkg/testutils"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -96,7 +96,7 @@ func (s *VaultSuite) TestNewClient() {
 
 			// set the test case env vars
 			for k, v := range tc.envVars {
-				assert.NoError(s.Suite.T(), os.Setenv(k, v), "error settings env var")
+				require.NoError(s.Suite.T(), os.Setenv(k, v), "error settings env var")
 			}
 
 			// auth
@@ -104,9 +104,9 @@ func (s *VaultSuite) TestNewClient() {
 
 			// assertions
 			if tc.err {
-				assert.Error(s.Suite.T(), err, tc.name)
+				require.Error(s.Suite.T(), err, tc.name)
 			} else {
-				assert.NoError(s.Suite.T(), err, tc.name)
+				require.NoError(s.Suite.T(), err, tc.name)
 			}
 
 			// unsert test case env vars
