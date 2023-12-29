@@ -12,7 +12,7 @@ require (
 	github.com/muesli/roff v0.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
-	github.com/testcontainers/testcontainers-go v0.26.0
+	github.com/testcontainers/testcontainers-go v0.27.0
 	gotest.tools/gotestsum v1.11.0
 )
 
