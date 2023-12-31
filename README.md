@@ -33,11 +33,11 @@ Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/quickstart/) Guid
 
 ```bash
 # Installation
-curl -OL https://github.com/FalcoSuessgott/vkv/releases/download/v0.5.0/vkv_$(uname)_$(uname -m).tar.gz
+version=$(curl https://api.github.com/repos/falcosuessgott/vkv/releases/latest -s | jq .name -r)
+curl -OL "https://github.com/FalcoSuessgott/vkv/releases/download/${version}/vkv_$(uname)_$(uname -m).tar.gz"
 tar xzf vkv_$(uname)_$(uname -m).tar.gz
 chmod u+x vkv
 ./vkv version
-vkv 0.5.0
 
 # set required env vars
 export VAULT_ADDR=https://vault-server:8200
