@@ -24,6 +24,7 @@ const (
 type Secrets map[string]interface{}
 
 // ListRecursive returns secrets to a path recursive.
+//nolint: cyclop
 func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secrets, error) {
 	s := make(Secrets)
 
@@ -31,8 +32,8 @@ func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secre
 	if err != nil {
 		// no sub directories in here, but lets check for normal kv pairs then..
 		secrets, err := v.ReadSecrets(rootPath, subPath)
-		if err != nil {
-			return nil, fmt.Errorf("could not read secrets from %s/%s: %w", rootPath, subPath, err)
+		if !skipErrors && err != nil {
+			return nil, fmt.Errorf("could not read secrets from %s/%s: %w. You can skip this error using --skip-errors", rootPath, subPath, err)
 		}
 
 		return (*Secrets)(&secrets), nil

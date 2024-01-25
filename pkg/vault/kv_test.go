@@ -71,9 +71,9 @@ func (s *VaultSuite) TestListRecursive() {
 			// write secrets
 
 			if tc.v1 {
-				assert.NoError(s.Suite.T(), s.client.EnableKV1Engine(tc.rootPath))
+				require.NoError(s.Suite.T(), s.client.EnableKV1Engine(tc.rootPath))
 			} else {
-				assert.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
+				require.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
 			}
 
 			for k, secrets := range tc.secrets {

@@ -22,6 +22,7 @@ const snapshotSavePrefix = "VKV_SNAPSHOT_SAVE_"
 type snapshotSaveOptions struct {
 	Namespace   string `env:"NS"`
 	Destination string `env:"DESTINATION" envDefault:"./vkv-snapshot-export"`
+	SkipErrors  bool   `env:"SKIP_ERRORS" envDefault:"false"`
 
 	writer io.Writer
 }
@@ -58,6 +59,7 @@ func newSnapshotSaveCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Comma
 
 	cmd.Flags().StringVarP(&o.Namespace, "namespace", "n", o.Namespace, "namespaces from which to save recursively all visible KV engines (env: VKV_SNAPSHOT_SAVE_NS)")
 	cmd.Flags().StringVarP(&o.Destination, "destination", "d", o.Destination, "vkv snapshot destination path (env: VKV_SNAPSHOT_SAVE_DESTINATION)")
+	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "dont exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)")
 
 	o.writer = writer
 
@@ -78,7 +80,7 @@ func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string
 		for _, e := range engines[ns] {
 			enginePath := path.Join(ns, e)
 
-			out, err := v.ListRecursive(enginePath, "", false)
+			out, err := v.ListRecursive(enginePath, "", o.SkipErrors)
 			if err != nil {
 				return err
 			}
