@@ -59,7 +59,7 @@ func newSnapshotSaveCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Comma
 
 	cmd.Flags().StringVarP(&o.Namespace, "namespace", "n", o.Namespace, "namespaces from which to save recursively all visible KV engines (env: VKV_SNAPSHOT_SAVE_NS)")
 	cmd.Flags().StringVarP(&o.Destination, "destination", "d", o.Destination, "vkv snapshot destination path (env: VKV_SNAPSHOT_SAVE_DESTINATION)")
-	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "dont exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)")
+	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "dont exit on errors (permission denied, deleted secrets) (env: VKV_SNAPSHOT_SAVE_SKIP_ERRORS)")
 
 	o.writer = writer
 
