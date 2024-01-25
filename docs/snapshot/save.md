@@ -12,6 +12,7 @@ vkv snapshot save [flags]
   -d, --destination string   vkv snapshot destination path (env: VKV_SNAPSHOT_SAVE_DESTINATION) (default "./vkv-snapshot-export")
   -h, --help                 help for save
   -n, --namespace string     namespaces from which to save recursively all visible KV engines (env: VKV_SNAPSHOT_SAVE_NS)
+      --skip-errors          dont exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)
 ```
 
 ### SEE ALSO
