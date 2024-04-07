@@ -15,32 +15,34 @@ plugins:
       enable_creation_date: false
 
 nav:
-  - vkv: index.md
-  - Quickstart: quickstart/index.md
-  - Installation: installation/index.md
-  - Authentication: authentication/index.md
-  - Configuration: configuration/index.md
-  - Export: 
-    - Export: export/index.md
-    - Export Formats: export/formats.md
-  - Import: import/index.md
-  - Snapshots:
-    - Snapshot Save: snapshot/save.md
-    - Snapshot Restore: snapshot/restore.md
-  - List Namespaces: namespaces/index.md
-  - List Engines: engines/index.md
-  - Server: server/index.md
-  - Advanced Examples: 
-    - advanced_examples/diff.md
-    - advanced_examples/fzf.md
-    - advanced_examples/kubernetes.md
-    - advanced_examples/sops.md
-    - advanced_examples/direnv.md
-  - CI/CD Integrations:
-    - cicd/gitlab.md
-    - cicd/github.md
-    - cicd/azure.md
-  - Development: development/index.md
+  - vkv: 
+    - index.md
+    - quickstart.md
+    - installation.md
+    - authentication.md
+    - configuration.md
+    - Export:
+      - export.md
+      - export_formats.md
+    - import.md
+    - Snapshots:
+      - snapshot_save.md
+      - snapshot_restore.md
+    - List:
+      - list_namespaces.md
+      - list_engines.md
+    - server.md
+    - Advanced Examples: 
+      - example_diff.md
+      - example_fzf.md
+      - example_kubernetes.md
+      - example_sops.md
+      - example_direnv.md
+    - CI/CD Integrations:
+      - cicd_gitlab.md
+      - cicd_github.md
+      - cicd_azure.md
+    - development.md
 
 markdown_extensions:
   - pymdownx.superfences:
@@ -54,9 +56,6 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.snippets
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.inlinehilite
   - admonition
   - def_list
@@ -107,3 +106,8 @@ theme:
     - navigation.top
     - navigation.expand
     - navigation.footer
+
+extra:
+  analytics:
+    provider: google
+    property: G-7LC1CWDZ0M

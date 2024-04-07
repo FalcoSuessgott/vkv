@@ -1,11 +1,12 @@
+# Kubernetes
+
 `vkv` comes in container images, which enable you to run scheduled snapshots in a kubernetes cluster. 
 
 The idea is to schedule a cronjob which snapshots a vault server and writes the snapshot files to a persistent volume.
 
 Here is a minimum working `k3s` using `local-storage` example:
 
-
-### create the volume directories
+## create the volume directories
 
 ```bash
 # on a k3s node
@@ -13,7 +14,7 @@ mkdir -p /data/volume/pv1
 chmod 777 /data/volume/pv1 # for testing
 ```
 
-### create a pv
+## create a pv
 
 ```yaml
 apiVersion: v1
@@ -39,7 +40,7 @@ spec:
           - worker-node # change
 ```
 
-### create a pvc
+## create a pvc
 ```yaml
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -54,7 +55,7 @@ spec:
       storage: 5Gi
 ```
 
-### create a cronjob
+## create a cronjob
 ```yaml
 apiVersion: batch/v1
 kind: CronJob
@@ -90,7 +91,7 @@ spec:
                 claimName: pvc
 ```
 
-### verify snapshots
+## verify snapshots
 if everything went correct, you should see the following:
 
 ```bash
@@ -100,7 +101,7 @@ drwxr-xr-x. 2 root root 108  5. Jan 09:50 vkv-export-20230105095000
 drwxr-xr-x. 2 root root 108  5. Jan 09:51 vkv-export-20230105095100
 ```
 
-### some last thoughts
+## some last thoughts
 Obviously this approach is just for development purposes. In order to make it production ready, you should consider changing some things, such as:
 
 * inject the environments from a ConfigMap

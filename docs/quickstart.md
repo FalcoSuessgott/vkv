@@ -1,13 +1,14 @@
+# Quickstart
 This guide will run you through some of the features of `vkv`.
 
-### 0. Prerequsuites
+## Prerequisites
 In order to perform all of the described tasks, you will need the following tools:
 
 * a Linux/MacOS Shell
 * `docker` installed and running (alternatively `vault` CLI can be used)
 * `vkv` installed (follow https://falcosuessgott.github.io/vkv/02_installation/)
 
-### 01. Spin up a development Vault server
+## Spin up a development Vault server
 First, we setup a development Vault server. 
 
 Open a terminal and run:
@@ -20,7 +21,7 @@ You should then be able to visit `http://127.0.0.1:8200` in your browser and see
 
 The `root` token is `root`.
 
-### 02. Verify connection
+## Verify connection
 Once you have exported the required environment variables, you can verify your connection with the vault CLI by running:
 
 ```bash
@@ -45,7 +46,7 @@ HA Enabled      false
 If `vault status` returned an output like this you good to go to the next step
 
 
-### 03. Write secrets to Vault using `vault` 
+## Write secrets to Vault using `vault` 
 In a development Vault server a `KVv2` under `secret/` is enabled by default.
 We want to write some secrets using `vault`:
 
@@ -56,9 +57,8 @@ vault kv put -mount=secret db/prod env=prod username=user password=passw0rd-prod
 vault kv put -mount=secret db/dev env=dev username=user password=passw0rd-dev
 ```
 
- 
-### 04. List secrets using `vkv`
-`vkv` requires atleast `VAULT_ADDR` and `VAULT_TOKEN` if the `vault status` command works, `vkv` will also work.
+## List secrets using `vkv`
+`vkv` requires at least `VAULT_ADDR` and `VAULT_TOKEN` if the `vault status` command works, `vkv` will also work.
 
 We can now use `vkv` to list all of our secrets recursively:
 
@@ -92,7 +92,7 @@ Here are some explanations:
 
 This output format is the default format called `base`. `vkv` has many other useful output formats. 
 
-You can see them all using this onliner:
+You can see them all using this oneliner:
 
 ```bash
 for f in base yaml json markdown policy export; do
@@ -203,7 +203,7 @@ VKV_EXPORT_FORMAT=JSON VKV_EXPORT_SHOW_VALUES=true vkv export -p secret
 }
 ```
 
-### 05. Import secrets using `vkv`
+## Import secrets using `vkv`
 Meanwhile `vkv export` can be used to store secrets, `vkv import` is used to import secrets from a `vkv export` command (either `yaml` or `json` format is accepted).
 
 Knowing this, we can copy a secret engine to another secret engine:
@@ -241,11 +241,11 @@ vkv export -p secret -f=yaml | VAULT_ADDR="..." VAULT_TOKEN="..." vkv import - -
 [...]
 ```
 
-The `-` tells `vkv` to read the secrets from STDIN. You cal also specifiy a file using the `--file` parameter.
+The `-` tells `vkv` to read the secrets from STDIN. You cal also specify a file using the `--file` parameter.
 
 `vkv` will create the `KVv2` engine if it doesn't exist. If the engine indeed exists, `vkv` will error unless `--force` is used.
 
-You can also copy subpaths to other engines:
+You can also copy sub-paths to other engines:
 
 ```bash
 vkv export -p secret/admin -f=yaml --show-values| vkv import - -p admin
@@ -262,7 +262,7 @@ admin/
     └── username=****
 ```
 
-### 06. Create KVv2 Snapshots using `vkv`
+## Create KVv2 Snapshots using `vkv`
 `vkv` enables you to create and restore snapshots of all KVv2 engines in all namespaces of a Vault instance (requires an appropiate token + policy):
 
 Consider the following namespaces and KVv2 engines on a Vault Enterprise instance:
@@ -291,7 +291,7 @@ test/test2/test3/test_test2_test3_secret_2
 You can create a snapshot of those KVv2 engines by running:
 
 ```bash
-vkv snapshot save --destionation vkv-export-$(date '+%Y-%m-%d')
+vkv snapshot save --destination vkv-export-$(date '+%Y-%m-%d')
 created vkv-export-2022-12-29
 created vkv-export-2022-12-29/secret.yaml
 created vkv-export-2022-12-29/secret_2.yaml
@@ -308,7 +308,7 @@ created vkv-export-2022-12-29/test/test2/test3/test_test2_test3_secret.yaml
 created vkv-export-2022-12-29/test/test2/test3/test_test2_test3_secret_2.yaml
 ```
 
-As you cann see: `vkv` exported all engines and wrote them to the specified directory:
+As you can see: `vkv` exported all engines and wrote them to the specified directory:
 
 ```bash
 vkv-export-2022-12-29/
@@ -360,7 +360,7 @@ cat vkv-export-2022-12-29/secret.yaml
 
 You could `.tar.gz` those directories and save those encrypted files in a secure fashion.
 
-### 07. Restore vkv snapshots
+## Restore vkv snapshots
 
 In order to restore a `vkv` snapshot the `snapshot restore` command is invoked:
 

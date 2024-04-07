@@ -1,7 +1,7 @@
-# server
+# Server
 `vkv server` is a subcommand that starts simple http server that accepts `GET` request `/export` on port `8080` (change using `--port`).
 
-### Options
+## Options
 
 ```
   -P, --port string          HTTP Server Port (env: VKV_SERVER_PORT) (default "8080")
@@ -43,7 +43,7 @@ secret/
 ```
 
 ## Output Format
-you can speciy the output format by adding a `format`-URL Query Parameter:
+you can specify the output format by adding a `format`-URL Query Parameter:
 
 ```bash
 $> curl localhost:88080/export?format=yaml

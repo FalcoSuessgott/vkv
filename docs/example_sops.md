@@ -1,10 +1,12 @@
+# sops
+
 In order to store the secret export created by `vkv` [sops](https://github.com/mozilla/sops#encrypting-using-hashicorp-vault) can be used.
 This example shows how to encrypt & decrypt `vkv` exported secrets using `sops` and Vaults transit engine:
 
-### Prerequisites
+## Prerequisites
 * Install [sops](https://github.com/mozilla/sops/releases)
 
-### Demo
+## Demo
 ```bash
 export VAULT_ADDR="https://vault.server"
 export VAULT_TOKEN="hvs.XXXX"

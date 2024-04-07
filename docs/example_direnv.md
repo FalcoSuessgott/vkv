@@ -1,9 +1,10 @@
+# direnv
 You can use `vkv` and [`direnv`](https://direnv.net/) to autimatically source KV secrets in your shell.
 
-### Prerequisites
+## Prerequisites
 * Install [direnv](https://direnv.net/) and hook into your shell
 
-### Demo
+## Demo
 
 Create in a project a `.envrc` file:
 ```bash

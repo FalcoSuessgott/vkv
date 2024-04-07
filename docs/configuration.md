@@ -1,6 +1,7 @@
+# Configuration
 `vkv` and  all its subcommands are highly configurable using environment variables.
 
-Checkout the subcommands documentation aswell as the help messages (`vkv <subcommand> --help`) to see the available environment variables.
+Checkout the subcommands documentation as well as the help messages (`vkv <subcommand> --help`) to see the available environment variables.
 
 ## Mode
 You can control the executed subcommand of `vkv` by setting `VKV_MODE` to either on of:
