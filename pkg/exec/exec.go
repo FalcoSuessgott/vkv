@@ -8,7 +8,7 @@ import (
 )
 
 // Run runs the given command and returns the output.
-//nolint: gosec
+// nolint: gosec
 func Run(cmd []string) ([]byte, error) {
 	var stdout, stderr bytes.Buffer
 

@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -29,7 +30,7 @@ var (
 	defaultWriter = os.Stdout
 
 	// ErrInvalidFormat invalid output format.
-	ErrInvalidFormat = fmt.Errorf("invalid format (valid options: base, yaml, json, export, markdown)")
+	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, export, markdown)")
 )
 
 // Option list of available options for modifying the output.
@@ -85,12 +86,12 @@ func NewPrinter(opts ...Option) *Printer {
 }
 
 // Out prints out engines.
-//nolint: cyclop
+// nolint: cyclop
 func (p *Printer) Out(engines map[string][]string) error {
 	engineList := p.buildEngineList(engines)
 
 	if len(engineList) == 0 {
-		return fmt.Errorf("no engines found")
+		return errors.New("no engines found")
 	}
 
 	if p.Regex != "" {

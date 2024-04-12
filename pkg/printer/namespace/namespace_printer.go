@@ -1,6 +1,7 @@
 package namespace
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -29,7 +30,7 @@ var (
 	defaultWriter = os.Stdout
 
 	// ErrInvalidFormat invalid output format.
-	ErrInvalidFormat = fmt.Errorf("invalid format (valid options: base, yaml, json, export, markdown)")
+	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, export, markdown)")
 )
 
 // Option list of available options for modifying the output.
@@ -77,12 +78,12 @@ func NewPrinter(opts ...Option) *Printer {
 }
 
 // Out prits out namespaces in various formats.
-//nolint: cyclop
+// nolint: cyclop
 func (p *Printer) Out(ns map[string][]string) error {
 	nsList := p.buildNamespaceList(ns)
 
 	if len(ns) == 0 {
-		return fmt.Errorf("no namespaces found")
+		return errors.New("no namespaces found")
 	}
 
 	if p.Regex != "" {

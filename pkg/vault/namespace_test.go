@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//nolint: errcheck
+// nolint: errcheck
 func (s *VaultSuite) TestNamespaces() {
 	testCases := []struct {
 		name string

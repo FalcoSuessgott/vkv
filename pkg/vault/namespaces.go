@@ -30,7 +30,7 @@ func (v *Vault) ListAllNamespaces(ns string) (Namespaces, error) {
 	return m, nil
 }
 
-//nolint: godox
+// nolint: godox
 func (v *Vault) namespaceIterator(ns string, res *Namespaces) error {
 	nsList, err := v.ListNamespaces(ns)
 	if err != nil {

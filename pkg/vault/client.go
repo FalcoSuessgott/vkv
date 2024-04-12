@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -19,7 +20,7 @@ func NewDefaultClient() (*Vault, error) {
 	// error if no VAULT_ADDR exported
 	_, ok := os.LookupEnv("VAULT_ADDR")
 	if !ok {
-		return nil, fmt.Errorf("VAULT_ADDR required but not set")
+		return nil, errors.New("VAULT_ADDR required but not set")
 	}
 
 	// get vault token
@@ -40,7 +41,7 @@ func NewDefaultClient() (*Vault, error) {
 
 	// if toke is still empty, error
 	if vaultToken == "" {
-		return nil, fmt.Errorf("VKV_LOGIN_COMMAND or VAULT_TOKEN required but not set")
+		return nil, errors.New("VKV_LOGIN_COMMAND or VAULT_TOKEN required but not set")
 	}
 
 	// read all other vault env vars

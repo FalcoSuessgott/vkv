@@ -1,6 +1,7 @@
 package export
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -16,7 +17,7 @@ import (
 
 const envVarExportPrefix = "VKV_EXPORT_"
 
-var errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
+var errInvalidFlagCombination = errors.New("invalid flag combination specified")
 
 // exportOptions holds all available commandline options.
 type exportOptions struct {
@@ -41,6 +42,7 @@ type exportOptions struct {
 }
 
 // NewExportCmd export subcommand.
+//
 //nolint:lll
 func NewExportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	var err error
@@ -134,7 +136,7 @@ func (o *exportOptions) validateFlags() error {
 	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):
 		return errInvalidFlagCombination
 	case o.EnginePath == "" && o.Path == "":
-		return fmt.Errorf("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
+		return errors.New("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
 	case true:
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":

@@ -99,7 +99,7 @@ func (v *Vault) ListKVSecretEngines(ns string) ([]string, error) {
 				return nil, fmt.Errorf("cannot get type of engine: %s", k)
 			}
 
-			if fmt.Sprintf("%v", t) == "kv" {
+			if fmt.Sprintf("%v", t) == "kv" || fmt.Sprintf("%v", t) == "generic" {
 				engineList = append(engineList, k)
 			}
 		}

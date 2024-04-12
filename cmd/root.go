@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -17,6 +18,7 @@ import (
 )
 
 // NewRootCmd vkv root command.
+//
 //nolint:cyclop
 func NewRootCmd(v string, writer io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
@@ -56,7 +58,7 @@ func NewRootCmd(v string, writer io.Writer) *cobra.Command {
 					}
 				}
 			default:
-				return fmt.Errorf("invalid value for VKV_MODE")
+				return errors.New("invalid value for VKV_MODE")
 			}
 
 			return cmd.Help()
