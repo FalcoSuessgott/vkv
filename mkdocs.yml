@@ -38,6 +38,7 @@ nav:
       - example_kubernetes.md
       - example_sops.md
       - example_direnv.md
+      - example_migrate_kvv1_kvv2.md
     - CI/CD Integrations:
       - cicd_gitlab.md
       - cicd_github.md

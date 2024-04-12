@@ -22,10 +22,11 @@
 * customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/export/)
 * print the CRUD-capabilities of the authenticated token for each KV-path (format: `policy`)
 * print secrets in `export <key>=<value>` format for env var exporting (format: `export`)
+* move or migrate secrets from KVV1 to a KVV2 Engine or any subpath [example](https://falcosuessgott.github.io/vkv//example_migrate_kvv1_kvv2/)
 * [import](https://falcosuessgott.github.io/vkv/import/) secrets back to Vault from `vkv`'s `json` or `yaml` format output
 * save and restore KVv2 snapshots (including namespaces) ([kubernetes](https://falcosuessgott.github.io/vkv/example_kubernetes/) example)
 * list all KVv2-engines or namespaces for scripting purposes ([fzf](https://falcosuessgott.github.io/vkv/example_fzf/) example)
-* more handy [snippets](https://falcosuessgott.github.io/vkv/example_diff/) using `fzf`, `sops` & `diff`,
+* more handy [snippets](https://falcosuessgott.github.io/vkv/example_diff/) using `fzf`, `sops` & `diff`
 
 Checkout the [Quickstart](https://falcosuessgott.github.io/vkv/quickstart/) Guide to learn more about `vkv`
 
