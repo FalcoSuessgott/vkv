@@ -69,7 +69,6 @@ func (s *VaultSuite) TestListRecursive() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			// write secrets
-
 			if tc.v1 {
 				require.NoError(s.Suite.T(), s.client.EnableKV1Engine(tc.rootPath))
 			} else {

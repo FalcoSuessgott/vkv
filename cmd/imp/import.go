@@ -1,6 +1,7 @@
 package imp
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -16,7 +17,7 @@ import (
 
 const envVarImportPrefix = "VKV_IMPORT_"
 
-var errInvalidFlagCombination = fmt.Errorf("invalid flag combination specified")
+var errInvalidFlagCombination = errors.New("invalid flag combination specified")
 
 type importOptions struct {
 	Force          bool   `env:"FORCE"`
@@ -31,7 +32,7 @@ type importOptions struct {
 }
 
 // NewImportCmd import subcommand.
-//nolint: cyclop, gocognit
+// nolint: cyclop, gocognit
 func NewImportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	var err error
 
@@ -127,11 +128,11 @@ func (o *importOptions) parseEnvs() error {
 	return nil
 }
 
-//nolint: cyclop
+// nolint: cyclop
 func (o *importOptions) validateFlags(args []string) error {
 	switch {
 	case len(args) == 0 && o.Path == "":
-		return fmt.Errorf("no KV-path given, -path / -p needs to be specified")
+		return errors.New("no KV-path given, -path / -p needs to be specified")
 	case o.Force && o.DryRun:
 		return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --force and --dry-run")
 	case o.Silent && o.DryRun:
@@ -165,7 +166,7 @@ func (o *importOptions) getInput(cmd *cobra.Command) ([]byte, error) {
 	fmt.Fprintln(o.writer, "reading secrets from STDIN")
 
 	if len(out) == 0 {
-		return nil, fmt.Errorf("no input found, perhaps the piped command failed or specified file is empty")
+		return nil, errors.New("no input found, perhaps the piped command failed or specified file is empty")
 	}
 
 	return out, nil

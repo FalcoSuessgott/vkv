@@ -2,7 +2,6 @@ package testutils
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -13,7 +12,7 @@ import (
 
 var (
 	vaultVersion = "latest"
-	image        = fmt.Sprintf("hashicorp/vault:%s", vaultVersion)
+	image        = "hashicorp/vault:" + vaultVersion
 	envs         = map[string]string{}
 	token        = "root"
 )
@@ -37,7 +36,7 @@ func StartTestContainer() (*TestContainer, error) {
 	// use OSS image per default, if license is available use enterprise
 	if license, ok := os.LookupEnv("VAULT_LICENSE"); ok {
 		envs["VAULT_LICENSE"] = license
-		image = fmt.Sprintf("hashicorp/vault-enterprise:%s", vaultVersion)
+		image = "hashicorp/vault-enterprise" + vaultVersion
 	}
 
 	req := testcontainers.ContainerRequest{
@@ -70,7 +69,7 @@ func StartTestContainer() (*TestContainer, error) {
 
 	return &TestContainer{
 		Container: c, ctx: ctx,
-		URI:   fmt.Sprintf("http://127.0.0.1:%s", mappedPort.Port()),
+		URI:   "http://127.0.0.1:" + mappedPort.Port(),
 		Token: token,
 	}, nil
 }

@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"path"
@@ -9,7 +10,7 @@ import (
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
-//nolint: gosec
+// nolint: gosec
 const (
 	kvv1ReadWriteSecretsPath = "%s/%s"
 	kvv1ListSecretsPath      = "%s/%s"
@@ -24,7 +25,7 @@ const (
 type Secrets map[string]interface{}
 
 // ListRecursive returns secrets to a path recursive.
-//nolint: cyclop
+// nolint: cyclop
 func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secrets, error) {
 	s := make(Secrets)
 
@@ -105,7 +106,7 @@ func (v *Vault) ListKeys(rootPath, subPath string) ([]string, error) {
 	return nil, fmt.Errorf("no keys found in \"%s\"", path.Join(rootPath, subPath))
 }
 
-// IsKVv1 returns true if the current path is a KVv2 Engine.
+// IsKVv1 returns true if the current path is a KVv1 Engine.
 func (v *Vault) IsKVv1(rootPath string) (bool, error) {
 	data, err := v.Client.Logical().Read(fmt.Sprintf(mountDetailsPath, rootPath))
 	if err != nil {
@@ -113,15 +114,18 @@ func (v *Vault) IsKVv1(rootPath string) (bool, error) {
 	}
 
 	if data == nil {
-		return false, fmt.Errorf("cannot lookup mount type")
+		return false, errors.New("cannot lookup mount type")
 	}
 
-	if opt, ok := data.Data["options"]; ok {
-		if version, ok := opt.(map[string]interface{})["version"]; ok {
-			//nolint: forcetypeassert
-			if version.(string) == "1" {
-				return true, nil
-			}
+	// early versions of Vaults KV engine are of type "generic"
+	if data.Data["type"] == "generic" {
+		return true, nil
+	}
+
+	if opts, ok := data.Data["options"].(map[string]interface{}); ok {
+		//nolint: forcetypeassert
+		if opts["version"].(string) == "1" {
+			return true, nil
 		}
 	}
 

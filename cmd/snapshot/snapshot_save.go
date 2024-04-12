@@ -66,7 +66,7 @@ func newSnapshotSaveCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Comma
 	return cmd
 }
 
-//nolint: cyclop
+// nolint: cyclop
 func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string][]string) error {
 	for _, ns := range utils.SortMapKeys(utils.ToMapStringInterface(engines)) {
 		nsDir := path.Join(o.Destination, ns)

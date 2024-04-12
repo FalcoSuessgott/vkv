@@ -1,7 +1,7 @@
 package secret
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -46,7 +46,7 @@ var (
 	defaultWriter = os.Stdout
 
 	// ErrInvalidFormat invalid output format.
-	ErrInvalidFormat = fmt.Errorf("invalid format (valid options: base, yaml, json, export, markdown)")
+	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, export, markdown)")
 )
 
 // Option list of available options for modifying the output.
@@ -180,7 +180,7 @@ func (p *Printer) WithOption(opt Option) {
 }
 
 // Out prints out the secrets according all configured options.
-//nolint: cyclop
+// nolint: cyclop
 func (p *Printer) Out(enginePath string, secrets map[string]interface{}) error {
 	for k, v := range secrets {
 		if !p.showValues {

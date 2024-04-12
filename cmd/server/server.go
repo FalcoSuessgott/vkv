@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"log"
 	"path"
@@ -40,6 +39,7 @@ func defaultServerOptions() *serverOptions {
 }
 
 // NewServerCmd export subcommand.
+//
 //nolint:lll
 func NewServerCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	var err error
@@ -156,7 +156,7 @@ func (o *serverOptions) serve() error {
 		c.Data(200, "text/plain", o.readSecrets())
 	})
 
-	return r.Run(fmt.Sprintf(":%s", o.Port))
+	return r.Run(o.Port)
 }
 
 func (o *serverOptions) readSecrets() []byte {
