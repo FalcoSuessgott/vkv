@@ -159,6 +159,7 @@ require (
 	github.com/mgechev/revive v1.3.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/sys/user v0.1.0 // indirect
@@ -264,7 +265,7 @@ require (
 require (
 	github.com/daixiang0/gci v0.13.4
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/docker/docker v25.0.5+incompatible
+	github.com/docker/docker v26.0.1+incompatible
 	github.com/go-test/deep v1.1.0 // indirect
 	github.com/golangci/golangci-lint v1.57.2
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
