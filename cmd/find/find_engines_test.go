@@ -1,4 +1,4 @@
-package list
+package find
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (s *VaultSuite) TestListEnginesCommand() {
+func (s *VaultSuite) TestFindEnginesCommand() {
 	testCases := []struct {
 		name       string
 		args       []string
@@ -21,7 +21,7 @@ func (s *VaultSuite) TestListEnginesCommand() {
 		expEngines string
 	}{
 		{
-			name: "list all engines",
+			name: "find all engines",
 			args: []string{"--all=true"},
 			engines: vault.Engines{
 				"":  []string{},
@@ -33,7 +33,7 @@ secret_2/
 `,
 		},
 		{
-			name: "list ns from a",
+			name: "find ns from a",
 			args: []string{"-n=a"},
 			engines: vault.Engines{
 				"":  []string{},
@@ -44,7 +44,7 @@ secret_2/
 `,
 		},
 		{
-			name: "list all ns with regex",
+			name: "find all ns with regex",
 			args: []string{"--all", "--regex=secret"},
 			engines: vault.Engines{
 				"":  []string{},
@@ -54,7 +54,7 @@ secret_2/
 `,
 		},
 		{
-			name: "list all ns in json",
+			name: "find all ns in json",
 			args: []string{"--all", "--format=json"},
 			engines: vault.Engines{
 				"":  []string{},
@@ -97,11 +97,11 @@ secret_2/
 			// run cmd
 			b := bytes.NewBufferString("")
 
-			listCmd := newListEngineCmd(b, s.client)
-			listCmd.SetOut(b)
-			listCmd.SetArgs(tc.args)
+			findCmd := newFindEngineCmd(b, s.client)
+			findCmd.SetOut(b)
+			findCmd.SetArgs(tc.args)
 
-			require.NoError(s.Suite.T(), listCmd.Execute(), tc.name)
+			require.NoError(s.Suite.T(), findCmd.Execute(), tc.name)
 
 			out, _ := io.ReadAll(b)
 
@@ -153,7 +153,7 @@ func TestEnginesOutputFormat(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		o := &listEnginesOptions{
+		o := &findEnginesOptions{
 			FormatString: tc.format,
 		}
 

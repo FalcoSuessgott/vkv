@@ -1,4 +1,4 @@
-package list
+package find
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (s *VaultSuite) TestListNamespacesCommand() {
+func (s *VaultSuite) TestFindNamespacesCommand() {
 	testCases := []struct {
 		name  string
 		args  []string
@@ -21,7 +21,7 @@ func (s *VaultSuite) TestListNamespacesCommand() {
 		expNS string
 	}{
 		{
-			name: "list all ns",
+			name: "find all ns",
 			args: []string{"--all"},
 			ns: vault.Namespaces{
 				"":  []string{},
@@ -33,7 +33,7 @@ b
 `,
 		},
 		{
-			name: "list ns from a",
+			name: "find ns from a",
 			args: []string{"-n=a"},
 			ns: vault.Namespaces{
 				"":  []string{},
@@ -44,7 +44,7 @@ b
 `,
 		},
 		{
-			name: "list all ns with regex",
+			name: "find all ns with regex",
 			args: []string{"--regex=a"},
 			ns: vault.Namespaces{
 				"":  []string{},
@@ -55,7 +55,7 @@ b
 `,
 		},
 		{
-			name: "list all ns in json",
+			name: "find all ns in json",
 			args: []string{"--format=json"},
 			ns: vault.Namespaces{
 				"":  []string{},
@@ -92,11 +92,11 @@ b
 			// run cmd
 			b := bytes.NewBufferString("")
 
-			listCmd := newListNamespacesCmd(b, s.client)
-			listCmd.SetOut(b)
-			listCmd.SetArgs(tc.args)
+			findCmd := newFindNamespacesCmd(b, s.client)
+			findCmd.SetOut(b)
+			findCmd.SetArgs(tc.args)
 
-			require.NoError(s.Suite.T(), listCmd.Execute(), tc.name)
+			require.NoError(s.Suite.T(), findCmd.Execute(), tc.name)
 
 			out, _ := io.ReadAll(b)
 
@@ -148,7 +148,7 @@ func TestNamespaceOutputFormat(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		o := &listNamespaceOptions{
+		o := &findNamespaceOptions{
 			FormatString: tc.format,
 		}
 

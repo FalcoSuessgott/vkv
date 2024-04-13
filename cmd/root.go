@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/cmd/export"
+	"github.com/FalcoSuessgott/vkv/cmd/find"
 	imp "github.com/FalcoSuessgott/vkv/cmd/imp"
-	"github.com/FalcoSuessgott/vkv/cmd/list"
 	"github.com/FalcoSuessgott/vkv/cmd/manpage"
 	"github.com/FalcoSuessgott/vkv/cmd/server"
 	"github.com/FalcoSuessgott/vkv/cmd/snapshot"
@@ -37,10 +37,10 @@ func NewRootCmd(v string, writer io.Writer) *cobra.Command {
 				return export.NewExportCmd(writer, nil).Execute()
 			case "IMPORT":
 				return imp.NewImportCmd(writer, nil).Execute()
+			case "FIND":
+				return find.NewFindCmd(writer, nil).Execute()
 			case "SERVER":
 				return server.NewServerCmd(writer, nil).Execute()
-			case "LIST":
-				return list.NewListCmd(writer, nil).Execute()
 			case "SNAPSHOT_RESTORE":
 				cmd := snapshot.NewSnapshotCmd(writer, nil)
 
@@ -68,7 +68,7 @@ func NewRootCmd(v string, writer io.Writer) *cobra.Command {
 	// sub commands
 	cmd.AddCommand(
 		export.NewExportCmd(writer, nil),
-		list.NewListCmd(writer, nil),
+		find.NewFindCmd(writer, nil),
 		snapshot.NewSnapshotCmd(writer, nil),
 		version.NewVersionCmd(v),
 		imp.NewImportCmd(writer, nil),

@@ -1,4 +1,4 @@
-package list
+package find
 
 import (
 	"log"
@@ -39,7 +39,7 @@ func (s *VaultSuite) SetupSubTest() {
 }
 
 func TestVaultSuite(t *testing.T) {
-	// github actions doenst offer the docker sock, which we need
+	// github actions doesn't offer the docker sock, which we need
 	// to run this test suite
 	if runtime.GOOS == "linux" {
 		suite.Run(t, new(VaultSuite))

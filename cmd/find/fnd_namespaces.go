@@ -1,4 +1,4 @@
-package list
+package find
 
 import (
 	"io"
@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const envVarListNamespacePrefix = "VKV_LIST_NAMESPACES_"
+const envVarfindNamespacePrefix = "VKV_FIND_NAMESPACES_"
 
-type listNamespaceOptions struct {
+type findNamespaceOptions struct {
 	Namespace string `env:"NS"`
 
 	Regex        string `env:"REGEX"`
@@ -24,10 +24,10 @@ type listNamespaceOptions struct {
 	writer       io.Writer
 }
 
-func newListNamespacesCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
+func newFindNamespacesCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	var err error
 
-	o := &listNamespaceOptions{}
+	o := &findNamespaceOptions{}
 
 	if err := o.parseEnvs(); err != nil {
 		log.Fatal(err)
@@ -35,7 +35,7 @@ func newListNamespacesCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Com
 
 	cmd := &cobra.Command{
 		Use:           "namespaces",
-		Short:         "list all namespaces",
+		Short:         "find all namespaces",
 		Aliases:       []string{"ns"},
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -54,11 +54,11 @@ func newListNamespacesCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Com
 			}
 
 			if !o.All {
-				if namespaces, err = o.listNamespaces(vaultClient); err != nil {
+				if namespaces, err = o.findNamespaces(vaultClient); err != nil {
 					return err
 				}
 			} else {
-				if namespaces, err = o.listAllNamespaces(vaultClient); err != nil {
+				if namespaces, err = o.findAllNamespaces(vaultClient); err != nil {
 					return err
 				}
 			}
@@ -73,17 +73,17 @@ func newListNamespacesCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Com
 
 	cmd.Flags().SortFlags = false
 
-	cmd.Flags().StringVarP(&o.Namespace, "ns", "n", o.Namespace, "specify the namespace (env: VKV_LIST_NAMESPACES_NS)")
-	cmd.Flags().StringVarP(&o.Regex, "regex", "r", o.Regex, "filter namespaces by the specified regex pattern (env: VKV_LIST_NAMESPACES_REGEX)")
-	cmd.Flags().BoolVarP(&o.All, "all", "a", o.All, "list all namespaces recursively from the specified namespace (env: VKV_LIST_NAMESPACES_ALL)")
-	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "available output formats: \"base\", \"json\", \"yaml\" (env: VKV_LIST_NAMESPACES_FORMAT")
+	cmd.Flags().StringVarP(&o.Namespace, "ns", "n", o.Namespace, "specify the namespace (env: VKV_find_NAMESPACES_NS)")
+	cmd.Flags().StringVarP(&o.Regex, "regex", "r", o.Regex, "filter namespaces by the specified regex pattern (env: VKV_find_NAMESPACES_REGEX)")
+	cmd.Flags().BoolVarP(&o.All, "all", "a", o.All, "find all namespaces recursively from the specified namespace (env: VKV_find_NAMESPACES_ALL)")
+	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "available output formats: \"base\", \"json\", \"yaml\" (env: VKV_find_NAMESPACES_FORMAT")
 
 	o.writer = writer
 
 	return cmd
 }
 
-func (o *listNamespaceOptions) validateFlags() error {
+func (o *findNamespaceOptions) validateFlags() error {
 	switch strings.ToLower(o.FormatString) {
 	case "yaml", "yml":
 		o.outputFormat = printer.YAML
@@ -98,9 +98,9 @@ func (o *listNamespaceOptions) validateFlags() error {
 	return nil
 }
 
-func (o *listNamespaceOptions) parseEnvs() error {
+func (o *findNamespaceOptions) parseEnvs() error {
 	if err := env.Parse(o, env.Options{
-		Prefix: envVarListNamespacePrefix,
+		Prefix: envVarfindNamespacePrefix,
 	}); err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (o *listNamespaceOptions) parseEnvs() error {
 	return nil
 }
 
-func (o *listNamespaceOptions) listNamespaces(v *vault.Vault) (vault.Namespaces, error) {
+func (o *findNamespaceOptions) findNamespaces(v *vault.Vault) (vault.Namespaces, error) {
 	ns, err := v.ListNamespaces(o.Namespace)
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ func (o *listNamespaceOptions) listNamespaces(v *vault.Vault) (vault.Namespaces,
 	return m, nil
 }
 
-func (o *listNamespaceOptions) listAllNamespaces(v *vault.Vault) (vault.Namespaces, error) {
+func (o *findNamespaceOptions) findAllNamespaces(v *vault.Vault) (vault.Namespaces, error) {
 	ns, err := v.ListAllNamespaces(o.Namespace)
 	if err != nil {
 		return nil, err
