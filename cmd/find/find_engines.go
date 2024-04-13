@@ -1,4 +1,4 @@
-package list
+package find
 
 import (
 	"io"
@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const envVarListEnginesPrefix = "VKV_LIST_ENGINES_"
+const envVarFindEnginesPrefix = "VKV_FIND_ENGINES_"
 
-type listEnginesOptions struct {
+type findEnginesOptions struct {
 	Namespace string `env:"NS"`
 	Prefix    bool   `env:"NS_PREFIX"`
 
@@ -26,10 +26,10 @@ type listEnginesOptions struct {
 	outputFormat printer.OutputFormat
 }
 
-func newListEngineCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
+func newFindEngineCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	var err error
 
-	o := &listEnginesOptions{}
+	o := &findEnginesOptions{}
 
 	if err := o.parseEnvs(); err != nil {
 		log.Fatal(err)
@@ -37,8 +37,8 @@ func newListEngineCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command
 
 	cmd := &cobra.Command{
 		Use:           "engines",
-		Short:         "list all KVv2 engines",
-		Aliases:       []string{"e"},
+		Short:         "find all KV engines",
+		Aliases:       []string{"e", "eng"},
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -56,11 +56,11 @@ func newListEngineCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command
 			}
 
 			if !o.All {
-				if engines, err = o.listEngines(vaultClient); err != nil {
+				if engines, err = o.findEngines(vaultClient); err != nil {
 					return err
 				}
 			} else {
-				if engines, err = o.listAllEngines(vaultClient); err != nil {
+				if engines, err = o.findAllEngines(vaultClient); err != nil {
 					return err
 				}
 			}
@@ -76,19 +76,19 @@ func newListEngineCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command
 
 	cmd.Flags().SortFlags = false
 
-	cmd.Flags().StringVarP(&o.Namespace, "namespace", "n", o.Namespace, "specify the namespace (env: VKV_LIST_ENGINES_NS)")
-	cmd.Flags().BoolVarP(&o.Prefix, "include-ns-prefix", "p", o.Prefix, "prepend the namespaces (env: VKV_LIST_ENGINES_NS_PREFIX)")
+	cmd.Flags().StringVarP(&o.Namespace, "namespace", "n", o.Namespace, "specify the namespace (env: VKV_find_ENGINES_NS)")
+	cmd.Flags().BoolVarP(&o.Prefix, "include-ns-prefix", "p", o.Prefix, "prepend the namespaces (env: VKV_find_ENGINES_NS_PREFIX)")
 
-	cmd.Flags().StringVarP(&o.Regex, "regex", "r", o.Regex, "filter engines by the specified regex pattern (env: VKV_LIST_ENGINES_REGEX")
-	cmd.Flags().BoolVarP(&o.All, "all", "a", o.All, "list all KV engines recursively from the specified namespaces (env: VKV_LIST_ENGINES_ALL)")
-	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "available output formats: \"base\", \"json\", \"yaml\" (env: VKV_LIST_ENGINES_FORMAT)")
+	cmd.Flags().StringVarP(&o.Regex, "regex", "r", o.Regex, "filter engines by the specified regex pattern (env: VKV_find_ENGINES_REGEX")
+	cmd.Flags().BoolVarP(&o.All, "all", "a", o.All, "find all KV engines recursively from the specified namespaces (env: VKV_find_ENGINES_ALL)")
+	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "available output formats: \"base\", \"json\", \"yaml\" (env: VKV_find_ENGINES_FORMAT)")
 
 	o.writer = writer
 
 	return cmd
 }
 
-func (o *listEnginesOptions) validateFlags() error {
+func (o *findEnginesOptions) validateFlags() error {
 	switch strings.ToLower(o.FormatString) {
 	case "yaml", "yml":
 		o.outputFormat = printer.YAML
@@ -103,9 +103,9 @@ func (o *listEnginesOptions) validateFlags() error {
 	return nil
 }
 
-func (o *listEnginesOptions) parseEnvs() error {
+func (o *findEnginesOptions) parseEnvs() error {
 	if err := env.Parse(o, env.Options{
-		Prefix: envVarListEnginesPrefix,
+		Prefix: envVarFindEnginesPrefix,
 	}); err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func (o *listEnginesOptions) parseEnvs() error {
 	return nil
 }
 
-func (o *listEnginesOptions) listEngines(v *vault.Vault) (vault.Engines, error) {
+func (o *findEnginesOptions) findEngines(v *vault.Vault) (vault.Engines, error) {
 	engines, err := v.ListKVSecretEngines(o.Namespace)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (o *listEnginesOptions) listEngines(v *vault.Vault) (vault.Engines, error) 
 	return m, nil
 }
 
-func (o *listEnginesOptions) listAllEngines(v *vault.Vault) (vault.Engines, error) {
+func (o *findEnginesOptions) findAllEngines(v *vault.Vault) (vault.Engines, error) {
 	engines, err := v.ListAllKVSecretEngines(o.Namespace)
 	if err != nil {
 		return nil, err
