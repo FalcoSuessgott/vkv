@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/caarlos0/env/v6"
 	"github.com/ghodss/yaml"
 )
 
@@ -229,4 +230,17 @@ func HandleEnginePath(enginePath, path string) (string, string) {
 	}
 
 	return SplitPath(path)
+}
+
+// ParseEnvs parses any envs with the configured prefix.
+func ParseEnvs(prefix string, i interface{}) error {
+	opts := env.Options{
+		Prefix: prefix,
+	}
+
+	if err := env.Parse(i, opts); err != nil {
+		return err
+	}
+
+	return nil
 }

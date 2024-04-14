@@ -12,11 +12,10 @@ import (
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
-	"github.com/caarlos0/env/v6"
 	"github.com/spf13/cobra"
 )
 
-const snapshotRestorePrefix = "VKV_SNAPSHOT_RESTORE_"
+const envVarSnapshotRestorePrefix = "VKV_SNAPSHOT_RESTORE_"
 
 type snapshotRestoreOptions struct {
 	Source string `env:"SOURCE" envDefault:"./vkv-snapshot-export"`
@@ -29,7 +28,7 @@ func newSnapshotRestoreCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Co
 
 	o := &snapshotRestoreOptions{}
 
-	if err := o.parseEnvs(); err != nil {
+	if err := utils.ParseEnvs(envVarSnapshotRestorePrefix, o); err != nil {
 		log.Fatal(err)
 	}
 
@@ -60,16 +59,6 @@ func newSnapshotRestoreCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Co
 	o.writer = writer
 
 	return cmd
-}
-
-func (o *snapshotRestoreOptions) parseEnvs() error {
-	if err := env.Parse(o, env.Options{
-		Prefix: snapshotRestorePrefix,
-	}); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // nolint: cyclop

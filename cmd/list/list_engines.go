@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/engine"
+	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
-	"github.com/caarlos0/env/v6"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +31,7 @@ func newListEngineCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command
 
 	o := &listEnginesOptions{}
 
-	if err := o.parseEnvs(); err != nil {
+	if err := utils.ParseEnvs(envVarListEnginesPrefix, o); err != nil {
 		log.Fatal(err)
 	}
 
@@ -98,16 +98,6 @@ func (o *listEnginesOptions) validateFlags() error {
 		o.outputFormat = printer.Base
 	default:
 		return printer.ErrInvalidFormat
-	}
-
-	return nil
-}
-
-func (o *listEnginesOptions) parseEnvs() error {
-	if err := env.Parse(o, env.Options{
-		Prefix: envVarListEnginesPrefix,
-	}); err != nil {
-		return err
 	}
 
 	return nil

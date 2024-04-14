@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/namespace"
+	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
-	"github.com/caarlos0/env/v6"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +29,7 @@ func newListNamespacesCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Com
 
 	o := &listNamespaceOptions{}
 
-	if err := o.parseEnvs(); err != nil {
+	if err := utils.ParseEnvs(envVarListNamespacePrefix, o); err != nil {
 		log.Fatal(err)
 	}
 
@@ -93,16 +93,6 @@ func (o *listNamespaceOptions) validateFlags() error {
 		o.outputFormat = printer.Base
 	default:
 		return printer.ErrInvalidFormat
-	}
-
-	return nil
-}
-
-func (o *listNamespaceOptions) parseEnvs() error {
-	if err := env.Parse(o, env.Options{
-		Prefix: envVarListNamespacePrefix,
-	}); err != nil {
-		return err
 	}
 
 	return nil

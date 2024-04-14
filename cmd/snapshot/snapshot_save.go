@@ -13,11 +13,10 @@ import (
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
-	"github.com/caarlos0/env/v6"
 	"github.com/spf13/cobra"
 )
 
-const snapshotSavePrefix = "VKV_SNAPSHOT_SAVE_"
+const envVarSnapshotSavePrefix = "VKV_SNAPSHOT_SAVE_"
 
 type snapshotSaveOptions struct {
 	Namespace   string `env:"NS"`
@@ -32,7 +31,7 @@ func newSnapshotSaveCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Comma
 
 	o := &snapshotSaveOptions{}
 
-	if err := o.parseEnvs(); err != nil {
+	if err := utils.ParseEnvs(envVarSnapshotSavePrefix, o); err != nil {
 		log.Fatal(err)
 	}
 
@@ -116,16 +115,6 @@ func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string
 
 			b.Reset()
 		}
-	}
-
-	return nil
-}
-
-func (o *snapshotSaveOptions) parseEnvs() error {
-	if err := env.Parse(o, env.Options{
-		Prefix: snapshotSavePrefix,
-	}); err != nil {
-		return err
 	}
 
 	return nil

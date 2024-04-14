@@ -36,7 +36,7 @@ func StartTestContainer() (*TestContainer, error) {
 	// use OSS image per default, if license is available use enterprise
 	if license, ok := os.LookupEnv("VAULT_LICENSE"); ok {
 		envs["VAULT_LICENSE"] = license
-		image = "hashicorp/vault-enterprise" + vaultVersion
+		image = "hashicorp/vault-enterprrise:" + vaultVersion
 	}
 
 	req := testcontainers.ContainerRequest{

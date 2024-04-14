@@ -11,7 +11,6 @@ import (
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
-	"github.com/caarlos0/env/v6"
 	"github.com/spf13/cobra"
 )
 
@@ -49,7 +48,7 @@ func NewExportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 
 	o := &exportOptions{}
 
-	if err := o.parseEnvs(); err != nil {
+	if err := utils.ParseEnvs(envVarExportPrefix, o); err != nil {
 		log.Fatal(err)
 	}
 
@@ -218,14 +217,4 @@ func (o *exportOptions) buildMap(v *vault.Vault) (map[string]interface{}, error)
 	}
 
 	return pathMap, nil
-}
-
-func (o *exportOptions) parseEnvs() error {
-	if err := env.Parse(o, env.Options{
-		Prefix: envVarExportPrefix,
-	}); err != nil {
-		return err
-	}
-
-	return nil
 }

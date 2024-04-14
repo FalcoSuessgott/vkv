@@ -10,7 +10,6 @@ import (
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
-	"github.com/caarlos0/env/v6"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
@@ -46,7 +45,7 @@ func NewServerCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 
 	o := defaultServerOptions()
 
-	if err := o.parseEnvs(); err != nil {
+	if err := utils.ParseEnvs(envVarExportPrefix, o); err != nil {
 		log.Fatal(err)
 	}
 
@@ -115,16 +114,6 @@ func (o *serverOptions) buildMap() (map[string]interface{}, error) {
 	}
 
 	return pathMap, nil
-}
-
-func (o *serverOptions) parseEnvs() error {
-	if err := env.Parse(o, env.Options{
-		Prefix: envVarExportPrefix,
-	}); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (o *serverOptions) serve() error {

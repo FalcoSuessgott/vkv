@@ -11,7 +11,6 @@ import (
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
-	"github.com/caarlos0/env/v6"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +37,7 @@ func NewImportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 
 	o := &importOptions{}
 
-	if err := o.parseEnvs(); err != nil {
+	if err := utils.ParseEnvs(envVarImportPrefix, o); err != nil {
 		log.Fatal(err)
 	}
 
@@ -48,11 +47,6 @@ func NewImportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// parse envs
-			if err := o.parseEnvs(); err != nil {
-				return err
-			}
-
 			// validate flags
 			if err := o.validateFlags(args); err != nil {
 				return err
@@ -116,16 +110,6 @@ func NewImportCmd(writer io.Writer, vaultClient *vault.Vault) *cobra.Command {
 	o.writer = writer
 
 	return cmd
-}
-
-func (o *importOptions) parseEnvs() error {
-	if err := env.Parse(o, env.Options{
-		Prefix: envVarImportPrefix,
-	}); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // nolint: cyclop
