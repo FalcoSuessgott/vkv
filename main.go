@@ -7,11 +7,14 @@ import (
 	"github.com/FalcoSuessgott/vkv/cmd"
 )
 
-var version = ""
+var version string
 
 func main() {
-	if err := cmd.Execute(version); err != nil {
+	cmd.Version = version
+
+	if err := cmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "%v.\n", err)
+
 		os.Exit(1)
 	}
 }

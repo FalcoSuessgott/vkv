@@ -7,81 +7,111 @@ import (
 	"os"
 	"strings"
 
-	"github.com/FalcoSuessgott/vkv/cmd/export"
-	imp "github.com/FalcoSuessgott/vkv/cmd/imp"
-	"github.com/FalcoSuessgott/vkv/cmd/list"
-	"github.com/FalcoSuessgott/vkv/cmd/manpage"
-	"github.com/FalcoSuessgott/vkv/cmd/server"
-	"github.com/FalcoSuessgott/vkv/cmd/snapshot"
-	"github.com/FalcoSuessgott/vkv/cmd/version"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
+)
+
+const (
+	envVarVKVMode               = "VKV_MODE"
+	envVarExportPrefix          = "VKV_EXPORT_"
+	envVarImportPrefix          = "VKV_IMPORT_"
+	envVarServerPrefix          = "VKV_SERVER_"
+	envVarListEnginesPrefix     = "VKV_LIST_ENGINES_"
+	envVarListNamespacePrefix   = "VKV_LIST_NAMESPACES_"
+	envVarSnapshotRestorePrefix = "VKV_SNAPSHOT_RESTORE_"
+	envVarSnapshotSavePrefix    = "VKV_SNAPSHOT_SAVE_"
+)
+
+var (
+	Version string
+
+	errInvalidFlagCombination = errors.New("invalid flag combination specified")
+	vaultClient               *vault.Vault
+	writer                    io.Writer
 )
 
 // NewRootCmd vkv root command.
 //
 //nolint:cyclop
-func NewRootCmd(v string, writer io.Writer) *cobra.Command {
+func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "vkv",
-		Short:         "the swiss army knife when working with Vault KVv2 engines",
+		Short:         "the swiss army knife when working with Vault KV engines",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// skip vault client creation for completion, docs and manpage generation
+			if (cmd.HasParent() && cmd.Parent().Use == "completion") || cmd.Use == "docs" || cmd.Use == "man" {
+				return nil
+			}
+
+			// required to inject the vault client for unit tests
+			if vaultClient != nil {
+				return nil
+			}
+
+			// otherwise create a new vault client
+			vc, err := vault.NewDefaultClient()
+			if err != nil {
+				return err
+			}
+
+			vaultClient = vc
+
+			return nil
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mode, ok := os.LookupEnv("VKV_MODE")
+			mode, ok := os.LookupEnv(envVarVKVMode)
 			if !ok {
 				return cmd.Help()
 			}
 
 			switch strings.ToUpper(mode) {
 			case "EXPORT":
-				return export.NewExportCmd(writer, nil).Execute()
+				return NewExportCmd().Execute()
 			case "IMPORT":
-				return imp.NewImportCmd(writer, nil).Execute()
+				return NewImportCmd().Execute()
 			case "SERVER":
-				return server.NewServerCmd(writer, nil).Execute()
+				return NewServerCmd().Execute()
 			case "LIST":
-				return list.NewListCmd(writer, nil).Execute()
+				return NewListCmd().Execute()
 			case "SNAPSHOT_RESTORE":
-				cmd := snapshot.NewSnapshotCmd(writer, nil)
-
-				for _, c := range cmd.Commands() {
-					if c.Name() == "restore" {
-						return c.Execute()
-					}
-				}
+				return NewSnapshotRestoreCmd().Execute()
 			case "SNAPSHOT_SAVE":
-				cmd := snapshot.NewSnapshotCmd(writer, nil)
-
-				for _, c := range cmd.Commands() {
-					if c.Name() == "save" {
-						return c.Execute()
-					}
-				}
+				return NewSnapshotSaveCmd().Execute()
 			default:
 				return errors.New("invalid value for VKV_MODE")
 			}
-
-			return cmd.Help()
 		},
 	}
 
 	// sub commands
 	cmd.AddCommand(
-		export.NewExportCmd(writer, nil),
-		list.NewListCmd(writer, nil),
-		snapshot.NewSnapshotCmd(writer, nil),
-		version.NewVersionCmd(v),
-		imp.NewImportCmd(writer, nil),
-		server.NewServerCmd(writer, nil),
-		manpage.NewManCmd().Cmd,
+		NewExportCmd(),
+		NewListCmd(),
+		NewSnapshotCmd(),
+		NewVersionCmd(),
+		NewImportCmd(),
+		NewServerCmd(),
+		NewManCmd(),
+		NewDocCmd(),
+	)
+
+	cobra.OnInitialize(
+		func() {
+			// initialize writer if not already, used for injecting the writer in unit tests
+			if writer == nil {
+				writer = cmd.OutOrStdout()
+			}
+		},
 	)
 
 	return cmd
 }
 
 // Execute invokes the command.
-func Execute(version string) error {
-	if err := NewRootCmd(version, os.Stdout).Execute(); err != nil {
+func Execute() error {
+	if err := NewRootCmd().Execute(); err != nil {
 		return fmt.Errorf("[ERROR] %w", err)
 	}
 

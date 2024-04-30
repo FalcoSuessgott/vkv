@@ -82,3 +82,8 @@ assets: clean vault-ent ## generate all assets
 docs: ## build and serve docs
 	mkdocs serve
 
+
+.PHONY: docgen
+docgen:
+	go run main.go docs
+	find ./docs -name '*.md' -print0 | xargs -0 sed -i 's/```vkv/```go/g'

@@ -15,6 +15,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.30.0
+	github.com/testcontainers/testcontainers-go/modules/vault v0.30.0
 	gotest.tools/gotestsum v1.11.0
 )
 
