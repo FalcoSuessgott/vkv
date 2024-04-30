@@ -1,26 +1,42 @@
 # Import
-# vkv import
 
-import secrets from vkv's json or yaml output
+`vkv import` requires an engine path (`--path`) and will accepts `vkv`s YAML or JSON output (`vkv export -f=yaml|json`) either by invoking `vkv import -` (for STDIN) or by specifying a file (`--file`). `vkv` will create the specified path if the engine does not exist yet and will error if it does, unless `--force` is specified. 
 
+See the [CLI Reference](https://github.com/FalcoSuessgott/vkv/cmd/vkv_import/) for more details on the supported flags and env vars.
+
+## Example Usage
+```bash
+> vkv export -p secret -f=yaml > secret_export.yaml
+> vkv import -p copy --file=secret_export.yaml
+reading secrets from secret_export.yaml
+parsing secrets from YAML
+writing secret "copy/admin" 
+writing secret "copy/demo" 
+writing secret "copy/sub/demo" 
+writing secret "copy/sub/sub2/demo" 
+successfully imported all secrets
+
+result:
+
+copy/
+├── v1: admin
+│   └── sub=********
+├── v1: demo
+│   └── foo=***
+└── sub/
+    ├── v1: demo
+    │   ├── demo=***********
+    │   ├── password=******
+    │   └── user=*****
+    └── sub2
+        └── v1: demo
+            ├── admin=***
+            ├── foo=***
+            ├── password=********
+            └── user=****
 ```
-vkv import [flags]
-```
 
-### Options
-
-```
-  -d, --dry-run                print resulting KV engine (env: VKV_IMPORT_DRY_RUN)
-  -f, --file string            path to a file containing vkv yaml or json output (env: VKV_IMPORT_FILE)
-      --force                  overwrite existing kv entries (env: VKV_IMPORT_FORCE)
-  -h, --help                   help for import
-      --max-value-length int   maximum char length of values. Set to "-1" for disabling (env: VKV_IMPORT_MAX_VALUE_LENGTH) (default 12)
-  -p, --path string            KVv2 Engine path (env: VKV_IMPORT_PATH)
-      --show-values            don't mask values (env: VKV_IMPORT_SHOW_VALUES)
-  -s, --silent                 do not output secrets (env: VKV_IMPORT_SILENT)
-```
-
-## read secrets from STDIN 
+## Reading secrets from STDIN 
 
 The `-` in `vkv import -`, tells `vkv` do read data via STDIN. The idea of `vkv import -` is, in order to copy/mirror KV-v2 secrets or complete engines across different Vault Servers or Namespaces, you can simply pipe 
 `vkv`s output into the `vkv import` command:

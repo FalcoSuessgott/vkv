@@ -47,4 +47,8 @@ func TestCreateDirectory(t *testing.T) {
 
 	_, err := os.Stat("a/b/c")
 	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		os.RemoveAll("a")
+	})
 }

@@ -577,3 +577,17 @@ func TestHandleEnginePath(t *testing.T) {
 		assert.Equal(t, tc.expectedSubPath, subPath, tc.name)
 	}
 }
+
+func TestParseEnvs(t *testing.T) {
+	type test struct {
+		Test string `env:"TEST"`
+	}
+
+	o := &test{}
+	exp := "test"
+
+	t.Setenv("test_TEST", exp)
+
+	require.NoError(t, ParseEnvs("test_", o))
+	require.Equal(t, exp, o.Test)
+}

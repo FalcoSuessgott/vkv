@@ -15,23 +15,16 @@ plugins:
       enable_creation_date: false
 
 nav:
-  - vkv: 
+  - Docs: 
     - index.md
     - quickstart.md
     - installation.md
     - authentication.md
     - configuration.md
-    - Export:
-      - export.md
-      - export_formats.md
+    - export.md
     - import.md
-    - Snapshots:
-      - snapshot_save.md
-      - snapshot_restore.md
-    - List:
-      - list_namespaces.md
-      - list_engines.md
     - server.md
+    - snapshots.md
     - Advanced Examples: 
       - example_diff.md
       - example_fzf.md
@@ -44,7 +37,23 @@ nav:
       - cicd_github.md
       - cicd_azure.md
     - development.md
-
+  - CLI Reference:
+    - cmd/vkv.md
+    - cmd/vkv_version.md
+    - cmd/vkv_export.md
+    - cmd/vkv_import.md
+    - cmd/vkv_list.md
+    - cmd/vkv_list_engines.md
+    - cmd/vkv_list_namespaces.md
+    - cmd/vkv_snapshot
+    - cmd/vkv_snapshot_save.md
+    - cmd/vkv_snapshot_restore.md
+    - cmd/vkv_server.md
+    - cmd/vkv_completion.md
+    - cmd/vkv_completion_bash.md
+    - cmd/vkv_completion_zsh.md
+    - cmd/vkv_completion_fish.md
+    
 markdown_extensions:
   - pymdownx.superfences:
       custom_fences:

@@ -1,26 +1,116 @@
 # Export
-## vkv export
+`vkv export` requires an engine path (`--path` or `--engine-path`) and supports the following export formats (specify via `--format` flag). 
 
-recursively list secrets from Vaults KV2 engine in various formats
+See the [CLI Reference](https://github.com/FalcoSuessgott/vkv/cmd/vkv_export/) for more details on the supported flags and env vars.
 
+## base
+```bash
+> vkv export -p secret -f=base               
+secret/
+├── v1: admin [key=value]
+│   └── sub=********
+├── v1: demo
+│   └── foo=***
+└── sub/
+    ├── v1: demo
+    │   ├── demo=***********
+    │   ├── password=******
+    │   └── user=*****
+    └── sub2
+        └── v2: demo [admin=false key=value]
+            ├── admin=***
+            ├── foo=***
+            ├── password=********
+            └── user=****
 ```
-vkv export [flags]
+
+## yaml
+```bash
+> vkv export -p secret -f=yaml                       
+secret/:
+  admin:
+    sub: '********'
+  demo:
+    foo: '***'
+  sub/:
+    demo:
+      demo: '***********'
+      password: '******'
+      user: '*****'
+    sub2/:
+      demo:
+        admin: '***'
+        foo: '***'
+        password: '********'
+        user: '****'
 ```
 
-### Options
-
+## json
+```bash
+> vkv export -p secret -f=json
+{
+  "secret/": {
+    "admin": {
+      "sub": "********"
+    },
+    "demo": {
+      "foo": "***"
+    },
+    "sub/": {
+      "demo": {
+        "demo": "***********",
+        "password": "******",
+        "user": "*****"
+      },
+      "sub2/": {
+        "demo": {
+          "admin": "***",
+          "foo": "***",
+          "password": "********",
+          "user": "****"
+        }
+      }
+    }
+  }
+}
 ```
-  -p, --path string              KVv2 Engine path (env: VKV_EXPORT_PATH)
-  -e, --engine-path string       engine path in case your KV-engine contains special characters such as "/", the path value will then be appended if specified ("<engine-path>/<path>") (env: VKV_EXPORT_ENGINE_PATH)
-      --skip-errors              dont exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)
-      --only-keys                show only keys (env: VKV_EXPORT_ONLY_KEYS)
-      --only-paths               show only paths (env: VKV_EXPORT_ONLY_PATHS)
-      --show-version             show the secret version (env: VKV_EXPORT_VERSION) (default true)
-      --show-metadata            show the secrets metadata (env: VKV_EXPORT_METADATA) (default true)
-      --show-values              don't mask values (env: VKV_EXPORT_SHOW_VALUES)
-      --max-value-length int     maximum char length of values. Set to "-1" for disabling (env: VKV_EXPORT_MAX_VALUE_LENGTH) (default 12)
-      --template-file string     path to a file containing Go-template syntax to render the KV entries (env: VKV_EXPORT_TEMPLATE_FILE)
-      --template-string string   template string containing Go-template syntax to render KV entries (env: VKV_EXPORT_TEMPLATE_STRING)
-  -f, --format string            available output formats: "base", "json", "yaml", "export", "policy", "markdown", "template" (env: VKV_EXPORT_FORMAT) (default "base")
-  -h, --help                     help for export
+
+## export
+```bash
+> vkv export -p secret -f=export
+export admin='key'
+export demo='hello world'
+export foo='bar'
+export password='password'
+export sub='password'
+
+eval $(vkv export -p secret -f=export)
+echo $admin
+key
+```
+
+### policy
+```bash
+> vkv export -p secret -f=policy 
+PATH                    CREATE  READ    UPDATE  DELETE  LIST    ROOT
+secret/sub/sub2/demo    ✖       ✖       ✖       ✖       ✖       ✔
+secret/admin            ✖       ✖       ✖       ✖       ✖       ✔
+secret/demo             ✖       ✖       ✖       ✖       ✖       ✔
+secret/sub/demo         ✖       ✖       ✖       ✖       ✖       ✔
+```
+
+### markdown
+```bash
+> vkv export -p secret -f=markdown      
+|         PATH         |   KEY    |    VALUE    | VERSION |       METADATA        |
+|----------------------|----------|-------------|---------|-----------------------|
+| secret/admin         | sub      | ********    |       1 | key=value             |
+| secret/demo          | foo      | ***         |       1 |                       |
+| secret/sub/demo      | demo     | *********** |       1 |                       |
+|                      | password | ******      |         |                       |
+|                      | user     | *****       |         |                       |
+| secret/sub/sub2/demo | admin    | ***         |       2 | admin=false key=value |
+|                      | foo      | ***         |         |                       |
+|                      | password | ********    |         |                       |
+|                      | user     | ****        |         |                       |
 ```
