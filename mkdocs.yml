@@ -45,7 +45,7 @@ nav:
     - cmd/vkv_list.md
     - cmd/vkv_list_engines.md
     - cmd/vkv_list_namespaces.md
-    - cmd/vkv_snapshot
+    - cmd/vkv_snapshot.md
     - cmd/vkv_snapshot_save.md
     - cmd/vkv_snapshot_restore.md
     - cmd/vkv_server.md
