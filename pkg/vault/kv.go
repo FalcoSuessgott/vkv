@@ -34,7 +34,7 @@ func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secre
 		// no sub directories in here, but lets check for normal kv pairs then..
 		secrets, err := v.ReadSecrets(rootPath, subPath)
 		if !skipErrors && err != nil {
-			return nil, fmt.Errorf("could not read secrets from %s/%s: %w. You can skip this error using --skip-errors", rootPath, subPath, err)
+			return nil, fmt.Errorf("could not read secrets from %s/%s: %w.\n\nYou can skip this error using --skip-errors", rootPath, subPath, err)
 		}
 
 		return (*Secrets)(&secrets), nil

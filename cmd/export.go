@@ -9,7 +9,6 @@ import (
 
 	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
 )
 
@@ -23,6 +22,7 @@ type exportOptions struct {
 	ShowValues     bool `env:"SHOW_VALUES"`
 	ShowVersion    bool `env:"SHOW_VERSION" envDefault:"true"`
 	ShowMetadata   bool `env:"SHOW_METADATA" envDefault:"true"`
+	WithHyperLink  bool `env:"WITH_HYPERLINK" envDefault:"true"`
 	MaxValueLength int  `env:"MAX_VALUE_LENGTH" envDefault:"12"`
 
 	SkipErrors bool `env:"SKIP_ERRORS" envDefault:"false"`
@@ -63,10 +63,11 @@ func NewExportCmd() *cobra.Command {
 				printer.WithWriter(writer),
 				printer.ShowVersion(o.ShowVersion),
 				printer.ShowMetadata(o.ShowMetadata),
+				printer.WithHyperLinks(o.WithHyperLink),
 			)
 
 			// prepare map
-			m, err := o.buildMap(vaultClient)
+			m, err := o.buildMap()
 			if err != nil {
 				return err
 			}
@@ -95,6 +96,8 @@ func NewExportCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&o.ShowVersion, "show-version", o.ShowVersion, "show the secret version (env: VKV_EXPORT_VERSION)")
 	cmd.Flags().BoolVar(&o.ShowMetadata, "show-metadata", o.ShowMetadata, "show the secrets metadata (env: VKV_EXPORT_METADATA)")
 	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_EXPORT_SHOW_VALUES)")
+	cmd.Flags().BoolVar(&o.WithHyperLink, "with-hyperlink", o.WithHyperLink, "don't link to the Vault UI (env: VKV_EXPORT_WITH_HYPERLINK)")
+
 	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
 		"(env: VKV_EXPORT_MAX_VALUE_LENGTH)")
 
@@ -169,19 +172,19 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func (o *exportOptions) buildMap(v *vault.Vault) (map[string]interface{}, error) {
+func (o *exportOptions) buildMap() (map[string]interface{}, error) {
 	var isSecretPath bool
 
 	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
 	// read recursive all secrets
-	s, err := v.ListRecursive(rootPath, subPath, o.SkipErrors)
+	s, err := vaultClient.ListRecursive(rootPath, subPath, o.SkipErrors)
 	if err != nil {
 		return nil, err
 	}
 
 	// check if path is a directory or secret path
-	if _, isSecret := v.ReadSecrets(rootPath, subPath); isSecret == nil {
+	if _, isSecret := vaultClient.ReadSecrets(rootPath, subPath); isSecret == nil {
 		isSecretPath = true
 	}
 

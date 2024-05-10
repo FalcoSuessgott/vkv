@@ -27,7 +27,6 @@ func TestPrintBase(t *testing.T) {
 				},
 			},
 			opts: []Option{
-				WithVaultClient(nil),
 				ToFormat(Base),
 				ShowValues(false),
 			},

@@ -17,6 +17,7 @@
 * Support KV version 1 & version 2 (no need to specify the version `vkv` will automatically detect the engines version)
 * **CI/CD Integrations for [Gitlab, GitHub, Azure Devops](https://falcosuessgott.github.io/vkv/cicd_gitlab)**
 * support all Vault Auth Env Vars and `VKV_LOGIN_COMMAND` for avoiding having to hardcode the `VAULT_TOKEN` ([example](https://falcosuessgott.github.io/vkv/authentication/))
+* clickable secrets redirecting to the secret in Vaults UI
 * recursively print secrets of any KV  Engine in `json`, `yaml`, `markdown` and [other formats](https://falcosuessgott.github.io/vkv/export/)
 * engine export shows the secret version as well as its [custom metadata](https://developer.hashicorp.com/vault/docs/commands/kv/metadata)
 * customize the output (show only-keys, only-paths, mask/unmask secrets) via [flags or environment](https://falcosuessgott.github.io/vkv/export/)

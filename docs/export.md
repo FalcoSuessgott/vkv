@@ -6,18 +6,18 @@ See the [CLI Reference](https://github.com/FalcoSuessgott/vkv/cmd/vkv_export/) f
 ## base
 ```bash
 > vkv export -p secret -f=base               
-secret/
-├── v1: admin [key=value]
+secret/ [desc=key/value secret storage] [type=kv2]
+├── admin [v=1] [key=value]
 │   └── sub=********
-├── v1: demo
+├── demo [v=1]
 │   └── foo=***
 └── sub/
-    ├── v1: demo
+    ├── demo [v=1]
     │   ├── demo=***********
     │   ├── password=******
     │   └── user=*****
     └── sub2
-        └── v2: demo [admin=false key=value]
+        └── demo [v=2] [admin=false key=value]
             ├── admin=***
             ├── foo=***
             ├── password=********

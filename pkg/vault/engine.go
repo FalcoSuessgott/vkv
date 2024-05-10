@@ -16,6 +16,35 @@ const (
 // Engines struct that hols all engines key is the namespace.
 type Engines map[string][]string
 
+// GetEngineDescription returns the description of the engine.
+func (v *Vault) GetEngineDescription(rootPath string) (string, error) {
+	data, err := v.Client.Logical().Read(fmt.Sprintf(mountEnginePath, rootPath))
+	if err != nil {
+		return "", err
+	}
+
+	if data != nil {
+		//nolint: forcetypeassert
+		return data.Data["description"].(string), nil
+	}
+
+	return "", fmt.Errorf("could not get engine description for path: \"%s\"", rootPath)
+}
+
+func (v *Vault) GetEngineTypeVersion(rootPath string) (string, string, error) {
+	data, err := v.Client.Logical().Read(fmt.Sprintf(mountEnginePath, rootPath))
+	if err != nil {
+		return "", "", err
+	}
+
+	if data != nil {
+		//nolint: forcetypeassert
+		return data.Data["type"].(string), data.Data["options"].(map[string]interface{})["version"].(string), nil
+	}
+
+	return "", "", fmt.Errorf("could not get engine type for path: \"%s\"", rootPath)
+}
+
 // EnableKV2Engine enables the kv2 engine at a specified path.
 func (v *Vault) EnableKV2Engine(rootPath string) error {
 	options := map[string]interface{}{

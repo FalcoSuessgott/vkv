@@ -64,31 +64,36 @@ We can now use `vkv` to list all of our secrets recursively:
 
 ```bash
 vkv export --path secret                                            
-secret/
-├── v1: admin [key=value]
-│   ├── password=********
-│   └── username=****
-└── db/
-    ├── v1: dev
-    │   ├── env=***
-    │   ├── password=************
-    │   └── username=****
-    └── v1: prod
-        ├── env=****
-        ├── password=************
-        └── username=****
+secret/ [desc=key/value secret storage] [type=kv2]
+├── admin [v=1] [key=value]
+│   └── sub=********
+├── demo [v=1]
+│   └── foo=***
+└── sub/
+    ├── demo [v=1]
+    │   ├── demo=***********
+    │   ├── password=******
+    │   └── user=*****
+    └── sub2
+        └── demo [v=2] [admin=false key=value]
+            ├── admin=***
+            ├── foo=***
+            ├── password=********
+            └── user=****
 ```
 
 Here are some explanations:
+* `vkv` prints the description and the engine type + version
 
 * `vkv` masks the secrets per default, you can disable this by using `--show-values` or `VKV_EXPORT_SHOW_VALUES=true`
   
 * `vkv` limits the length of the secrets per default to `12` for readability purposes (You can set you own value length by using `--max-value-length=XX` or `VKV_EXPORT_MAX_VALUE_LENGTH=XX`)
   
-* `v1` indicates the secret version (disable by using `--show-version` or `VKV_EXPORT_SHOW_VERSION=false`
+* `v1` indicates the secret version (disable by using `--show-version`) or `VKV_EXPORT_SHOW_VERSION=false`
   
 * `[key=value]` represents the custom metadata that we added to the secret in step 3. (disable by `--show-metadata` or (`VKV_EXPORT_SHOW_METADATA=false`)
 
+* every secret is a hyperlink which links to the secret in the Vault UI  (disable with `--with-hyperlink=false` or `VKV_EXPORT_WITH_HYPERLINK`). Works only for supported terminals (see [https://github.com/savioxavier/termlink/blob/master/termlink.go#L80](https://github.com/savioxavier/termlink/blob/master/termlink.go#L80))
 
 This output format is the default format called `base`. `vkv` has many other useful output formats. 
 
@@ -101,19 +106,23 @@ vkv export -p secret --format=$f;
 done 
 
 ===> Output Format: base <===
-secret/
-├── v1: admin [key=value]
-│   ├── password=********
-│   └── username=****
-└── db/
-    ├── v1: dev
-    │   ├── env=***
-    │   ├── password=************
-    │   └── username=****
-    └── v1: prod
-        ├── env=****
-        ├── password=************
-        └── username=****
+vkv export --path secret                                            
+secret/ [desc=key/value secret storage] [type=kv2]
+├── admin [v=1] [key=value]
+│   └── sub=********
+├── demo [v=1]
+│   └── foo=***
+└── sub/
+    ├── demo [v=1]
+    │   ├── demo=***********
+    │   ├── password=******
+    │   └── user=*****
+    └── sub2
+        └── demo [v=2] [admin=false key=value]
+            ├── admin=***
+            ├── foo=***
+            ├── password=********
+            └── user=****
 
 ===> Output Format: yaml <===
 secret/:

@@ -27,11 +27,11 @@ chmod u+x vkv
 ./vkv version
 
 # set required env vars
-export VAULT_ADDR=https://vault-server:8200
-export VAULT_TOKEN=<your-vault-token>
+> export VAULT_ADDR=https://vault-server:8200
+> export VAULT_TOKEN=<your-vault-token>
 
 # verify connection
-vault status
+> vault status
 Key             Value
 ---             -----
 Seal Type       shamir
@@ -46,20 +46,20 @@ Cluster Name    vault-cluster-ffd05212
 Cluster ID      42ef92d5-eb21-0cb5-dd0b-804dac04e505
 HA Enabled      false
 
-# list secrets recursively of a KVv2 engine
-vkv export --path <KVv2-engine path>
-secret/
-├── v1: admin [key=value]   # v1 -> secret version; "admin" -> secrets name; "[key=value]" -> secrets custom metadata
-│   └── sub=********        # "sub" -> key; "*****" -> masked value (disable with --show-values)
-├── v1: demo
+# list secrets recursively from a KV engine
+> vkv export --path <path>
+secret/ [desc=key/value secret storage] [type=kv2] # engine description & type
+├── admin [v=1] [key=value] # secret version & metadata, every secret is a hyperlink o Vaults UI
+│   └── sub=********
+├── demo [v=1]
 │   └── foo=***
 └── sub/
-    ├── v1: demo
+    ├── demo [v=1] 
     │   ├── demo=***********
     │   ├── password=******
     │   └── user=*****
     └── sub2
-        └── v2: demo [admin=false key=value]
+        └── demo [v=2] [admin=false key=value] 
             ├── admin=***
             ├── foo=***
             ├── password=********

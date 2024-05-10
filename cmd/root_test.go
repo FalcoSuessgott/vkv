@@ -52,8 +52,9 @@ func (s *VaultSuite) TestMode() {
 		{
 			name: "export",
 			envs: map[string]string{
-				"VKV_MODE":        "export",
-				"VKV_EXPORT_PATH": "e2e",
+				"VKV_MODE":                  "export",
+				"VKV_EXPORT_PATH":           "e2e",
+				"VKV_EXPORT_WITH_HYPERLINK": "false",
 			},
 			secrets: map[string]interface{}{
 				"sub": map[string]interface{}{
@@ -63,10 +64,10 @@ func (s *VaultSuite) TestMode() {
 					"key": false,
 				},
 			},
-			expected: `e2e/
-├── v1: sub
+			expected: `e2e/ [type=kv2]
+├── sub [v=1]
 │   └── user=********
-└── v1: sub2
+└── sub2 [v=1]
     └── key=*****
 `,
 		},
@@ -85,8 +86,6 @@ func (s *VaultSuite) TestMode() {
 			b := bytes.NewBufferString("")
 			writer = b
 
-			fmt.Println("writer set to b")
-
 			// enable kv engine
 			s.Require().NoError(vaultClient.EnableKV2Engine("e2e"), "enabling KV engine")
 
@@ -102,8 +101,10 @@ func (s *VaultSuite) TestMode() {
 				s.Suite.T().Setenv(k, v)
 			}
 
+			err := NewRootCmd().Execute()
+			fmt.Println(err)
 			// run vkv
-			s.Require().Equal(tc.err, NewRootCmd().Execute() != nil, tc.name)
+			s.Require().Equal(tc.err, err != nil, "error "+tc.name)
 
 			// assert output
 			if !tc.err {
