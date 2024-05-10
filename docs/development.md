@@ -24,21 +24,21 @@ export VKV_PATH="secret"
 If everything worked fine, you should be able to run:
 
 ```sh
-go run main.go   
-secret/
-├── demo
-│   └── foo=***
-├── sub
+go run main.go export -p secret
+secret/ [desc=key/value secret storage] [type=kv2]
+├── admin [v=1] [key=value]
 │   └── sub=********
-├── sub/
-│   └── demo
-│       ├── demo=***********
-│       ├── password=******
-│       └── user=*****
-└── sub/
-    └── sub2/
-        └── demo
-            ├── password=*******
-            ├── user=********
-            └── value=*********
+├── demo [v=1]
+│   └── foo=***
+└── sub
+    ├── demo [v=1]
+    │   ├── demo=***********
+    │   ├── password=******
+    │   └── user=*****
+    └── sub2
+        └── demo [v=2] [admin=false key=value]
+            ├── admin=***
+            ├── foo=***
+            ├── password=********
+            └── user=****
 ```

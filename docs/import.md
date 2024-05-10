@@ -18,18 +18,18 @@ successfully imported all secrets
 
 result:
 
-copy/
-├── v1: admin
+copy/ [type=kv2]
+├── admin [v=1] [key=value]
 │   └── sub=********
-├── v1: demo
+├── demo [v=1]
 │   └── foo=***
-└── sub/
-    ├── v1: demo
+└── sub
+    ├── demo [v=1]
     │   ├── demo=***********
     │   ├── password=******
     │   └── user=*****
     └── sub2
-        └── v1: demo
+        └── demo [v=2] [admin=false key=value]
             ├── admin=***
             ├── foo=***
             ├── password=********
@@ -50,4 +50,4 @@ vkv export -p <source> --show-values -f=yaml | vkv import - -p <destination>
 * `<source>` and `<destination>` dont have to be the root path of a secret engine, you also specify subpaths and copy them another secret engine.
 * `vkv` will error if the enabled secret engine already exist, you can use `--force` to overwrite the destination engine, if the destination path contains a subpath (`root/sub`), `vkv` will then insert the secrets to that specific directory
 
-**⚠️ `vkv import` can overwrite important secrets, always double check the commmand by using the dry-run mode (`--dry-run`) first**
+**⚠️ `vkv import` can overwrite important secrets, always double check the command by using the dry-run mode (`--dry-run`) first**

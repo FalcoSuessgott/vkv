@@ -53,7 +53,7 @@ secret/ [desc=key/value secret storage] [type=kv2] # engine description & type
 │   └── sub=********
 ├── demo [v=1]
 │   └── foo=***
-└── sub/
+└── sub
     ├── demo [v=1] 
     │   ├── demo=***********
     │   ├── password=******

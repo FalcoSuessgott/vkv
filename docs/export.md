@@ -11,7 +11,7 @@ secret/ [desc=key/value secret storage] [type=kv2]
 │   └── sub=********
 ├── demo [v=1]
 │   └── foo=***
-└── sub/
+└── sub
     ├── demo [v=1]
     │   ├── demo=***********
     │   ├── password=******

@@ -79,7 +79,7 @@ func (p *Printer) printTree(rootPath, subPath string, m map[string]interface{}) 
 
 // nolint: cyclop
 func (p *Printer) buildTreeName(rootPath, subPath string) string {
-	name := subPath
+	name := strings.TrimSuffix(subPath, utils.Delimiter)
 
 	subPathParts := strings.Split(strings.TrimSuffix(subPath, utils.Delimiter), utils.Delimiter)
 	if len(subPathParts) > 1 {

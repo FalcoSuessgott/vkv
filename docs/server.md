@@ -14,22 +14,12 @@ listening on 127.0.0.1:8080
 ## Client side
 ```bash
 $> curl localhost:8080/export
-secret/
-├── v1: admin [key=value]  
-│   └── sub=********        
-├── v1: demo
-│   └── foo=***
-└── sub/
-    ├── v1: demo
-    │   ├── demo=***********
-    │   ├── password=******
-    │   └── user=*****
-    └── sub2
-        └── v2: demo [admin=false key=value]
-            ├── admin=***
-            ├── foo=***
-            ├── password=********
-            └── user=****
+export admin='key'
+export demo='hello world'
+export foo='bar'
+export password='password'
+export sub='password'
+export user='user'
 ```
 
 ## Output Format

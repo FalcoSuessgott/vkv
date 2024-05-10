@@ -69,7 +69,7 @@ secret/ [desc=key/value secret storage] [type=kv2]
 │   └── sub=********
 ├── demo [v=1]
 │   └── foo=***
-└── sub/
+└── sub
     ├── demo [v=1]
     │   ├── demo=***********
     │   ├── password=******
@@ -112,7 +112,7 @@ secret/ [desc=key/value secret storage] [type=kv2]
 │   └── sub=********
 ├── demo [v=1]
 │   └── foo=***
-└── sub/
+└── sub
     ├── demo [v=1]
     │   ├── demo=***********
     │   ├── password=******
@@ -228,19 +228,22 @@ successfully imported all secrets
 
 result:
 
-copy/
-├── v1: admin
-│   ├── password=********
-│   └── username=****
-└── db/
-    ├── v1: dev
-    │   ├── env=***
-    │   ├── password=************
-    │   └── username=****
-    └── v1: prod
-        ├── env=****
-        ├── password=************
-        └── username=****
+copy/ [type=kv2]
+├── admin [v=1] [key=value]
+│   └── sub=********
+├── demo [v=1]
+│   └── foo=***
+└── sub
+    ├── demo [v=1]
+    │   ├── demo=***********
+    │   ├── password=******
+    │   └── user=*****
+    └── sub2
+        └── demo [v=2] [admin=false key=value]
+            ├── admin=***
+            ├── foo=***
+            ├── password=********
+            └── user=****
 ```
 
 Or even to another Vault instance:
@@ -266,7 +269,7 @@ successfully imported all secrets
 result:
 
 admin/
-└── v1: admin
+└── admin [v=1]
     ├── password=********
     └── username=****
 ```
