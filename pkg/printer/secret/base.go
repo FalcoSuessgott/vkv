@@ -2,11 +2,13 @@ package secret
 
 import (
 	"fmt"
+	"net/url"
 	"path"
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/disiqueira/gotree/v3"
+	"github.com/savioxavier/termlink"
 )
 
 func (p *Printer) printBase(enginePath string, secrets map[string]interface{}) error {
@@ -15,7 +17,30 @@ func (p *Printer) printBase(enginePath string, secrets map[string]interface{}) e
 	m := make(map[string]interface{})
 
 	for _, k := range utils.SortMapKeys(secrets) {
-		tree = gotree.New(enginePath + utils.Delimiter)
+		baseName := enginePath + utils.Delimiter
+
+		if p.withHyperLinks {
+			addr := fmt.Sprintf("%s/ui/vault/secrets/%s/kv", p.vaultClient.Client.Address(), enginePath)
+
+			baseName = termlink.Link(enginePath+utils.Delimiter, addr, false)
+		}
+
+		if p.vaultClient != nil {
+			// append description
+			desc, err := p.vaultClient.GetEngineDescription(enginePath)
+			if err == nil && desc != "" {
+				baseName = fmt.Sprintf("%s [desc=%s]", baseName, desc)
+			}
+
+			// append type + version
+			engineType, version, err := p.vaultClient.GetEngineTypeVersion(enginePath)
+			if err == nil {
+				baseName = fmt.Sprintf("%s [type=%s]", baseName, engineType+version)
+			}
+		}
+
+		tree = gotree.New(baseName)
+
 		m = utils.ToMapStringInterface(secrets[k])
 	}
 
@@ -52,6 +77,7 @@ func (p *Printer) printTree(rootPath, subPath string, m map[string]interface{}) 
 	return tree
 }
 
+// nolint: cyclop
 func (p *Printer) buildTreeName(rootPath, subPath string) string {
 	name := subPath
 
@@ -60,9 +86,20 @@ func (p *Printer) buildTreeName(rootPath, subPath string) string {
 		name = path.Base(subPath)
 	}
 
+	if p.withHyperLinks && !strings.HasSuffix(subPath, utils.Delimiter) {
+		// {{ vault-addr }}/ui/vault/secrets/{{ root path }}/kv/{{ sub path (url encoded if contains "/" )}}
+		addr := fmt.Sprintf("%s/ui/vault/secrets/%s/kv/%s", p.vaultClient.Client.Address(), rootPath, subPath)
+
+		if len(subPathParts) > 1 {
+			addr = fmt.Sprintf("%s/ui/vault/secrets/%s/kv/%s", p.vaultClient.Client.Address(), rootPath, url.QueryEscape(subPath))
+		}
+
+		name = termlink.Link(name, addr, false)
+	}
+
 	if p.showVersion {
 		if v, err := p.vaultClient.ReadSecretVersion(rootPath, subPath); err == nil {
-			name = fmt.Sprintf("v%v: %s", v, name)
+			name = fmt.Sprintf("%s [v=%v]", name, v)
 		}
 	}
 
@@ -73,7 +110,7 @@ func (p *Printer) buildTreeName(rootPath, subPath string) string {
 
 			if ok {
 				for k, v := range metadata {
-					md = fmt.Sprintf("%v %s=%v", md, k, v)
+					md = fmt.Sprintf("%s %s=%v", md, k, v)
 				}
 
 				name = fmt.Sprintf("%s [%v]", name, strings.TrimPrefix(md, " "))

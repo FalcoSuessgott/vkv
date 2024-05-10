@@ -9,6 +9,7 @@ import (
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
+	"github.com/savioxavier/termlink"
 )
 
 // OutputFormat enum of valid output formats.
@@ -54,16 +55,17 @@ type Option func(*Printer)
 
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
-	format       OutputFormat
-	writer       io.Writer
-	onlyKeys     bool
-	onlyPaths    bool
-	showVersion  bool
-	showValues   bool
-	showMetadata bool
-	valueLength  int
-	template     string
-	vaultClient  *vault.Vault
+	format         OutputFormat
+	writer         io.Writer
+	onlyKeys       bool
+	onlyPaths      bool
+	showVersion    bool
+	showValues     bool
+	showMetadata   bool
+	withHyperLinks bool
+	valueLength    int
+	template       string
+	vaultClient    *vault.Vault
 }
 
 // CustomValueLength option for trimming down the output of secrets.
@@ -78,6 +80,15 @@ func OnlyKeys(b bool) Option {
 	return func(p *Printer) {
 		if b {
 			p.onlyKeys = true
+		}
+	}
+}
+
+// WithHyperLinks for enabling hyperlinks.
+func WithHyperLinks(b bool) Option {
+	return func(p *Printer) {
+		if b {
+			p.withHyperLinks = termlink.SupportsHyperlinks()
 		}
 	}
 }

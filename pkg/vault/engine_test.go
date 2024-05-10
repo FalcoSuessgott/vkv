@@ -4,6 +4,27 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func (s *VaultSuite) TestGetDescription() {
+	s.Run("description", func() {
+		desc, err := s.client.GetEngineDescription("secret")
+
+		s.Require().NoError(err)
+
+		s.Require().Equal("key/value secret storage", desc)
+	})
+}
+
+func (s *VaultSuite) TestGetEngineVersionType() {
+	s.Run("description", func() {
+		engineType, version, err := s.client.GetEngineTypeVersion("secret")
+
+		s.Require().NoError(err)
+
+		s.Require().Equal("kv", engineType)
+		s.Require().Equal("2", version)
+	})
+}
+
 func (s *VaultSuite) TestEnableKV2EngineErrorIfNotForced() {
 	testCases := []struct {
 		name    string
