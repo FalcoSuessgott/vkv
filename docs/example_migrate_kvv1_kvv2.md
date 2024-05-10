@@ -23,13 +23,13 @@ successfully imported all secrets
 result:
 
 kvv2/
-└── v1: dev
+└── dev [v=2]
     ├── admin=****
 
 # verify
 $> vkv export -p kvv2 --show-values
 kvv2/
-└── v1: dev
+└── dev [v=1]
     ├── admin=user
     └── password=ok
 ```
@@ -54,7 +54,7 @@ engine/subpath/
 $> vkv export -p engine
 engine/
 └── subpath/
-    └── v1: dev
+    └── dev [v=1]
         ├── admin=****
         └── password=**
 ```
