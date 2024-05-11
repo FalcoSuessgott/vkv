@@ -37,8 +37,7 @@ func TestPrintJSON(t *testing.T) {
       "user": "password"
     }
   }
-}
-`,
+}`,
 		},
 		{
 			name:     "test: normal map to json only keys",
@@ -60,8 +59,7 @@ func TestPrintJSON(t *testing.T) {
       "user": ""
     }
   }
-}
-`,
+}`,
 		},
 	}
 

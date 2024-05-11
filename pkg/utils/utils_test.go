@@ -333,18 +333,22 @@ func TestToJson(t *testing.T) {
 		{
 			name: "test: normal map",
 			s: map[string]interface{}{
-				"key_1": "value",
-				"key_2": false,
+				"key_1":   "value",
+				"key_2":   false,
+				"special": "passw0rd<",
 			},
 			json: []byte(`{
   "key_1": "value",
-  "key_2": false
-}`),
+  "key_2": false,
+  "special": "passw0rd<"
+}
+`),
 		},
 		{
 			name: "test: empty map",
 			s:    map[string]interface{}{},
-			json: []byte("{}"),
+			json: []byte(`{}
+`),
 		},
 		{
 			name: "test: multiple values",
@@ -360,7 +364,8 @@ func TestToJson(t *testing.T) {
     "foo": "bar",
     "user": "password"
   }
-}`),
+}
+`),
 		},
 	}
 
