@@ -2,6 +2,7 @@ package utils
 
 // nolint: staticcheck
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"path"
@@ -100,12 +101,23 @@ func ToMapStringInterface(i interface{}) map[string]interface{} {
 
 // ToJSON marshalls a given map to json.
 func ToJSON(m interface{}) ([]byte, error) {
-	out, err := json.MarshalIndent(m, "", "  ")
+	// avoid encoding < and > to \u003c and \u003e
+	data := &bytes.Buffer{}
+	enc := json.NewEncoder(data)
+	enc.SetEscapeHTML(false)
+
+	err := enc.Encode(m)
 	if err != nil {
 		return nil, err
 	}
 
-	return out, nil
+	// pretty print json
+	res := &bytes.Buffer{}
+	if err := json.Indent(res, data.Bytes(), "", "  "); err != nil {
+		return nil, err
+	}
+
+	return res.Bytes(), nil
 }
 
 // FromJSON takes a json byte array and marshalls it into a map.

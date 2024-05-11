@@ -2,6 +2,7 @@ package secret
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
@@ -12,7 +13,7 @@ func (p *Printer) printJSON(secrets map[string]interface{}) error {
 		return err
 	}
 
-	fmt.Fprintln(p.writer, string(out))
+	fmt.Fprint(p.writer, strings.TrimSuffix(string(out), "\n"))
 
 	return nil
 }
