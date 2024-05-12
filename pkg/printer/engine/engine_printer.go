@@ -112,14 +112,14 @@ func (p *Printer) Out(engines map[string][]string) error {
 			return err
 		}
 
-		fmt.Fprintln(p.writer, string(out))
+		fmt.Fprint(p.writer, string(out))
 	case JSON:
 		out, err := utils.ToJSON(map[string]interface{}{"engines": utils.RemoveDuplicates(engineList)})
 		if err != nil {
 			return err
 		}
 
-		fmt.Fprintln(p.writer, string(out))
+		fmt.Fprint(p.writer, string(out))
 	case Base:
 		for _, k := range utils.RemoveDuplicates(engineList) {
 			fmt.Fprintln(p.writer, k)

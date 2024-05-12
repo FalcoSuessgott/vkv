@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/disiqueira/gotree/v3"
 	"github.com/savioxavier/termlink"
+	"github.com/xlab/treeprint"
 )
 
 func (p *Printer) printBase(enginePath string, secrets map[string]interface{}) error {
-	var tree gotree.Tree
+	var tree treeprint.Tree
 
 	m := make(map[string]interface{})
 
@@ -39,37 +39,38 @@ func (p *Printer) printBase(enginePath string, secrets map[string]interface{}) e
 			}
 		}
 
-		tree = gotree.New(baseName)
+		tree = treeprint.NewWithRoot(baseName)
 
 		m = utils.ToMapStringInterface(secrets[k])
 	}
 
 	for _, i := range utils.SortMapKeys(m) {
 		//nolint: forcetypeassert
-		tree.AddTree(p.printTree(enginePath, i, m[i].(map[string]interface{})))
+		tree.AddBranch(p.printTree(enginePath, i, m[i].(map[string]interface{})))
 	}
 
-	fmt.Fprint(p.writer, tree.Print())
+	fmt.Fprintln(p.writer, strings.TrimSpace(tree.String()))
 
 	return nil
 }
 
-func (p *Printer) printTree(rootPath, subPath string, m map[string]interface{}) gotree.Tree {
-	tree := gotree.New(p.buildTreeName(rootPath, subPath))
+func (p *Printer) printTree(rootPath, subPath string, m map[string]interface{}) treeprint.Tree {
+	tree := treeprint.NewWithRoot(p.buildTreeName(rootPath, subPath))
 
+	//nolint: nestif
 	if strings.HasSuffix(subPath, utils.Delimiter) {
 		for _, i := range utils.SortMapKeys(m) {
 			//nolint: forcetypeassert
-			tree.AddTree(p.printTree(rootPath, subPath+i, m[i].(map[string]interface{})))
+			tree.AddBranch(p.printTree(rootPath, subPath+i, m[i].(map[string]interface{})))
 		}
 	} else {
 		for _, k := range utils.SortMapKeys(m) {
 			if p.onlyKeys {
-				tree.Add(k)
+				tree.AddNode(k)
 			}
 
 			if !p.onlyKeys && !p.onlyPaths {
-				tree.Add(fmt.Sprintf("%s=%v", k, m[k]))
+				tree.AddNode(fmt.Sprintf("%s=%v", k, m[k]))
 			}
 		}
 	}

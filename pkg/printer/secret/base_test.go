@@ -91,6 +91,25 @@ func TestPrintBase(t *testing.T) {
     └── user
 `,
 		},
+		{
+			name:     "test: multiple lines",
+			rootPath: "root",
+			s: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"key":  "value",
+					"user": "value",
+				},
+			},
+			opts: []Option{
+				ToFormat(Base),
+				ShowValues(true),
+			},
+			output: `root/
+└── secret
+    ├── key=value
+    └── user=value
+`,
+		},
 	}
 
 	for _, tc := range testCases {
