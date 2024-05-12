@@ -77,7 +77,7 @@ func NewPrinter(opts ...Option) *Printer {
 	return p
 }
 
-// Out prits out namespaces in various formats.
+// Out prints out namespaces in various formats.
 // nolint: cyclop
 func (p *Printer) Out(ns map[string][]string) error {
 	nsList := p.buildNamespaceList(ns)
@@ -104,14 +104,14 @@ func (p *Printer) Out(ns map[string][]string) error {
 			return err
 		}
 
-		fmt.Fprintln(p.writer, string(out))
+		fmt.Fprint(p.writer, string(out))
 	case JSON:
 		out, err := utils.ToJSON(map[string]interface{}{"namespaces": utils.RemoveDuplicates(nsList)})
 		if err != nil {
 			return err
 		}
 
-		fmt.Fprintln(p.writer, string(out))
+		fmt.Fprint(p.writer, string(out))
 	case Base:
 		for _, k := range utils.RemoveDuplicates(nsList) {
 			fmt.Fprintln(p.writer, k)

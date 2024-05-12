@@ -98,7 +98,6 @@ a1
 			expected: `engines:
 - a
 - b
-
 `,
 		},
 		{

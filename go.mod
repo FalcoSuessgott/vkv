@@ -17,6 +17,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.31.0
 	github.com/testcontainers/testcontainers-go/modules/vault v0.31.0
+	github.com/xlab/treeprint v1.2.0
 	gotest.tools/gotestsum v1.11.0
 )
 

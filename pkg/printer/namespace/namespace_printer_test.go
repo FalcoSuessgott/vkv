@@ -106,7 +106,6 @@ a/a2
 			expected: `namespaces:
 - a
 - b
-
 `,
 		},
 		{
