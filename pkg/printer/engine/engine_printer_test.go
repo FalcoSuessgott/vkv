@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -11,7 +12,7 @@ import (
 func TestPrintEngines(t *testing.T) {
 	testCases := []struct {
 		name     string
-		ns       map[string][]string
+		ns       vault.Engines
 		opts     []Option
 		expected string
 		err      bool
@@ -130,7 +131,7 @@ p/b
 
 		tc.opts = append(tc.opts, WithWriter(&b))
 
-		p := NewPrinter(tc.opts...)
+		p := NewEnginePrinter(tc.opts...)
 
 		err := p.Out(tc.ns)
 

@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 )
 
 func (s *VaultSuite) TestValidateExportFlags() {
@@ -121,45 +121,45 @@ func (s *VaultSuite) TestExportImportCommand() {
 func (s *VaultSuite) TestExportOutputFormat() {
 	testCases := []struct {
 		name     string
-		expected printer.OutputFormat
+		expected prt.OutputFormat
 		err      bool
 	}{
 		{
 			name:     "json",
-			expected: printer.JSON,
+			expected: prt.JSON,
 		},
 		{
 			name:     "yaml",
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "yml",
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "invalid",
 			err:      true,
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "export",
-			expected: printer.Export,
+			expected: prt.Export,
 		},
 		{
 			name:     "markdown",
-			expected: printer.Markdown,
+			expected: prt.Markdown,
 		},
 		{
 			name:     "base",
-			expected: printer.Base,
+			expected: prt.Base,
 		},
 		{
 			name:     "template",
-			expected: printer.Template,
+			expected: prt.Template,
 		},
 		{
 			name:     "tmpl",
-			expected: printer.Template,
+			expected: prt.Template,
 		},
 	}
 

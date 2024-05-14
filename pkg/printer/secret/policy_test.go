@@ -36,7 +36,7 @@ func TestPrintPolicy(t *testing.T) {
 		var b bytes.Buffer
 		tc.opts = append(tc.opts, WithWriter(&b))
 
-		p := NewPrinter(tc.opts...)
+		p := NewSecretPrinter(tc.opts...)
 
 		require.NoError(t, p.printCapabilities(tc.caps))
 

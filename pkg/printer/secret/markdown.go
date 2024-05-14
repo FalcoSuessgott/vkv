@@ -8,8 +8,8 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func (p *Printer) printMarkdownTable(enginePath string, secrets map[string]interface{}) error {
-	headers, data := p.buildMarkdownTable(enginePath, secrets)
+func (p *Printer) printMarkdownTable(secrets map[string]interface{}) error {
+	headers, data := p.buildMarkdownTable(secrets)
 
 	table := tablewriter.NewWriter(p.writer)
 	table.SetHeader(headers)
@@ -23,7 +23,7 @@ func (p *Printer) printMarkdownTable(enginePath string, secrets map[string]inter
 }
 
 // nolint: gocognit, nestif, cyclop
-func (p *Printer) buildMarkdownTable(enginePath string, secrets map[string]interface{}) ([]string, [][]string) {
+func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, [][]string) {
 	data := [][]string{}
 	headers := []string{}
 
@@ -47,7 +47,7 @@ func (p *Printer) buildMarkdownTable(enginePath string, secrets map[string]inter
 		default:
 			headers = []string{"path", "key", "value"}
 
-			rootPath := enginePath
+			rootPath := p.enginePath
 			subPath := strings.ReplaceAll(k, rootPath, "")
 
 			for i, j := range utils.SortMapKeys(v) {

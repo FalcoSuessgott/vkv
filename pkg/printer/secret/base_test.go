@@ -114,14 +114,17 @@ func TestPrintBase(t *testing.T) {
 
 	for _, tc := range testCases {
 		var b bytes.Buffer
-		tc.opts = append(tc.opts, WithWriter(&b))
+		tc.opts = append(tc.opts,
+			WithWriter(&b),
+			WithEnginePath(tc.rootPath),
+		)
 
-		p := NewPrinter(tc.opts...)
+		p := NewSecretPrinter(tc.opts...)
 
 		m := map[string]interface{}{}
 
 		m[tc.rootPath+"/"] = tc.s
-		require.NoError(t, p.Out(tc.rootPath, m))
+		require.NoError(t, p.Out(m))
 		assert.Equal(t, tc.output, b.String(), tc.name)
 	}
 }

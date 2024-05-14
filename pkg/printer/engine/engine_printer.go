@@ -10,6 +10,7 @@ import (
 
 	"github.com/FalcoSuessgott/vkv/pkg/regex"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 )
 
 // OutputFormat enum of valid output formats.
@@ -30,7 +31,7 @@ var (
 	defaultWriter = os.Stdout
 
 	// ErrInvalidFormat invalid output format.
-	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, export, markdown)")
+	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json)")
 )
 
 // Option list of available options for modifying the output.
@@ -39,8 +40,8 @@ type Option func(*Printer)
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
 	format   OutputFormat
-	Regex    string
-	NSPrefix bool
+	regex    string
+	nsPrefix bool
 	writer   io.Writer
 }
 
@@ -54,14 +55,14 @@ func WithWriter(w io.Writer) Option {
 // WithRegex namespace regex.
 func WithRegex(r string) Option {
 	return func(p *Printer) {
-		p.Regex = r
+		p.regex = r
 	}
 }
 
 // WithNSPrefix print engines with their ns prefix.
 func WithNSPrefix(b bool) Option {
 	return func(p *Printer) {
-		p.NSPrefix = b
+		p.nsPrefix = b
 	}
 }
 
@@ -73,7 +74,7 @@ func ToFormat(format OutputFormat) Option {
 }
 
 // NewPrinter return a new printer struct.
-func NewPrinter(opts ...Option) *Printer {
+func NewEnginePrinter(opts ...Option) *Printer {
 	p := &Printer{
 		writer: defaultWriter,
 	}
@@ -87,14 +88,20 @@ func NewPrinter(opts ...Option) *Printer {
 
 // Out prints out engines.
 // nolint: cyclop
-func (p *Printer) Out(engines map[string][]string) error {
+func (p *Printer) Out(secrets interface{}) error {
+	engines, ok := secrets.(vault.Engines)
+
+	if !ok {
+		return fmt.Errorf("invalid engines type: %T", engines)
+	}
+
 	engineList := p.buildEngineList(engines)
 
 	if len(engineList) == 0 {
 		return errors.New("no engines found")
 	}
 
-	if p.Regex != "" {
+	if p.regex != "" {
 		var err error
 
 		engineList, err = p.applyRegex(engineList)
@@ -136,7 +143,7 @@ func (p *Printer) buildEngineList(engines map[string][]string) []string {
 
 	for ns, eng := range engines {
 		for _, e := range eng {
-			if p.NSPrefix {
+			if p.nsPrefix {
 				engineList = append(engineList, path.Join(ns, e))
 			} else {
 				engineList = append(engineList, e)
@@ -151,7 +158,7 @@ func (p *Printer) applyRegex(engines []string) ([]string, error) {
 	engineListRegex := make([]string, 0)
 
 	for _, e := range engines {
-		match, err := regex.MatchRegex(p.Regex, e)
+		match, err := regex.MatchRegex(p.regex, e)
 		if err != nil {
 			return nil, err
 		}

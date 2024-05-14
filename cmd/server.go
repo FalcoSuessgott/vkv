@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -21,8 +21,7 @@ type serverOptions struct {
 	SkipErrors   bool   `env:"SKIP_ERRORS" envDefault:"false"`
 	LoginCommand string `env:"LoginCommand"`
 
-	writer  *bytes.Buffer
-	printer *printer.Printer
+	writer *bytes.Buffer
 }
 
 func defaultServerOptions() *serverOptions {
@@ -47,13 +46,6 @@ func NewServerCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			o.printer = printer.NewPrinter(
-				printer.ShowValues(true),
-				printer.ToFormat(printer.Export),
-				printer.WithVaultClient(vaultClient),
-				printer.WithWriter(o.writer),
-			)
-
 			fmt.Fprintf(writer, "mirroring secrets from path: \"%s\" to \"%s/export\"\n", o.Path, o.Port)
 
 			return o.serve()
@@ -122,24 +114,36 @@ func (o *serverOptions) serve() error {
 	r.GET("/export", func(c *gin.Context) {
 		// get format specified per request via url query param
 		format, ok := c.GetQuery("format")
+		enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
+
+		opts := []prt.Option{
+			prt.ShowValues(true),
+			prt.WithVaultClient(vaultClient),
+			prt.WithWriter(o.writer),
+			prt.WithEnginePath(enginePath),
+			prt.ToFormat(prt.Export),
+		}
+
 		if ok {
 			switch strings.ToLower(format) {
 			case "yaml", "yml":
-				o.printer.WithOption(printer.ToFormat(printer.YAML))
+				opts = append(opts, prt.ToFormat(prt.YAML))
 			case "json":
-				o.printer.WithOption(printer.ToFormat(printer.JSON))
+				opts = append(opts, prt.ToFormat(prt.JSON))
 			case "export":
-				o.printer.WithOption(printer.ToFormat(printer.Export))
+				opts = append(opts, prt.ToFormat(prt.Export))
 			case "markdown":
-				o.printer.WithOption(printer.ToFormat(printer.Markdown))
+				opts = append(opts, prt.ToFormat(prt.Markdown))
 			case "base":
-				o.printer.WithOption(printer.ToFormat(printer.Base))
+				opts = append(opts, prt.ToFormat(prt.Base))
 			case "policy":
-				o.printer.WithOption(printer.ToFormat(printer.Policy))
+				opts = append(opts, prt.ToFormat(prt.Policy))
 			case "template", "tmpl":
-				o.printer.WithOption(printer.ToFormat(printer.Template))
+				opts = append(opts, prt.ToFormat(prt.Template))
 			}
 		}
+
+		printer = prt.NewSecretPrinter(opts...)
 
 		c.Data(200, "text/plain", o.readSecrets())
 	})
@@ -155,9 +159,7 @@ func (o *serverOptions) readSecrets() []byte {
 		log.Fatal(err)
 	}
 
-	enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
-
-	if err := o.printer.Out(enginePath, m); err != nil {
+	if err := printer.Out(m); err != nil {
 		log.Fatal(err)
 	}
 

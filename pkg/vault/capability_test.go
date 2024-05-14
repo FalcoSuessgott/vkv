@@ -12,7 +12,7 @@ func (s *VaultSuite) TestGetCapabilities() {
 		name     string
 		rootPath string
 		subPath  string
-		s        map[string]interface{}
+		s        Secrets
 		expected *Capability
 	}{
 		{

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -11,7 +12,7 @@ import (
 func TestPrintExport(t *testing.T) {
 	testCases := []struct {
 		name     string
-		s        map[string]interface{}
+		s        vault.Secrets
 		rootPath string
 		opts     []Option
 		output   string
@@ -48,12 +49,12 @@ export user='password'
 		var b bytes.Buffer
 		tc.opts = append(tc.opts, WithWriter(&b))
 
-		p := NewPrinter(tc.opts...)
+		p := NewSecretPrinter(tc.opts...)
 
 		m := map[string]interface{}{}
 
 		m[tc.rootPath+"/"] = tc.s
-		require.NoError(t, p.Out(tc.rootPath, m))
+		require.NoError(t, p.Out(m))
 		assert.Equal(t, tc.output, b.String(), tc.name)
 	}
 }

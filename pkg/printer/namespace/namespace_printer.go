@@ -10,6 +10,7 @@ import (
 
 	"github.com/FalcoSuessgott/vkv/pkg/regex"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 )
 
 // OutputFormat enum of valid output formats.
@@ -30,7 +31,7 @@ var (
 	defaultWriter = os.Stdout
 
 	// ErrInvalidFormat invalid output format.
-	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, export, markdown)")
+	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, markdown)")
 )
 
 // Option list of available options for modifying the output.
@@ -39,7 +40,7 @@ type Option func(*Printer)
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
 	format OutputFormat
-	Regex  string
+	regex  string
 	writer io.Writer
 }
 
@@ -53,7 +54,7 @@ func WithWriter(w io.Writer) Option {
 // WithRegex namespace regex.
 func WithRegex(r string) Option {
 	return func(p *Printer) {
-		p.Regex = r
+		p.regex = r
 	}
 }
 
@@ -65,7 +66,7 @@ func ToFormat(format OutputFormat) Option {
 }
 
 // NewPrinter return a new printer struct.
-func NewPrinter(opts ...Option) *Printer {
+func NewNamespacePrinter(opts ...Option) *Printer {
 	p := &Printer{
 		writer: defaultWriter,
 	}
@@ -79,14 +80,19 @@ func NewPrinter(opts ...Option) *Printer {
 
 // Out prints out namespaces in various formats.
 // nolint: cyclop
-func (p *Printer) Out(ns map[string][]string) error {
+func (p *Printer) Out(secrets interface{}) error {
+	ns, ok := secrets.(vault.Namespaces)
+	if !ok {
+		return fmt.Errorf("invalid namespace type. Got: %T, want: map[string][]string", ns)
+	}
+
 	nsList := p.buildNamespaceList(ns)
 
 	if len(ns) == 0 {
 		return errors.New("no namespaces found")
 	}
 
-	if p.Regex != "" {
+	if p.regex != "" {
 		var err error
 
 		nsList, err = p.applyRegex(nsList)
@@ -147,7 +153,7 @@ func (p *Printer) applyRegex(nsList []string) ([]string, error) {
 	nsListRegex := make([]string, 0)
 
 	for _, k := range nsList {
-		match, err := regex.MatchRegex(p.Regex, k)
+		match, err := regex.MatchRegex(p.regex, k)
 		if err != nil {
 			return nil, err
 		}

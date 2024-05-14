@@ -3,6 +3,7 @@ package secret
 import (
 	"testing"
 
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -10,8 +11,8 @@ func TestMaskSecrets(t *testing.T) {
 	testCases := []struct {
 		name    string
 		options []Option
-		input   map[string]interface{}
-		output  map[string]interface{}
+		input   vault.Secrets
+		output  vault.Secrets
 	}{
 		{
 			name:    "test: normal secrets",
@@ -46,7 +47,7 @@ func TestMaskSecrets(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		p := NewPrinter(tc.options...)
+		p := NewSecretPrinter(tc.options...)
 
 		p.maskValues(tc.input)
 

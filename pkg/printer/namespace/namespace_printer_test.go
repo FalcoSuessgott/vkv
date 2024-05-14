@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -11,7 +12,7 @@ import (
 func TestPrintNamespaces(t *testing.T) {
 	testCases := []struct {
 		name     string
-		ns       map[string][]string
+		ns       vault.Namespaces
 		opts     []Option
 		expected string
 		err      bool
@@ -126,13 +127,14 @@ a/a2
 
 		tc.opts = append(tc.opts, WithWriter(&b))
 
-		p := NewPrinter(tc.opts...)
+		p := NewNamespacePrinter(tc.opts...)
 
 		err := p.Out(tc.ns)
 
 		if tc.err {
-			require.Error(t, err)
+			require.Error(t, err, tc.name)
 		} else {
+			require.NoError(t, err, tc.name)
 			assert.Equal(t, tc.expected, b.String(), tc.name)
 		}
 	}

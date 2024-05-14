@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/namespace"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/namespace"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
@@ -19,7 +19,7 @@ type listNamespaceOptions struct {
 	All          bool   `env:"ALL"`
 	FormatString string `env:"FORMAT" envDefault:"base"`
 
-	outputFormat printer.OutputFormat
+	outputFormat prt.OutputFormat
 }
 
 func newListNamespacesCmd() *cobra.Command {
@@ -55,10 +55,10 @@ func newListNamespacesCmd() *cobra.Command {
 				}
 			}
 
-			return printer.NewPrinter(
-				printer.ToFormat(o.outputFormat),
-				printer.WithWriter(writer),
-				printer.WithRegex(o.Regex),
+			return prt.NewNamespacePrinter(
+				prt.ToFormat(o.outputFormat),
+				prt.WithWriter(writer),
+				prt.WithRegex(o.Regex),
 			).Out(namespaces)
 		},
 	}
@@ -76,13 +76,13 @@ func newListNamespacesCmd() *cobra.Command {
 func (o *listNamespaceOptions) Validate() error {
 	switch strings.ToLower(o.FormatString) {
 	case "yaml", "yml":
-		o.outputFormat = printer.YAML
+		o.outputFormat = prt.YAML
 	case "json":
-		o.outputFormat = printer.JSON
+		o.outputFormat = prt.JSON
 	case "base":
-		o.outputFormat = printer.Base
+		o.outputFormat = prt.Base
 	default:
-		return printer.ErrInvalidFormat
+		return prt.ErrInvalidFormat
 	}
 
 	return nil
