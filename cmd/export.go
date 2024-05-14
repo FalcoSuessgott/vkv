@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -32,7 +32,7 @@ type exportOptions struct {
 
 	FormatString string `env:"FORMAT" envDefault:"base"`
 
-	outputFormat printer.OutputFormat
+	outputFormat prt.OutputFormat
 }
 
 // NewExportCmd export subcommand.
@@ -52,18 +52,21 @@ func NewExportCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			printer := printer.NewPrinter(
-				printer.OnlyKeys(o.OnlyKeys),
-				printer.OnlyPaths(o.OnlyPaths),
-				printer.CustomValueLength(o.MaxValueLength),
-				printer.ShowValues(o.ShowValues),
-				printer.WithTemplate(o.TemplateString, o.TemplateFile),
-				printer.ToFormat(o.outputFormat),
-				printer.WithVaultClient(vaultClient),
-				printer.WithWriter(writer),
-				printer.ShowVersion(o.ShowVersion),
-				printer.ShowMetadata(o.ShowMetadata),
-				printer.WithHyperLinks(o.WithHyperLink),
+			enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
+
+			printer = prt.NewSecretPrinter(
+				prt.OnlyKeys(o.OnlyKeys),
+				prt.OnlyPaths(o.OnlyPaths),
+				prt.CustomValueLength(o.MaxValueLength),
+				prt.ShowValues(o.ShowValues),
+				prt.WithTemplate(o.TemplateString, o.TemplateFile),
+				prt.ToFormat(o.outputFormat),
+				prt.WithVaultClient(vaultClient),
+				prt.WithWriter(writer),
+				prt.ShowVersion(o.ShowVersion),
+				prt.ShowMetadata(o.ShowMetadata),
+				prt.WithHyperLinks(o.WithHyperLink),
+				prt.WithEnginePath(enginePath),
 			)
 
 			// prepare map
@@ -72,10 +75,7 @@ func NewExportCmd() *cobra.Command {
 				return err
 			}
 
-			// print secrets
-			enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
-
-			if err := printer.Out(enginePath, m); err != nil {
+			if err := printer.Out(m); err != nil {
 				return err
 			}
 
@@ -125,34 +125,34 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	case true:
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":
-			o.outputFormat = printer.YAML
+			o.outputFormat = prt.YAML
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.MaxValueLength = -1
 			o.ShowValues = true
 		case "json":
-			o.outputFormat = printer.JSON
+			o.outputFormat = prt.JSON
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.MaxValueLength = -1
 			o.ShowValues = true
 		case "export":
-			o.outputFormat = printer.Export
+			o.outputFormat = prt.Export
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.ShowValues = true
 			o.MaxValueLength = -1
 		case "markdown":
-			o.outputFormat = printer.Markdown
+			o.outputFormat = prt.Markdown
 		case "base":
-			o.outputFormat = printer.Base
+			o.outputFormat = prt.Base
 		case "policy":
-			o.outputFormat = printer.Policy
+			o.outputFormat = prt.Policy
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.ShowValues = true
 		case "template", "tmpl":
-			o.outputFormat = printer.Template
+			o.outputFormat = prt.Template
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.MaxValueLength = -1
@@ -165,7 +165,7 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
 			}
 		default:
-			return printer.ErrInvalidFormat
+			return prt.ErrInvalidFormat
 		}
 	}
 

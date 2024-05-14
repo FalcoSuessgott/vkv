@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
@@ -72,17 +72,18 @@ func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string
 
 			b := bytes.NewBufferString("")
 
-			p := printer.NewPrinter(
-				printer.CustomValueLength(-1),
-				printer.ShowValues(true),
-				printer.ToFormat(printer.JSON),
-				printer.WithVaultClient(v),
-				printer.WithWriter(b),
-				printer.ShowVersion(false),
-				printer.ShowMetadata(false),
+			printer = prt.NewSecretPrinter(
+				prt.CustomValueLength(-1),
+				prt.ShowValues(true),
+				prt.ToFormat(prt.JSON),
+				prt.WithVaultClient(v),
+				prt.WithWriter(b),
+				prt.ShowVersion(false),
+				prt.ShowMetadata(false),
+				prt.WithEnginePath(strings.TrimSuffix(e, utils.Delimiter)),
 			)
 
-			if err := p.Out(strings.TrimSuffix(e, utils.Delimiter), utils.ToMapStringInterface(out)); err != nil {
+			if err := printer.Out(utils.ToMapStringInterface(out)); err != nil {
 				return err
 			}
 

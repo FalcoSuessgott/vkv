@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/engine"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/engine"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 )
 
@@ -70,29 +70,29 @@ secret_2/
 func (s *VaultSuite) TestEnginesOutputFormat() {
 	testCases := []struct {
 		name     string
-		expected printer.OutputFormat
+		expected prt.OutputFormat
 		err      bool
 	}{
 		{
 			name:     "json",
-			expected: printer.JSON,
+			expected: prt.JSON,
 		},
 		{
 			name:     "yaml",
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "yml",
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "invalid",
 			err:      true,
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "base",
-			expected: printer.Base,
+			expected: prt.Base,
 		},
 	}
 

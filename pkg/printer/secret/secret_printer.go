@@ -47,7 +47,7 @@ var (
 	defaultWriter = os.Stdout
 
 	// ErrInvalidFormat invalid output format.
-	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, export, markdown)")
+	ErrInvalidFormat = errors.New("invalid format (valid options: base, yaml, json, export, markdown, template, policy)")
 )
 
 // Option list of available options for modifying the output.
@@ -55,6 +55,7 @@ type Option func(*Printer)
 
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
+	enginePath     string
 	format         OutputFormat
 	writer         io.Writer
 	onlyKeys       bool
@@ -172,8 +173,14 @@ func WithVaultClient(v *vault.Vault) Option {
 	}
 }
 
+func WithEnginePath(path string) Option {
+	return func(p *Printer) {
+		p.enginePath = path
+	}
+}
+
 // NewPrinter return a new printer struct.
-func NewPrinter(opts ...Option) *Printer {
+func NewSecretPrinter(opts ...Option) *Printer {
 	p := &Printer{
 		writer:      defaultWriter,
 		valueLength: MaxValueLength,
@@ -186,42 +193,40 @@ func NewPrinter(opts ...Option) *Printer {
 	return p
 }
 
-func (p *Printer) WithOption(opt Option) {
-	opt(p)
-}
-
 // Out prints out the secrets according all configured options.
 // nolint: cyclop
-func (p *Printer) Out(enginePath string, secrets map[string]interface{}) error {
-	for k, v := range secrets {
+func (p *Printer) Out(secrets interface{}) error {
+	secretMap := utils.ToMapStringInterface(secrets)
+
+	for k, v := range secretMap {
 		if !p.showValues {
-			secrets[k] = p.maskValues(utils.ToMapStringInterface(v))
+			secretMap[k] = p.maskValues(utils.ToMapStringInterface(v))
 		}
 
 		if p.onlyPaths {
-			secrets[k] = p.printOnlyPaths(utils.ToMapStringInterface(v))
+			secretMap[k] = p.printOnlyPaths(utils.ToMapStringInterface(v))
 		}
 
 		if p.onlyKeys {
-			secrets[k] = p.printOnlykeys(utils.ToMapStringInterface(v))
+			secretMap[k] = p.printOnlykeys(utils.ToMapStringInterface(v))
 		}
 	}
 
 	switch p.format {
 	case YAML:
-		return p.printYAML(secrets)
+		return p.printYAML(secretMap)
 	case JSON:
-		return p.printJSON(secrets)
+		return p.printJSON(secretMap)
 	case Export:
-		return p.printExport(secrets)
+		return p.printExport(secretMap)
 	case Markdown:
-		return p.printMarkdownTable(enginePath, secrets)
+		return p.printMarkdownTable(secretMap)
 	case Template:
-		return p.printTemplate(secrets)
+		return p.printTemplate(secretMap)
 	case Base:
-		return p.printBase(enginePath, secrets)
+		return p.printBase(secretMap)
 	case Policy:
-		return p.printPolicy(secrets)
+		return p.printPolicy(secretMap)
 	default:
 		return ErrInvalidFormat
 	}

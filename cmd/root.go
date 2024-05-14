@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
 )
@@ -28,6 +29,8 @@ var (
 	errInvalidFlagCombination = errors.New("invalid flag combination specified")
 	vaultClient               *vault.Vault
 	writer                    io.Writer
+
+	printer prt.Printer
 )
 
 // NewRootCmd vkv root command.

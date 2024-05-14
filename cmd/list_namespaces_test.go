@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/namespace"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/namespace"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/stretchr/testify/assert"
@@ -78,38 +78,38 @@ func TestNamespaceOutputFormat(t *testing.T) {
 	testCases := []struct {
 		name     string
 		format   string
-		expected printer.OutputFormat
+		expected prt.OutputFormat
 		err      bool
 	}{
 		{
 			name:     "json",
 			err:      false,
 			format:   "json",
-			expected: printer.JSON,
+			expected: prt.JSON,
 		},
 		{
 			name:     "yaml",
 			err:      false,
 			format:   "YamL",
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "yml",
 			err:      false,
 			format:   "yml",
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "invalid",
 			err:      true,
 			format:   "invalid",
-			expected: printer.YAML,
+			expected: prt.YAML,
 		},
 		{
 			name:     "base",
 			err:      false,
 			format:   "base",
-			expected: printer.Base,
+			expected: prt.Base,
 		},
 	}
 
@@ -121,7 +121,7 @@ func TestNamespaceOutputFormat(t *testing.T) {
 		err := o.Validate()
 
 		if tc.err {
-			require.ErrorIs(t, err, printer.ErrInvalidFormat, tc.name)
+			require.ErrorIs(t, err, prt.ErrInvalidFormat, tc.name)
 		} else {
 			require.NoError(t, err, tc.name, tc.name)
 			assert.Equal(t, tc.expected, o.outputFormat, tc.name)

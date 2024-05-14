@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	printer "github.com/FalcoSuessgott/vkv/pkg/printer/engine"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer/engine"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
@@ -21,7 +21,7 @@ type listEnginesOptions struct {
 
 	FormatString string `env:"FORMAT" envDefault:"base"`
 
-	outputFormat printer.OutputFormat
+	outputFormat prt.OutputFormat
 }
 
 func newListEngineCmd() *cobra.Command {
@@ -41,22 +41,23 @@ func newListEngineCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.Validate,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			printer = prt.NewEnginePrinter(
+				prt.ToFormat(o.outputFormat),
+				prt.WithWriter(writer),
+				prt.WithRegex(o.Regex),
+				prt.WithNSPrefix(o.Prefix),
+			)
 			if !o.All {
-				if engines, err = o.listEngines(vaultClient); err != nil {
+				if engines, err = o.listEngines(); err != nil {
 					return err
 				}
 			} else {
-				if engines, err = o.listAllEngines(vaultClient); err != nil {
+				if engines, err = o.listAllEngines(); err != nil {
 					return err
 				}
 			}
 
-			return printer.NewPrinter(
-				printer.ToFormat(o.outputFormat),
-				printer.WithWriter(writer),
-				printer.WithRegex(o.Regex),
-				printer.WithNSPrefix(o.Prefix),
-			).Out(engines)
+			return printer.Out(engines)
 		},
 	}
 
@@ -75,20 +76,20 @@ func newListEngineCmd() *cobra.Command {
 func (o *listEnginesOptions) Validate(cmd *cobra.Command, args []string) error {
 	switch strings.ToLower(o.FormatString) {
 	case "yaml", "yml":
-		o.outputFormat = printer.YAML
+		o.outputFormat = prt.YAML
 	case "json":
-		o.outputFormat = printer.JSON
+		o.outputFormat = prt.JSON
 	case "base":
-		o.outputFormat = printer.Base
+		o.outputFormat = prt.Base
 	default:
-		return printer.ErrInvalidFormat
+		return prt.ErrInvalidFormat
 	}
 
 	return nil
 }
 
-func (o *listEnginesOptions) listEngines(v *vault.Vault) (vault.Engines, error) {
-	engines, err := v.ListKVSecretEngines(o.Namespace)
+func (o *listEnginesOptions) listEngines() (vault.Engines, error) {
+	engines, err := vaultClient.ListKVSecretEngines(o.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +100,8 @@ func (o *listEnginesOptions) listEngines(v *vault.Vault) (vault.Engines, error) 
 	return m, nil
 }
 
-func (o *listEnginesOptions) listAllEngines(v *vault.Vault) (vault.Engines, error) {
-	engines, err := v.ListAllKVSecretEngines(o.Namespace)
+func (o *listEnginesOptions) listAllEngines() (vault.Engines, error) {
+	engines, err := vaultClient.ListAllKVSecretEngines(o.Namespace)
 	if err != nil {
 		return nil, err
 	}
