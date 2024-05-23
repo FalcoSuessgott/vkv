@@ -8,23 +8,28 @@ linters:
     - testpackage
     - forbidigo
     - paralleltest
-    - err113
     - wrapcheck
     - gochecknoglobals
     - varnamelen
     - funlen
     - gomnd
     - containedctx
-    - ireturn
+    - nlreturn
+    - wsl
+    - err113
     - exhaustruct
     - nolintlint
     - maintidx
     - mnd
     - dupl
-    - goimports
-    - gci
-    - gofmt
-    - gofumpt
     - revive
     - depguard
     - tagalign
+    - perfsprint
+    - godox
+    - intrange
+    - copyloopvar
+    - gomoddirectives
+    - goconst
+    - godot
+    - execinquery

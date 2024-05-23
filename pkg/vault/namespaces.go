@@ -4,15 +4,34 @@ import (
 	"fmt"
 	"path"
 	"sort"
+
+	"github.com/FalcoSuessgott/vkv/pkg/markdown"
+	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
-const (
-	listNamespaces  = "sys/namespaces"
-	createNamespace = "sys/namespaces/%s"
-)
+func (ns *Namespaces) PrintJSON() ([]byte, error) {
+	return utils.ToJSON(ns)
+}
 
-// Namespaces represents vault hierarchical namespaces.
-type Namespaces map[string][]string
+func (ns *Namespaces) PrintYAML() ([]byte, error) {
+	return utils.ToYAML(ns)
+}
+
+func (ns *Namespaces) PrintMarkdown() ([]byte, error) {
+	out, err := markdown.Table([]string{"test"}, [][]string{
+		{"ok"},
+		{"test"},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return out, nil
+}
+
+func (ns *Namespaces) PrintBase() ([]byte, error) {
+	return nil, nil
+}
 
 // ListAllNamespaces lists all namespaces of a specified namespace recursively.
 func (v *Vault) ListAllNamespaces(ns string) (Namespaces, error) {

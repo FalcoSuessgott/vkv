@@ -41,12 +41,12 @@ func newListEngineCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.Validate,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			printer = prt.NewEnginePrinter(
-				prt.ToFormat(o.outputFormat),
-				prt.WithWriter(writer),
-				prt.WithRegex(o.Regex),
-				prt.WithNSPrefix(o.Prefix),
-			)
+			// printer = prt.NewEnginePrinter(
+			// 	prt.ToFormat(o.outputFormat),
+			// 	prt.WithWriter(writer),
+			// 	prt.WithRegex(o.Regex),
+			// 	prt.WithNSPrefix(o.Prefix),
+			// )
 			if !o.All {
 				if engines, err = o.listEngines(); err != nil {
 					return err
@@ -57,7 +57,8 @@ func newListEngineCmd() *cobra.Command {
 				}
 			}
 
-			return printer.Out(engines)
+			return nil
+			// return printer.Out(engines)
 		},
 	}
 

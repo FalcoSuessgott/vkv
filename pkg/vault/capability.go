@@ -5,20 +5,6 @@ import (
 	"log"
 )
 
-const (
-	has    = "✔"
-	hasNot = "✖"
-
-	capCreate = "create"
-	capRead   = "read"
-	capUpdate = "update"
-	capDelete = "delete"
-	capList   = "list"
-	capRoot   = "root"
-
-	capabilities = "sys/capabilities-self"
-)
-
 // Capability represents a tokens caps for a specific path.
 type Capability struct {
 	Create bool

@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"log"
 	"os"
 	"runtime"
@@ -37,6 +38,7 @@ func (s *VaultSuite) SetupSubTest() {
 	}
 
 	s.client = v
+	s.client.Context = context.Background()
 }
 
 func (s *VaultSuite) TestNewClient() {
@@ -100,7 +102,7 @@ func (s *VaultSuite) TestNewClient() {
 			}
 
 			// auth
-			_, err := NewDefaultClient()
+			_, err := NewDefaultClient(context.Background())
 
 			// assertions
 			if tc.err {
