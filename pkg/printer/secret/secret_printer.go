@@ -198,19 +198,19 @@ func NewSecretPrinter(opts ...Option) *Printer {
 func (p *Printer) Out(secrets interface{}) error {
 	secretMap := utils.ToMapStringInterface(secrets)
 
-	for k, v := range secretMap {
-		if !p.showValues {
-			secretMap[k] = p.maskValues(utils.ToMapStringInterface(v))
-		}
+	// for k, v := range secretMap {
+	// 	if !p.showValues {
+	// 		secretMap[k] = p.maskValues(utils.ToMapStringInterface(v))
+	// 	}
 
-		if p.onlyPaths {
-			secretMap[k] = p.printOnlyPaths(utils.ToMapStringInterface(v))
-		}
+	// 	if p.onlyPaths {
+	// 		secretMap[k] = p.printOnlyPaths(utils.ToMapStringInterface(v))
+	// 	}
 
-		if p.onlyKeys {
-			secretMap[k] = p.printOnlykeys(utils.ToMapStringInterface(v))
-		}
-	}
+	// 	if p.onlyKeys {
+	// 		secretMap[k] = p.printOnlykeys(utils.ToMapStringInterface(v))
+	// 	}
+	// }
 
 	switch p.format {
 	case YAML:

@@ -9,6 +9,7 @@ import (
 
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +17,8 @@ import (
 type exportOptions struct {
 	Path       string `env:"PATH"`
 	EnginePath string `env:"ENGINE_PATH"`
+
+	AllVersions bool `env:"ALL_VERSIONS" envDefault:"true"`
 
 	OnlyKeys       bool `env:"ONLY_KEYS"`
 	OnlyPaths      bool `env:"ONLY_PATHS"`
@@ -69,15 +72,27 @@ func NewExportCmd() *cobra.Command {
 				prt.WithEnginePath(enginePath),
 			)
 
-			// prepare map
-			m, err := o.buildMap()
+			rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
+
+			engine, err := vault.NewEngine(vaultClient, rootPath)
 			if err != nil {
 				return err
 			}
 
-			if err := printer.Out(m); err != nil {
+			err = engine.ListRecursive2(rootPath, subPath, false, o.AllVersions)
+			if err != nil {
 				return err
 			}
+
+			secrets := make(map[string]interface{})
+
+			for path, secret := range engine.Secrets {
+				m := utils.PathMap2(path, secret, true)
+
+				secrets = utils.DeepMergeMaps(secrets, m)
+			}
+
+			printer.Out(secrets)
 
 			return nil
 		},
@@ -89,6 +104,8 @@ func NewExportCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, fmt.Sprintf("KV Engine path (env: %s)", envVarExportPrefix+"_PATH"))
 	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path value will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_EXPORT_ENGINE_PATH)")
 	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "dont exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)")
+
+	cmd.Flags().BoolVarP(&o.AllVersions, "all-versions", "v", o.AllVersions, "prints out all secrets versions) (env: VKV_EXPORT_ALL_VERSIONS)")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")
@@ -111,6 +128,12 @@ func NewExportCmd() *cobra.Command {
 		"(env: VKV_EXPORT_FORMAT)")
 
 	return cmd
+}
+
+func prepMap(m map[string]interface{}, k string) map[string]interface{} {
+	m[k] = map[string]interface{}{}
+
+	return m
 }
 
 // nolint: cyclop, goconst

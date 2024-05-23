@@ -10,7 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/caarlos0/env/v6"
+	"github.com/SerhiiCho/timeago/v2"
+	"github.com/caarlos0/env/v11"
 	"github.com/ghodss/yaml"
 )
 
@@ -48,6 +49,29 @@ func PathMap(path string, s map[string]interface{}, isSecretPath bool) map[strin
 
 	if len(parts) > 1 {
 		m[parts[0]+Delimiter] = PathMap(strings.Join(parts[1:], Delimiter), s, isSecretPath)
+	} else {
+		// if path leads to a vault kv directory, append a "/"
+		if !isSecretPath {
+			path += Delimiter
+		}
+
+		m[path] = s
+	}
+
+	return m
+}
+
+func PathMap2(path string, s interface{}, isSecretPath bool) map[string]interface{} {
+	m := map[string]interface{}{}
+
+	parts := strings.Split(path, Delimiter)
+
+	// if path == "" {
+	// 	return s
+	// }
+
+	if len(parts) > 1 {
+		m[parts[0]+Delimiter] = PathMap2(strings.Join(parts[1:], Delimiter), s, isSecretPath)
 	} else {
 		// if path leads to a vault kv directory, append a "/"
 		if !isSecretPath {
@@ -249,9 +273,13 @@ func ParseEnvs(prefix string, i interface{}) error {
 		Prefix: prefix,
 	}
 
-	if err := env.Parse(i, opts); err != nil {
+	if err := env.ParseWithOptions(i, opts); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func TimeAgo(t string) string {
+	return timeago.Parse(t, "noSuffix")
 }

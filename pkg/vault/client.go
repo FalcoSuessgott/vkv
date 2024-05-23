@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -13,6 +14,25 @@ import (
 // Vault represents a vault struct used for reading and writing secrets.
 type Vault struct {
 	Client *api.Client
+
+	Context context.Context
+}
+
+type Engine struct {
+	*Vault
+
+	Type        string
+	Description string
+	Secrets     map[string][]*Secret
+}
+
+type Secret struct {
+	Data               map[string]interface{}
+	CustomMetadata     map[string]interface{}
+	Version            int
+	VersionCreatedTime string
+	Destroyed          bool
+	Deleted            bool
 }
 
 // NewDefaultClient returns a new vault client wrapper.
@@ -63,7 +83,34 @@ func NewDefaultClient() (*Vault, error) {
 		return nil, fmt.Errorf("not authenticated. Perhaps not a valid token: %w", err)
 	}
 
-	return &Vault{Client: c}, nil
+	return &Vault{
+		Client:  c,
+		Context: context.Background(),
+	}, nil
+}
+
+// NewEngine returns a new engine struct.
+func NewEngine(v *Vault, rootPath string) (*Engine, error) {
+	engine := &Engine{
+		Vault:   v,
+		Secrets: make(map[string][]*Secret),
+	}
+
+	desc, err := v.GetEngineDescription(rootPath)
+	if err != nil {
+		return nil, err
+	}
+
+	engine.Description = desc
+
+	engineType, version, err := v.GetEngineTypeVersion(rootPath)
+	if err != nil {
+		return nil, err
+	}
+
+	engine.Type = engineType + version
+
+	return engine, nil
 }
 
 // NewClient returns a new vault client wrapper.
