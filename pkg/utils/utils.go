@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/SerhiiCho/timeago/v2"
 	"github.com/caarlos0/env/v11"
@@ -36,49 +37,15 @@ func TransformMap(p string, m map[string]interface{}, s *map[string]interface{})
 	}
 }
 
-// PathMap takes a path like "a/b/c" and returns a map like map[a] -> map[b] -> map[c].
-// if isSecretPath is true, then c does not have a / as suffix.
-func PathMap(path string, s map[string]interface{}, isSecretPath bool) map[string]interface{} {
-	m := map[string]interface{}{}
+func PathMap[T any](path string, v []*T) map[string]any {
+	m := map[string]any{}
 
 	parts := strings.Split(path, Delimiter)
 
-	if path == "" {
-		return s
-	}
-
 	if len(parts) > 1 {
-		m[parts[0]+Delimiter] = PathMap(strings.Join(parts[1:], Delimiter), s, isSecretPath)
+		m[parts[0]+Delimiter] = PathMap[T](strings.Join(parts[1:], Delimiter), v)
 	} else {
-		// if path leads to a vault kv directory, append a "/"
-		if !isSecretPath {
-			path += Delimiter
-		}
-
-		m[path] = s
-	}
-
-	return m
-}
-
-func PathMap2(path string, s interface{}, isSecretPath bool) map[string]interface{} {
-	m := map[string]interface{}{}
-
-	parts := strings.Split(path, Delimiter)
-
-	// if path == "" {
-	// 	return s
-	// }
-
-	if len(parts) > 1 {
-		m[parts[0]+Delimiter] = PathMap2(strings.Join(parts[1:], Delimiter), s, isSecretPath)
-	} else {
-		// if path leads to a vault kv directory, append a "/"
-		if !isSecretPath {
-			path += Delimiter
-		}
-
-		m[path] = s
+		m[path] = v
 	}
 
 	return m
@@ -280,6 +247,6 @@ func ParseEnvs(prefix string, i interface{}) error {
 	return nil
 }
 
-func TimeAgo(t string) string {
-	return timeago.Parse(t, "noSuffix")
+func TimeAgo(t time.Time) string {
+	return timeago.Parse(t)
 }

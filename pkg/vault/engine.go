@@ -8,14 +8,6 @@ import (
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
-const (
-	mountEnginePath   = "sys/mounts/%s"
-	listSecretEngines = "sys/mounts"
-)
-
-// Engines struct that hols all engines key is the namespace.
-type Engines map[string][]string
-
 // GetEngineDescription returns the description of the engine.
 func (v *Vault) GetEngineDescription(rootPath string) (string, error) {
 	data, err := v.Client.Logical().Read(fmt.Sprintf(mountEnginePath, rootPath))
