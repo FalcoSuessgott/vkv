@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -29,8 +30,7 @@ var (
 	errInvalidFlagCombination = errors.New("invalid flag combination specified")
 	vaultClient               *vault.Vault
 	writer                    io.Writer
-
-	printer prt.Printer
+	printer                   prt.Printer
 )
 
 // NewRootCmd vkv root command.
@@ -54,7 +54,7 @@ func NewRootCmd() *cobra.Command {
 			}
 
 			// otherwise create a new vault client
-			vc, err := vault.NewDefaultClient()
+			vc, err := vault.NewDefaultClient(context.Background())
 			if err != nil {
 				return err
 			}
