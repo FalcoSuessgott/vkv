@@ -8,6 +8,7 @@ import (
 
 	"github.com/FalcoSuessgott/vkv/pkg/exec"
 	"github.com/hashicorp/vault/api"
+	"github.com/hashicorp/vault/api/tokenhelper"
 )
 
 // Vault represents a vault struct used for reading and writing secrets.
@@ -17,18 +18,30 @@ type Vault struct {
 
 // NewDefaultClient returns a new vault client wrapper.
 func NewDefaultClient() (*Vault, error) {
-	// error if no VAULT_ADDR exported
-	_, ok := os.LookupEnv("VAULT_ADDR")
-	if !ok {
-		return nil, errors.New("VAULT_ADDR required but not set")
+	// create vault client using defaults (recommended)
+	c, err := api.NewClient(nil)
+	if err != nil {
+		return nil, err
 	}
 
-	// get vault token
-	vaultToken, tokenExported := os.LookupEnv("VAULT_TOKEN")
+	// use tokenhelper if available
+	th, err := tokenhelper.NewInternalTokenHelper()
+	if err != nil {
+		return nil, fmt.Errorf("error creating default token helper: %w", err)
+	}
 
-	// if none exported, check for VKV_LOGIN_COMMAND, execute it, and set the output as token
+	token, err := th.Get()
+	if err != nil {
+		return nil, fmt.Errorf("error getting token from default token helper: %w", err)
+	}
+
+	if token != "" {
+		c.SetToken(token)
+	}
+
+	// custom: if VKV_LOGIN_COMMAND is set, execute it and set the output as token
 	cmd, ok := os.LookupEnv("VKV_LOGIN_COMMAND")
-	if !tokenExported && ok {
+	if ok && cmd != "" {
 		cmdParts := strings.Split(cmd, " ")
 
 		token, err := exec.Run(cmdParts)
@@ -36,31 +49,18 @@ func NewDefaultClient() (*Vault, error) {
 			return nil, fmt.Errorf("error running VKV_LOGIN_CMD (%s): %w", cmd, err)
 		}
 
-		vaultToken = strings.TrimSpace(string(token))
-	}
+		vaultToken := strings.TrimSpace(string(token))
+		if vaultToken == "" {
+			return nil, errors.New("VKV_LOGIN_COMMAND required but not set")
+		}
 
-	// if toke is still empty, error
-	if vaultToken == "" {
-		return nil, errors.New("VKV_LOGIN_COMMAND or VAULT_TOKEN required but not set")
-	}
-
-	// read all other vault env vars
-	c, err := api.NewClient(api.DefaultConfig())
-	if err != nil {
-		return nil, err
-	}
-
-	// set token
-	c.SetToken(vaultToken)
-
-	// and namespace
-	if vaultNamespace, ok := os.LookupEnv("VAULT_NAMESPACE"); ok {
-		c.SetNamespace(vaultNamespace)
+		// set token
+		c.SetToken(vaultToken)
 	}
 
 	// self lookup current auth for verification
 	if _, err := c.Auth().Token().LookupSelf(); err != nil {
-		return nil, fmt.Errorf("not authenticated. Perhaps not a valid token: %w", err)
+		return nil, fmt.Errorf("not authenticated, perhaps not a valid token: %w", err)
 	}
 
 	return &Vault{Client: c}, nil
