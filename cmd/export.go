@@ -27,6 +27,9 @@ type exportOptions struct {
 
 	SkipErrors bool `env:"SKIP_ERRORS" envDefault:"false"`
 
+	ExportIncludePath bool `env:"EXPORT_INCLUDE_PATH"`
+	ExportUpper       bool `env:"EXPORT_UPPER"`
+
 	TemplateFile   string `env:"TEMPLATE_FILE"`
 	TemplateString string `env:"TEMPLATE_STRING"`
 
@@ -55,18 +58,20 @@ func NewExportCmd() *cobra.Command {
 			enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
 
 			printer = prt.NewSecretPrinter(
+				prt.WithEnginePath(enginePath),
 				prt.OnlyKeys(o.OnlyKeys),
 				prt.OnlyPaths(o.OnlyPaths),
 				prt.CustomValueLength(o.MaxValueLength),
 				prt.ShowValues(o.ShowValues),
-				prt.WithTemplate(o.TemplateString, o.TemplateFile),
 				prt.ToFormat(o.outputFormat),
 				prt.WithVaultClient(vaultClient),
 				prt.WithWriter(writer),
 				prt.ShowVersion(o.ShowVersion),
 				prt.ShowMetadata(o.ShowMetadata),
 				prt.WithHyperLinks(o.WithHyperLink),
-				prt.WithEnginePath(enginePath),
+				prt.WithTemplate(o.TemplateString, o.TemplateFile),
+				prt.WithExportIncludePath(o.ExportIncludePath),
+				prt.WithExportUpper(o.ExportUpper),
 			)
 
 			// prepare map
@@ -100,6 +105,10 @@ func NewExportCmd() *cobra.Command {
 
 	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
 		"(env: VKV_EXPORT_MAX_VALUE_LENGTH)")
+
+	// Export
+	cmd.Flags().BoolVar(&o.ExportIncludePath, "export-include-path", o.ExportIncludePath, "include the secret path as the env var prefix in format export (env: VKV_EXPORT_EXPORT_INCLUDE_PATH)")
+	cmd.Flags().BoolVar(&o.ExportUpper, "export-upper", o.ExportUpper, "upper case the env var names (env: VKV_EXPORT_UPPER)")
 
 	// Template
 	cmd.Flags().StringVar(&o.TemplateFile, "template-file", o.TemplateFile, "path to a file containing Go-template syntax to render the KV entries (env: VKV_EXPORT_TEMPLATE_FILE)")

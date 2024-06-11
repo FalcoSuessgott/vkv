@@ -65,8 +65,13 @@ type Printer struct {
 	showMetadata   bool
 	withHyperLinks bool
 	valueLength    int
-	template       string
-	vaultClient    *vault.Vault
+
+	template string
+
+	includePath bool
+	upper       bool
+
+	vaultClient *vault.Vault
 }
 
 // CustomValueLength option for trimming down the output of secrets.
@@ -163,6 +168,20 @@ func WithTemplate(str, path string) Option {
 
 			return
 		}
+	}
+}
+
+// WithExportUpper sets the export keys to uppercase.
+func WithExportUpper(b bool) Option {
+	return func(p *Printer) {
+		p.upper = b
+	}
+}
+
+// WithExportIncludePath sets the export keys to include the path.
+func WithExportIncludePath(b bool) Option {
+	return func(p *Printer) {
+		p.includePath = b
 	}
 }
 

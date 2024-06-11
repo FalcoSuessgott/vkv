@@ -43,6 +43,40 @@ export user='password'
 			},
 			output: "",
 		},
+		{
+			name: "upper",
+			s: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"key":  "value",
+					"user": "password",
+				},
+			}, opts: []Option{
+				ToFormat(Export),
+				ShowValues(true),
+				WithExportUpper(true),
+			},
+			output: `export KEY='value'
+export USER='password'
+`,
+		},
+		{
+			name:     "include path",
+			rootPath: "root",
+			s: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"key":  "value",
+					"user": "password",
+				},
+			}, opts: []Option{
+				ToFormat(Export),
+				ShowValues(true),
+				WithExportUpper(true),
+				WithExportIncludePath(true),
+			},
+			output: `export ROOT_SECRET_KEY='value'
+export ROOT_SECRET_USER='password'
+`,
+		},
 	}
 
 	for _, tc := range testCases {
