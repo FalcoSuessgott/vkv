@@ -5,12 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"path"
-	"strings"
 
-	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
 
@@ -48,7 +44,7 @@ func NewServerCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Fprintf(writer, "mirroring secrets from path: \"%s\" to \"%s/export\"\n", o.Path, o.Port)
 
-			return o.serve()
+			return nil
 		},
 	}
 
@@ -74,94 +70,94 @@ func (o *serverOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func (o *serverOptions) buildMap() (map[string]interface{}, error) {
-	var isSecretPath bool
+// func (o *serverOptions) buildMap() (map[string]interface{}, error) {
+// 	var isSecretPath bool
 
-	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
+// 	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
-	// read recursive all secrets
-	s, err := vaultClient.ListRecursive(rootPath, subPath, o.SkipErrors)
-	if err != nil {
-		return nil, err
-	}
+// 	// read recursive all secrets
+// 	s, err := vaultClient.ListRecursive(rootPath, subPath, o.SkipErrors)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	// check if path is a directory or secret path
-	if _, isSecret := vaultClient.ReadSecrets(rootPath, subPath); isSecret == nil {
-		isSecretPath = true
-	}
+// 	// check if path is a directory or secret path
+// 	if _, isSecret := vaultClient.ReadSecrets(rootPath, subPath); isSecret == nil {
+// 		isSecretPath = true
+// 	}
 
-	path := path.Join(rootPath, subPath)
-	if o.EnginePath != "" {
-		path = subPath
-	}
+// 	path := path.Join(rootPath, subPath)
+// 	if o.EnginePath != "" {
+// 		path = subPath
+// 	}
 
-	// prepare the output map
-	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
+// 	// prepare the output map
+// 	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
 
-	if o.EnginePath != "" {
-		return map[string]interface{}{
-			o.EnginePath: pathMap,
-		}, nil
-	}
+// 	if o.EnginePath != "" {
+// 		return map[string]interface{}{
+// 			o.EnginePath: pathMap,
+// 		}, nil
+// 	}
 
-	return pathMap, nil
-}
+// 	return pathMap, nil
+// }
 
-func (o *serverOptions) serve() error {
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
+// func (o *serverOptions) serve() error {
+// 	gin.SetMode(gin.ReleaseMode)
+// 	r := gin.Default()
 
-	r.GET("/export", func(c *gin.Context) {
-		// get format specified per request via url query param
-		format, ok := c.GetQuery("format")
-		enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
+// 	r.GET("/export", func(c *gin.Context) {
+// 		// get format specified per request via url query param
+// 		format, ok := c.GetQuery("format")
+// 		enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
 
-		opts := []prt.Option{
-			prt.ShowValues(true),
-			prt.WithVaultClient(vaultClient),
-			prt.WithWriter(o.writer),
-			prt.WithEnginePath(enginePath),
-			prt.ToFormat(prt.Export),
-		}
+// 		opts := []prt.Option{
+// 			prt.ShowValues(true),
+// 			prt.WithVaultClient(vaultClient),
+// 			prt.WithWriter(o.writer),
+// 			prt.WithEnginePath(enginePath),
+// 			prt.ToFormat(prt.Export),
+// 		}
 
-		if ok {
-			switch strings.ToLower(format) {
-			case "yaml", "yml":
-				opts = append(opts, prt.ToFormat(prt.YAML))
-			case "json":
-				opts = append(opts, prt.ToFormat(prt.JSON))
-			case "export":
-				opts = append(opts, prt.ToFormat(prt.Export))
-			case "markdown":
-				opts = append(opts, prt.ToFormat(prt.Markdown))
-			case "base":
-				opts = append(opts, prt.ToFormat(prt.Base))
-			case "policy":
-				opts = append(opts, prt.ToFormat(prt.Policy))
-			case "template", "tmpl":
-				opts = append(opts, prt.ToFormat(prt.Template))
-			}
-		}
+// 		if ok {
+// 			switch strings.ToLower(format) {
+// 			case "yaml", "yml":
+// 				opts = append(opts, prt.ToFormat(prt.YAML))
+// 			case "json":
+// 				opts = append(opts, prt.ToFormat(prt.JSON))
+// 			case "export":
+// 				opts = append(opts, prt.ToFormat(prt.Export))
+// 			case "markdown":
+// 				opts = append(opts, prt.ToFormat(prt.Markdown))
+// 			case "base":
+// 				opts = append(opts, prt.ToFormat(prt.Base))
+// 			case "policy":
+// 				opts = append(opts, prt.ToFormat(prt.Policy))
+// 			case "template", "tmpl":
+// 				opts = append(opts, prt.ToFormat(prt.Template))
+// 			}
+// 		}
 
-		printer = prt.NewSecretPrinter(opts...)
+// 		// printer = prt.NewSecretPrinter(opts...)
 
-		c.Data(200, "text/plain", o.readSecrets())
-	})
+// 		// c.Data(200, "text/plain", o.readSecrets())
+// 	})
 
-	return r.Run(o.Port)
-}
+// 	return r.Run(o.Port)
+// }
 
-func (o *serverOptions) readSecrets() []byte {
-	o.writer.Reset()
+// func (o *serverOptions) readSecrets() []byte {
+// 	o.writer.Reset()
 
-	m, err := o.buildMap()
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	m, err := o.buildMap()
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err := printer.Out(m); err != nil {
-		log.Fatal(err)
-	}
+// 	if err := printer.Out(m); err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	return o.writer.Bytes()
-}
+// 	return o.writer.Bytes()
+// }

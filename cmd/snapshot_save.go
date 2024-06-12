@@ -1,18 +1,9 @@
 package cmd
 
 import (
-	"bytes"
-	"fmt"
-	"io"
 	"log"
-	"os"
-	"path"
-	"strings"
 
-	"github.com/FalcoSuessgott/vkv/pkg/fs"
-	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
 )
 
@@ -35,12 +26,13 @@ func NewSnapshotSaveCmd() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			engines, err := vaultClient.ListAllKVSecretEngines(o.Namespace)
+			_, err := vaultClient.ListAllKVSecretEngines(o.Namespace)
 			if err != nil {
 				return err
 			}
 
-			return o.backupKVEngines(vaultClient, engines)
+			return nil
+			//			return o.backupKVEngines(vaultClient, engines)
 		},
 	}
 
@@ -51,58 +43,58 @@ func NewSnapshotSaveCmd() *cobra.Command {
 	return cmd
 }
 
-// nolint: cyclop
-func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string][]string) error {
-	for _, ns := range utils.SortMapKeys(utils.ToMapStringInterface(engines)) {
-		nsDir := path.Join(o.Destination, ns)
+// // nolint: cyclop
+// func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string][]string) error {
+// 	for _, ns := range utils.SortMapKeys(utils.ToMapStringInterface(engines)) {
+// 		nsDir := path.Join(o.Destination, ns)
 
-		if err := fs.CreateDirectory(nsDir); err != nil {
-			return err
-		}
+// 		if err := fs.CreateDirectory(nsDir); err != nil {
+// 			return err
+// 		}
 
-		fmt.Fprintf(writer, "created %s\n", nsDir)
+// 		fmt.Fprintf(writer, "created %s\n", nsDir)
 
-		for _, e := range engines[ns] {
-			enginePath := path.Join(ns, e)
+// 		for _, e := range engines[ns] {
+// 			enginePath := path.Join(ns, e)
 
-			out, err := v.ListRecursive(enginePath, "", o.SkipErrors)
-			if err != nil {
-				return err
-			}
+// 			out, err := v.ListRecursive(enginePath, "", o.SkipErrors)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			b := bytes.NewBufferString("")
+// 			b := bytes.NewBufferString("")
 
-			printer = prt.NewSecretPrinter(
-				prt.CustomValueLength(-1),
-				prt.ShowValues(true),
-				prt.ToFormat(prt.JSON),
-				prt.WithVaultClient(v),
-				prt.WithWriter(b),
-				prt.ShowVersion(false),
-				prt.ShowMetadata(false),
-				prt.WithEnginePath(strings.TrimSuffix(e, utils.Delimiter)),
-			)
+// 			printer = prt.NewSecretPrinter(
+// 				prt.CustomValueLength(-1),
+// 				prt.ShowValues(true),
+// 				prt.ToFormat(prt.JSON),
+// 				prt.WithVaultClient(v),
+// 				prt.WithWriter(b),
+// 				prt.ShowVersion(false),
+// 				prt.ShowMetadata(false),
+// 				prt.WithEnginePath(strings.TrimSuffix(e, utils.Delimiter)),
+// 			)
 
-			if err := printer.Out(utils.ToMapStringInterface(out)); err != nil {
-				return err
-			}
+// 			if err := printer.Out(utils.ToMapStringInterface(out)); err != nil {
+// 				return err
+// 			}
 
-			c, err := io.ReadAll(b)
-			if err != nil {
-				return err
-			}
+// 			c, err := io.ReadAll(b)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			engineFile := path.Join(o.Destination, ns, e) + ".yaml"
+// 			engineFile := path.Join(o.Destination, ns, e) + ".yaml"
 
-			if err := os.WriteFile(engineFile, c, 0o600); err != nil {
-				return err
-			}
+// 			if err := os.WriteFile(engineFile, c, 0o600); err != nil {
+// 				return err
+// 			}
 
-			fmt.Fprintf(writer, "created %s\n", engineFile)
+// 			fmt.Fprintf(writer, "created %s\n", engineFile)
 
-			b.Reset()
-		}
-	}
+// 			b.Reset()
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

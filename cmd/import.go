@@ -8,7 +8,6 @@ import (
 	"path"
 
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
-	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -41,16 +40,16 @@ func NewImportCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			printer = prt.NewSecretPrinter(
-				prt.CustomValueLength(o.MaxValueLength),
-				prt.ShowValues(o.ShowValues),
-				prt.ToFormat(prt.Base),
-				prt.WithVaultClient(vaultClient),
-				prt.WithWriter(writer),
-				prt.ShowVersion(true),
-				prt.ShowMetadata(true),
-				prt.WithEnginePath(o.Path),
-			)
+			// printer = prt.NewSecretPrinter(
+			// 	prt.CustomValueLength(o.MaxValueLength),
+			// 	prt.ShowValues(o.ShowValues),
+			// 	prt.ToFormat(prt.Base),
+			// 	prt.WithVaultClient(vaultClient),
+			// 	prt.WithWriter(writer),
+			// 	prt.ShowVersion(true),
+			// 	prt.ShowMetadata(true),
+			// 	prt.WithEnginePath(o.Path),
+			// )
 
 			// get user input via -f or STDIN
 			input, err := o.getInput()
@@ -64,10 +63,10 @@ func NewImportCmd() *cobra.Command {
 				return err
 			}
 
-			// print preview during dryrun and exit
-			if o.DryRun {
-				return o.dryRun(secrets)
-			}
+			// // print preview during dryrun and exit
+			// if o.DryRun {
+			// 	return o.dryRun(secrets)
+			// }
 
 			// enable kv engine, error if already enabled, unless force is used
 			if err := vaultClient.EnableKV2EngineErrorIfNotForced(o.Force, o.Path); err != nil {
@@ -80,9 +79,9 @@ func NewImportCmd() *cobra.Command {
 			}
 
 			// show result if not silence mode
-			if !o.Silent {
-				return o.printResult()
-			}
+			// if !o.Silent {
+			// 	return o.printResult()
+			// }
 
 			return nil
 		},
@@ -197,55 +196,55 @@ func (o *importOptions) writeSecrets(secrets map[string]interface{}) error {
 	return nil
 }
 
-func (o *importOptions) dryRun(secrets map[string]interface{}) error {
-	fmt.Fprintln(writer, "")
-	fmt.Fprintln(writer, "preview:")
-	fmt.Fprintln(writer, "")
+// func (o *importOptions) dryRun(secrets map[string]interface{}) error {
+// 	fmt.Fprintln(writer, "")
+// 	fmt.Fprintln(writer, "preview:")
+// 	fmt.Fprintln(writer, "")
 
-	// read existing ecrets from the rootPath
-	rootPath, _ := utils.SplitPath(o.Path)
-	existingSecrets := make(map[string]interface{})
+// 	// read existing ecrets from the rootPath
+// 	rootPath, _ := utils.SplitPath(o.Path)
+// 	existingSecrets := make(map[string]interface{})
 
-	tmp, err := vaultClient.ListRecursive(rootPath, "", false)
-	if err == nil {
-		existingSecrets = utils.PathMap(rootPath, utils.ToMapStringInterface(tmp), false)
-	}
+// 	tmp, err := vaultClient.ListRecursive(rootPath, "", false)
+// 	if err == nil {
+// 		existingSecrets = utils.PathMap(rootPath, utils.ToMapStringInterface(tmp), false)
+// 	}
 
-	// add new secrets to it
-	newSecrets := make(map[string]interface{})
-	for _, v := range secrets {
-		newSecrets = utils.PathMap(o.Path, utils.ToMapStringInterface(v), false)
-	}
+// 	// add new secrets to it
+// 	newSecrets := make(map[string]interface{})
+// 	for _, v := range secrets {
+// 		newSecrets = utils.PathMap(o.Path, utils.ToMapStringInterface(v), false)
+// 	}
 
-	// deep merge both secrets
-	mergedSecrets := utils.DeepMergeMaps(newSecrets, existingSecrets)
-	if err := printer.Out(mergedSecrets); err != nil {
-		return err
-	}
+// 	// deep merge both secrets
+// 	mergedSecrets := utils.DeepMergeMaps(newSecrets, existingSecrets)
+// 	if err := printer.Out(mergedSecrets); err != nil {
+// 		return err
+// 	}
 
-	fmt.Fprintln(writer, "")
-	fmt.Fprintln(writer, "apply changes by using the --force flag")
+// 	fmt.Fprintln(writer, "")
+// 	fmt.Fprintln(writer, "apply changes by using the --force flag")
 
-	return nil
-}
+// 	return nil
+// }
 
-func (o *importOptions) printResult() error {
-	fmt.Fprintln(writer, "")
-	fmt.Fprintln(writer, "result:")
-	fmt.Fprintln(writer, "")
+// func (o *importOptions) printResult() error {
+// 	fmt.Fprintln(writer, "")
+// 	fmt.Fprintln(writer, "result:")
+// 	fmt.Fprintln(writer, "")
 
-	rootPath, _ := utils.SplitPath(o.Path)
+// 	rootPath, _ := utils.SplitPath(o.Path)
 
-	s, err := vaultClient.ListRecursive(rootPath, "", false)
-	if err != nil {
-		return err
-	}
+// 	s, err := vaultClient.ListRecursive(rootPath, "", false)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	secrets := utils.PathMap(rootPath, utils.ToMapStringInterface(s), false)
+// 	secrets := utils.PathMap(rootPath, utils.ToMapStringInterface(s), false)
 
-	if err := printer.Out(secrets); err != nil {
-		return err
-	}
+// 	if err := printer.Print(secrets); err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
