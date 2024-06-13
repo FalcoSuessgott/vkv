@@ -173,7 +173,7 @@ func (o *importOptions) parseInput(input []byte) (map[string]interface{}, error)
 
 func (o *importOptions) writeSecrets(secrets map[string]interface{}) error {
 	transformedMap := make(map[string]interface{})
-	utils.TransformMap("", secrets, &transformedMap)
+	utils.TransformMap(secrets, transformedMap, "")
 
 	for p, m := range transformedMap {
 		secrets, ok := m.(map[string]interface{})

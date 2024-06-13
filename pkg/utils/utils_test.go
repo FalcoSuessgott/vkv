@@ -133,7 +133,7 @@ func TestTransformMap(t *testing.T) {
 	for _, tc := range testCases {
 		res := make(map[string]interface{})
 
-		TransformMap("", tc.m, &res)
+		TransformMap(tc.m, res, "")
 
 		assert.Equal(t, tc.expected, res, tc.expected)
 	}

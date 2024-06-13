@@ -19,7 +19,7 @@ const (
 
 func (p *Printer) printPolicy(secrets map[string]interface{}) error {
 	transformMap := make(map[string]interface{})
-	utils.TransformMap("", secrets, &transformMap)
+	utils.TransformMap(secrets, transformMap, "")
 
 	capMap := make(map[string]*vault.Capability)
 

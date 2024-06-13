@@ -24,13 +24,14 @@ type Keys []string
 
 // TransformMap takes a multi leveled map and returns a map with its combined paths
 // as the keys and the map as its value. Also see TestTransformMap().
-func TransformMap(p string, m map[string]interface{}, s *map[string]interface{}) {
-	for k, v := range m {
-		subMap, ok := v.(map[string]interface{})
+func TransformMap(a, b map[string]interface{}, key string) {
+	for k, v := range a {
+		// if its a map -> go deeper
+		m, ok := v.(map[string]interface{})
 		if ok {
-			TransformMap(path.Join(p, k), subMap, s)
-		} else {
-			(*s)[p] = m
+			TransformMap(m, b, path.Join(key, k))
+		} else { // otherwise add the key and value to the map
+			b[key] = a
 		}
 	}
 }

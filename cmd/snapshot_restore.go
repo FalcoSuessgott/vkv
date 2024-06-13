@@ -122,7 +122,7 @@ func (o *snapshotRestoreOptions) restoreSecrets(source string) error {
 
 func (o *snapshotRestoreOptions) writeSecrets(secrets map[string]interface{}, v *vault.Vault, ns, rootPath string) error {
 	transformedMap := make(map[string]interface{})
-	utils.TransformMap("", secrets, &transformedMap)
+	utils.TransformMap(secrets, transformedMap, "")
 
 	for p, m := range transformedMap {
 		secrets, ok := m.(map[string]interface{})
