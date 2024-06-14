@@ -20,26 +20,7 @@ func TestPrintTemplate(t *testing.T) {
 		err      bool
 	}{
 		{
-			name:     "test: template",
-			rootPath: "root",
-			s: map[string]interface{}{
-				"root/secret": map[string]interface{}{
-					"key":  "value",
-					"user": "password",
-				},
-			},
-			opts: []Option{
-				ToFormat(Template),
-				WithTemplate(`{{ range $path, $data := . }}{{ range $entry := $data }}{{ printf "%s:\t%s=%v\n" $path $entry.Key $entry.Value }}{{ end }}{{ end }}`, ""),
-			},
-			output: `root/secret:	key=*****
-root/secret:	user=********
-
-`,
-		},
-		{
-			name:     "test: template show values",
-			rootPath: "root",
+			name: "test: template",
 			s: map[string]interface{}{
 				"root/secret": map[string]interface{}{
 					"key":  "value",
@@ -49,16 +30,18 @@ root/secret:	user=********
 			opts: []Option{
 				ToFormat(Template),
 				ShowValues(true),
-				WithTemplate(`{{ range $path, $data := . }}{{ range $entry := $data }}{{ printf "%s:\t%s=%v\n" $path $entry.Key $entry.Value }}{{ end }}{{ end }}`, ""),
+				WithTemplate(`{{ range $path, $secret:= . }}
+{{- range $key, $value := $secret -}}
+{{ $key}}={{ $value }}
+{{ end -}}
+{{ end -}}`, ""),
 			},
-			output: `root/secret:	key=value
-root/secret:	user=password
-
+			output: `key=value
+user=password
 `,
 		},
 		{
-			name:     "test: template file show values",
-			rootPath: "root",
+			name: "test: template file show values",
 			s: map[string]interface{}{
 				"root/secret": map[string]interface{}{
 					"key":  "value",
@@ -70,12 +53,9 @@ root/secret:	user=password
 				ShowValues(true),
 				WithTemplate("", "testdata/policies.tmpl"),
 			},
-			output: `
-path "root/secret/*" {
+			output: `path "root/secret/*" {
     capabilities = [ "create", "read" ]
 }
-
-
 `,
 		},
 	}
@@ -88,7 +68,7 @@ path "root/secret/*" {
 
 		m := map[string]interface{}{}
 
-		m[tc.rootPath+"/"] = tc.s
+		m[tc.rootPath] = tc.s
 		require.NoError(t, p.Out(m))
 		assert.Equal(t, tc.output, utils.RemoveCarriageReturns(b.String()), tc.name)
 	}

@@ -1,7 +1,7 @@
 # Export
 `vkv export` requires an engine path (`--path` or `--engine-path`) and supports the following export formats (specify via `--format` flag). 
 
-See the [CLI Reference](https://github.com/FalcoSuessgott/vkv/cmd/vkv_export/) for more details on the supported flags and env vars.
+See the [CLI Reference](https://falcosuessgott.github.io/vkv/cmd/vkv_export/) for more details on the supported flags and env vars.
 
 ## base
 ```bash
@@ -89,7 +89,7 @@ echo $admin
 key
 ```
 
-### policy
+## policy
 ```bash
 > vkv export -p secret -f=policy 
 PATH                    CREATE  READ    UPDATE  DELETE  LIST    ROOT
@@ -99,7 +99,7 @@ secret/demo             ✖       ✖       ✖       ✖       ✖       ✔
 secret/sub/demo         ✖       ✖       ✖       ✖       ✖       ✔
 ```
 
-### markdown
+## markdown
 ```bash
 > vkv export -p secret -f=markdown      
 |         PATH         |   KEY    |    VALUE    | VERSION |       METADATA        |
@@ -113,4 +113,42 @@ secret/sub/demo         ✖       ✖       ✖       ✖       ✖       ✔
 |                      | foo      | ***         |         |                       |
 |                      | password | ********    |         |                       |
 |                      | user     | ****        |         |                       |
+```
+
+## template
+`template` is a special output format that allows you, render the output using Golangs template engine. Format `template` requires either a `--template-file` or a `--template-string` flag or the equivalent env vars. 
+
+The secrets are passed as map with the secret path as the key and the actual secrets as values:
+
+```
+# <PATH>              <SECRETS>
+secret/admin          map[sub:password]
+secret/demo           map[foo:bar]
+secret/sub/demo       map[demo:hello world password:s3cre5< user:admin]
+secret/sub/sub2/demo  map[foo:bar password:password user:user]
+```
+
+Here is an advanced template that renders the secrets in a special env var export format. Note that within a `--template-file` or a `--template-string` the following functions are available: [http://masterminds.github.io/sprig/](http://masterminds.github.io/sprig/):
+
+```jinja
+# export.tmpl
+{{- range $path, $secrets := . }}
+{{- range $key, $value := $secrets }}
+export {{ list $path $key | join "/" | replace "/" "_" | upper | trimPrefix "SECRET_" }}={{ $value | squote -}}
+{{ end -}}
+{{- end }}
+```
+
+This would result in the following output:
+
+```bash
+> vkv export -p secret -f=template --template-file=export.tmpl
+export ADMIN_SUB='password'
+export DEMO_FOO='bar'
+export SUB_DEMO_DEMO='hello world'
+export SUB_DEMO_PASSWORD='s3cre5<'
+export SUB_DEMO_USER='admin'
+export SUB_SUB2_DEMO_FOO='bar'
+export SUB_SUB2_DEMO_PASSWORD='password'
+export SUB_SUB2_DEMO_USER='user'
 ```

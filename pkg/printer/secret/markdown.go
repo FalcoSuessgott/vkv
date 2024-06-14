@@ -28,7 +28,7 @@ func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, 
 	headers := []string{}
 
 	m := make(map[string]interface{})
-	utils.TransformMap(secrets, m, "")
+	utils.FlattenMap(secrets, m, "")
 
 	for _, k := range utils.SortMapKeys(m) {
 		v := utils.ToMapStringInterface(m[k])
