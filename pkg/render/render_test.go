@@ -10,7 +10,7 @@ import (
 var testTemplate = []byte("This is a {{ .Test }} template which replaces certain {{ .Values }}!")
 
 func TestRenderTemplate(t *testing.T) {
-	result, err := String(testTemplate, map[string]interface{}{
+	result, err := Apply(testTemplate, map[string]interface{}{
 		"Test":   "test",
 		"Values": "values",
 	})
@@ -20,7 +20,7 @@ func TestRenderTemplate(t *testing.T) {
 }
 
 func TestRenderInvalidString(t *testing.T) {
-	_, err := String([]byte("{{ invalid }"), map[string]interface{}{
+	_, err := Apply([]byte("{{ invalid }"), map[string]interface{}{
 		"Test":   "test",
 		"Values": "values",
 	})
@@ -29,7 +29,7 @@ func TestRenderInvalidString(t *testing.T) {
 }
 
 func TestRenderExpectError(t *testing.T) {
-	_, err := String(testTemplate, map[string]interface{}{
+	_, err := Apply(testTemplate, map[string]interface{}{
 		"Test":       "test",
 		"WrongValue": "values",
 	})

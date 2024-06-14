@@ -155,6 +155,7 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 			o.outputFormat = prt.Template
 			o.OnlyKeys = false
 			o.OnlyPaths = false
+			o.ShowValues = true
 			o.MaxValueLength = -1
 
 			if o.TemplateFile != "" && o.TemplateString != "" {

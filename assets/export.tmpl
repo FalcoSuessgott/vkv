@@ -1,0 +1,5 @@
+{{- range $path, $secrets := . }}
+{{- range $key, $value := $secrets }}
+export {{ list $path $key | join "/" | replace "/" "_" | upper | trimPrefix "SECRET_" }}={{ $value | squote -}}
+{{ end -}}
+{{- end }}

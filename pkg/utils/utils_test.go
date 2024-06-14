@@ -17,7 +17,7 @@ func TestRemoveCarriageReturn(t *testing.T) {
 	assert.Equal(t, "new line\n", RemoveCarriageReturns(s))
 }
 
-func TestTransformMap(t *testing.T) {
+func TestFlattenMap(t *testing.T) {
 	testCases := []struct {
 		name     string
 		m        map[string]interface{}
@@ -133,7 +133,7 @@ func TestTransformMap(t *testing.T) {
 	for _, tc := range testCases {
 		res := make(map[string]interface{})
 
-		TransformMap(tc.m, res, "")
+		FlattenMap(tc.m, res, "")
 
 		assert.Equal(t, tc.expected, res, tc.expected)
 	}

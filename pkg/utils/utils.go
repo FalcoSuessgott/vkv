@@ -22,14 +22,13 @@ const (
 // Keys type for receiving all keys of a map.
 type Keys []string
 
-// TransformMap takes a multi leveled map and returns a map with its combined paths
-// as the keys and the map as its value. Also see TestTransformMap().
-func TransformMap(a, b map[string]interface{}, key string) {
+// FlattenMap flattens a nested map into a single map with its.
+func FlattenMap(a, b map[string]interface{}, key string) {
 	for k, v := range a {
 		// if its a map -> go deeper
 		m, ok := v.(map[string]interface{})
 		if ok {
-			TransformMap(m, b, path.Join(key, k))
+			FlattenMap(m, b, path.Join(key, k))
 		} else { // otherwise add the key and value to the map
 			b[key] = a
 		}
