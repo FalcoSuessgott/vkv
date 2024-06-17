@@ -2,15 +2,20 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
+	"context"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
 	"path"
-	"strings"
+	"sync"
+	"time"
 
+	srv "github.com/FalcoSuessgott/vkv/pkg/http"
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
+	"github.com/hashicorp/vault/api"
 	"github.com/spf13/cobra"
 )
 
@@ -44,11 +49,63 @@ func NewServerCmd() *cobra.Command {
 		Short:         "expose a http server that returns the read secrets from Vault, useful during CI",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		PreRunE:       o.validateFlags,
+		// PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintf(writer, "mirroring secrets from path: \"%s\" to \"%s/export\"\n", o.Path, o.Port)
+			fmt.Fprintf(writer, "proxying secrets via \"%s/export?path=<PATH>?format=<FORMAT>\"\n", o.Port)
 
-			return o.serve()
+			ctx := context.Background()
+
+			// otherwise create a new vault client
+			vaultClient = &vault.Vault{}
+
+			c, err := api.NewClient(api.DefaultConfig())
+			if err != nil {
+				return err
+			}
+
+			vaultClient.Client = c
+
+			vaultClient.Client.SetAddress(os.Getenv("VAULT_ADDR"))
+			// main handler for /export
+
+			handler := srv.NewServer(vaultClient, prt.NewSecretPrinter())
+
+			// server
+			httpServer := &http.Server{
+				Addr:    o.Port,
+				Handler: handler,
+			}
+
+			// run in background
+			go func() {
+				log.Printf("listening on %s\n", o.Port)
+
+				if err := httpServer.ListenAndServe(); err != nil {
+					fmt.Fprintln(writer, "error listening and serving: %w", err)
+				}
+			}()
+
+			var wg sync.WaitGroup
+			wg.Add(1)
+
+			go func() {
+				defer wg.Done()
+
+				<-ctx.Done()
+
+				shutdownCtx := context.Background()
+				shutdownCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+
+				defer cancel()
+
+				if err := httpServer.Shutdown(shutdownCtx); err != nil {
+					fmt.Fprintf(writer, "error shutting down http server: %s\n", err)
+				}
+			}()
+
+			wg.Wait()
+
+			return nil
 		},
 	}
 
@@ -63,16 +120,16 @@ func NewServerCmd() *cobra.Command {
 	return cmd
 }
 
-func (o *serverOptions) validateFlags(cmd *cobra.Command, args []string) error {
-	switch {
-	case o.EnginePath == "" && o.Path == "":
-		return errors.New("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
-	case o.EnginePath != "" && o.Path != "":
-		return errors.New("cannot specify both engine-path and path")
-	}
+// func (o *serverOptions) validateFlags(cmd *cobra.Command, args []string) error {
+// 	switch {
+// 	case o.EnginePath == "" && o.Path == "":
+// 		return errors.New("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
+// 	case o.EnginePath != "" && o.Path != "":
+// 		return errors.New("cannot specify both engine-path and path")
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (o *serverOptions) buildMap() (map[string]interface{}, error) {
 	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
@@ -98,50 +155,6 @@ func (o *serverOptions) buildMap() (map[string]interface{}, error) {
 	}
 
 	return pathMap, nil
-}
-
-func (o *serverOptions) serve() error {
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
-
-	r.GET("/export", func(c *gin.Context) {
-		// get format specified per request via url query param
-		format, ok := c.GetQuery("format")
-		enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
-
-		opts := []prt.Option{
-			prt.ShowValues(true),
-			prt.WithVaultClient(vaultClient),
-			prt.WithWriter(o.writer),
-			prt.WithEnginePath(enginePath),
-			prt.ToFormat(prt.Export),
-		}
-
-		if ok {
-			switch strings.ToLower(format) {
-			case "yaml", "yml":
-				opts = append(opts, prt.ToFormat(prt.YAML))
-			case "json":
-				opts = append(opts, prt.ToFormat(prt.JSON))
-			case "export":
-				opts = append(opts, prt.ToFormat(prt.Export))
-			case "markdown":
-				opts = append(opts, prt.ToFormat(prt.Markdown))
-			case "base":
-				opts = append(opts, prt.ToFormat(prt.Base))
-			case "policy":
-				opts = append(opts, prt.ToFormat(prt.Policy))
-			case "template", "tmpl":
-				opts = append(opts, prt.ToFormat(prt.Template))
-			}
-		}
-
-		printer = prt.NewSecretPrinter(opts...)
-
-		c.Data(200, "text/plain", o.readSecrets())
-	})
-
-	return r.Run(o.Port)
 }
 
 func (o *serverOptions) readSecrets() []byte {

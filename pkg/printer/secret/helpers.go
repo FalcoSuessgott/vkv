@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-func (p *Printer) printOnlykeys(secrets map[string]interface{}) map[string]interface{} {
+func (p *Printer) printOnlyKeys(secrets map[string]interface{}) map[string]interface{} {
 	res := map[string]interface{}{}
 
 	for k, v := range secrets {
 		m, ok := v.(map[string]interface{})
 		if ok {
-			res[k] = p.printOnlykeys(m)
+			res[k] = p.printOnlyKeys(m)
 		} else {
 			res[k] = ""
 		}

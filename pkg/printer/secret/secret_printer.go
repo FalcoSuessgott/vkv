@@ -205,7 +205,7 @@ func (p *Printer) Out(secrets interface{}) error {
 		}
 
 		if p.onlyKeys {
-			secretMap[k] = p.printOnlykeys(utils.ToMapStringInterface(v))
+			secretMap[k] = p.printOnlyKeys(utils.ToMapStringInterface(v))
 		}
 	}
 
@@ -227,4 +227,8 @@ func (p *Printer) Out(secrets interface{}) error {
 	default:
 		return ErrInvalidFormat
 	}
+}
+
+func (p *Printer) Print(v any, format string) ([]byte, error) {
+	return []byte("works"), nil
 }

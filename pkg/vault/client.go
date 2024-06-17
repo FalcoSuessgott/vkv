@@ -13,7 +13,7 @@ import (
 
 // Vault represents a vault struct used for reading and writing secrets.
 type Vault struct {
-	Client *api.Client
+	*api.Client
 }
 
 // NewDefaultClient returns a new vault client wrapper.
@@ -80,4 +80,15 @@ func NewClient(addr, token string) (*Vault, error) {
 	c.SetToken(token)
 
 	return &Vault{Client: c}, nil
+}
+
+func (v *Vault) Authenticate(token string) error {
+	v.Client.SetToken(token)
+
+	// self lookup current auth for verification
+	if _, err := v.Client.Auth().Token().LookupSelf(); err != nil {
+		return fmt.Errorf("not authenticated. Perhaps not a valid token: %w", err)
+	}
+
+	return nil
 }
