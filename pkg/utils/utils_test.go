@@ -7,6 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestNormalizePath(t *testing.T) {
+	assert.Equal(t, "a/b/c/", NormalizePath("a/b/c"))
+	assert.Equal(t, "a/b/c/", NormalizePath("a/b/c/"))
+	assert.Equal(t, "a/b/c/", NormalizePath("a/b/c/////"))
+}
+
 func TestRemoveExtension(t *testing.T) {
 	s := "path/to/file.txt"
 	assert.Equal(t, "path/to/file", RemoveExtension(s))
@@ -139,22 +145,39 @@ func TestFlattenMap(t *testing.T) {
 	}
 }
 
-func TestPathMap(t *testing.T) {
+func TestGetRootElement(t *testing.T) {
+	m := map[string]interface{}{
+		"k": false,
+	}
+
+	res, err := GetRootElement(m)
+	require.NoError(t, err)
+	assert.Equal(t, "k", res)
+
+	n := map[string]interface{}{
+		"k": false,
+		"b": true,
+	}
+
+	_, err = GetRootElement(n)
+	require.Error(t, err)
+}
+
+func TestUnflattenMap(t *testing.T) {
 	testCases := []struct {
-		name         string
-		path         string
-		m            map[string]interface{}
-		isSecretPath bool
-		expected     map[string]interface{}
+		name           string
+		path           string
+		m              map[string]interface{}
+		ignoreElements []string
+		expected       map[string]interface{}
 	}{
 		{
-			name: "secret path",
+			name: "simple",
 			path: "root/sub",
 			m: map[string]interface{}{
 				"k":  "v",
 				"k2": 12,
 			},
-			isSecretPath: true,
 			expected: map[string]interface{}{
 				"root/": map[string]interface{}{
 					"sub": map[string]interface{}{
@@ -165,36 +188,43 @@ func TestPathMap(t *testing.T) {
 			},
 		},
 		{
-			name:         "directory path",
-			path:         "root/sub",
-			m:            map[string]interface{}{},
-			isSecretPath: false,
+			name: "simple with ignored fields",
+			path: "root/sub",
+			m: map[string]interface{}{
+				"k":  "v",
+				"k2": 12,
+			},
+			ignoreElements: []string{"root/sub"},
 			expected: map[string]interface{}{
-				"root/": map[string]interface{}{
-					"sub/": map[string]interface{}{},
+				"root/sub/": map[string]interface{}{
+					"k":  "v",
+					"k2": 12,
 				},
 			},
 		},
 		{
-			name:         "only root",
-			path:         "root",
-			m:            map[string]interface{}{},
-			isSecretPath: false,
-			expected: map[string]interface{}{
-				"root/": map[string]interface{}{},
+			name: "complex with ignored fields",
+			path: "root/sub/a/b/c",
+			m: map[string]interface{}{
+				"k":  "v",
+				"k2": 12,
 			},
-		},
-		{
-			name:         "only root",
-			path:         "",
-			m:            map[string]interface{}{},
-			isSecretPath: false,
-			expected:     map[string]interface{}{},
+			ignoreElements: []string{"root/sub", "b/c"},
+			expected: map[string]interface{}{
+				"root/sub/": map[string]interface{}{
+					"a/": map[string]interface{}{
+						"b/c/": map[string]interface{}{
+							"k":  "v",
+							"k2": 12,
+						},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tc := range testCases {
-		assert.Equal(t, tc.expected, PathMap(tc.path, tc.m, tc.isSecretPath), tc.name)
+		assert.Equal(t, tc.expected, UnflattenMap(tc.path, tc.m, tc.ignoreElements...), tc.name)
 	}
 }
 
@@ -569,7 +599,7 @@ func TestHandleEnginePath(t *testing.T) {
 			expectedSubPath:  "5/6",
 		},
 		{
-			name:             " only engine path",
+			name:             "only engine path",
 			enginePath:       "1/2/3/4",
 			expectedRootPath: "1/2/3/4",
 		},

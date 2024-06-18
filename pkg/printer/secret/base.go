@@ -17,12 +17,12 @@ func (p *Printer) printBase(secrets map[string]interface{}) error {
 	m := make(map[string]interface{})
 
 	for _, k := range utils.SortMapKeys(secrets) {
-		baseName := p.enginePath + utils.Delimiter
+		baseName := p.enginePath
 
 		if p.withHyperLinks {
 			addr := fmt.Sprintf("%s/ui/vault/secrets/%s/kv", p.vaultClient.Client.Address(), p.enginePath)
 
-			baseName = termlink.Link(p.enginePath+utils.Delimiter, addr, false)
+			baseName = termlink.Link(p.enginePath, addr, false)
 		}
 
 		if p.vaultClient != nil {
@@ -60,8 +60,9 @@ func (p *Printer) printTree(rootPath, subPath string, m map[string]interface{}) 
 	//nolint: nestif
 	if strings.HasSuffix(subPath, utils.Delimiter) {
 		for _, i := range utils.SortMapKeys(m) {
-			//nolint: forcetypeassert
-			tree.AddBranch(p.printTree(rootPath, subPath+i, m[i].(map[string]interface{})))
+			if data, ok := m[i].(map[string]interface{}); ok {
+				tree.AddBranch(p.printTree(rootPath, subPath+i, data))
+			}
 		}
 	} else {
 		for _, k := range utils.SortMapKeys(m) {

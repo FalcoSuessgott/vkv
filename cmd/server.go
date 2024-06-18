@@ -75,8 +75,6 @@ func (o *serverOptions) validateFlags(cmd *cobra.Command, args []string) error {
 }
 
 func (o *serverOptions) buildMap() (map[string]interface{}, error) {
-	var isSecretPath bool
-
 	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
 	// read recursive all secrets
@@ -85,18 +83,13 @@ func (o *serverOptions) buildMap() (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	// check if path is a directory or secret path
-	if _, isSecret := vaultClient.ReadSecrets(rootPath, subPath); isSecret == nil {
-		isSecretPath = true
-	}
-
 	path := path.Join(rootPath, subPath)
 	if o.EnginePath != "" {
 		path = subPath
 	}
 
 	// prepare the output map
-	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
+	pathMap := utils.UnflattenMap(path, utils.ToMapStringInterface(s))
 
 	if o.EnginePath != "" {
 		return map[string]interface{}{

@@ -52,7 +52,7 @@ func NewExportCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
+			enginePath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
 			printer = prt.NewSecretPrinter(
 				prt.OnlyKeys(o.OnlyKeys),
@@ -66,16 +66,17 @@ func NewExportCmd() *cobra.Command {
 				prt.ShowVersion(o.ShowVersion),
 				prt.ShowMetadata(o.ShowMetadata),
 				prt.WithHyperLinks(o.WithHyperLink),
-				prt.WithEnginePath(enginePath),
+				prt.WithEnginePath(utils.NormalizePath(enginePath)),
 			)
 
-			// prepare map
-			m, err := o.buildMap()
+			secrets, err := vaultClient.ListRecursive(enginePath, subPath, o.SkipErrors)
 			if err != nil {
 				return err
 			}
 
-			if err := printer.Out(m); err != nil {
+			result := utils.UnflattenMap(utils.NormalizePath(path.Join(enginePath, subPath)), utils.ToMapStringInterface(secrets), o.EnginePath)
+
+			if err := printer.Out(result); err != nil {
 				return err
 			}
 
@@ -86,9 +87,9 @@ func NewExportCmd() *cobra.Command {
 	cmd.Flags().SortFlags = false
 
 	// Input
-	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, fmt.Sprintf("KV Engine path (env: %s)", envVarExportPrefix+"_PATH"))
-	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path value will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_EXPORT_ENGINE_PATH)")
-	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "dont exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)")
+	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KV Engine path (env: VKV_EXPORT_PATH")
+	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path (-p) flag will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_EXPORT_ENGINE_PATH)")
+	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "don't exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)")
 
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")
@@ -119,9 +120,7 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):
 		return errInvalidFlagCombination
 	case o.EnginePath == "" && o.Path == "":
-		return errors.New("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
-	case o.EnginePath != "" && o.Path != "":
-		return errors.New("cannot specify both engine-path and path")
+		return errors.New("no KV-paths given. Either --engine-path/-e or --path/-p needs to be specified")
 	case true:
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":
@@ -171,37 +170,4 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-func (o *exportOptions) buildMap() (map[string]interface{}, error) {
-	var isSecretPath bool
-
-	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
-
-	// read recursive all secrets
-	s, err := vaultClient.ListRecursive(rootPath, subPath, o.SkipErrors)
-	if err != nil {
-		return nil, err
-	}
-
-	// check if path is a directory or secret path
-	if _, isSecret := vaultClient.ReadSecrets(rootPath, subPath); isSecret == nil {
-		isSecretPath = true
-	}
-
-	path := path.Join(rootPath, subPath)
-	if o.EnginePath != "" {
-		path = subPath
-	}
-
-	// prepare the output map
-	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
-
-	if o.EnginePath != "" {
-		return map[string]interface{}{
-			o.EnginePath: pathMap,
-		}, nil
-	}
-
-	return pathMap, nil
 }

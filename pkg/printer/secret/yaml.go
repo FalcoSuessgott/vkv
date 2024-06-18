@@ -12,7 +12,7 @@ func (p *Printer) printYAML(secrets map[string]interface{}) error {
 		return err
 	}
 
-	fmt.Fprintln(p.writer, string(out))
+	fmt.Fprint(p.writer, string(out))
 
 	return nil
 }

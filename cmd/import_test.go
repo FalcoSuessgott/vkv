@@ -20,19 +20,22 @@ func (s *VaultSuite) TestValidateImportFlags() {
 			err:  true,
 		},
 		{
-			name: "no path should fail",
-			err:  true,
-			args: []string{},
-		},
-		{
 			name: "silent and dry-run should fail",
 			err:  true,
 			args: []string{"-p=o", "-s", "-d"},
+		},
+		{
+			name: "file and STDIN should fail",
+			err:  true,
+			args: []string{"-f=sss", "-"},
 		},
 	}
 
 	for _, tc := range testCases {
 		cmd := NewImportCmd()
+
+		writer = io.Discard
+
 		cmd.SetArgs(tc.args)
 
 		err := cmd.Execute()
@@ -62,7 +65,6 @@ func (s *VaultSuite) TestGetInput() {
 			expected: `yaml/:
   secret:
     user: password
-
 `,
 		},
 		{

@@ -1,8 +1,28 @@
 # Import
 
-`vkv import` requires an engine path (`--path`) and will accepts `vkv`s YAML or JSON output (`vkv export -f=yaml|json`) either by invoking `vkv import -` (for STDIN) or by specifying a file (`--file`). `vkv` will create the specified path if the engine does not exist yet and will error if it does, unless `--force` is specified. 
+`vkv import` tries to determine the path from the input, if that is not possible you can specify on using `--path|--engine-path`. 
+
+`vkv import` accepts `vkv`s YAML or JSON output (`vkv export -f=yaml|json`) either by invoking `vkv import -` (for STDIN) or by specifying a file (`--file`). 
+
+`vkv` will create the specified path if the engine does not exist yet and will error if it does, unless `--force` is specified. 
 
 See the [CLI Reference](https://github.com/FalcoSuessgott/vkv/cmd/vkv_import/) for more details on the supported flags and env vars.
+
+!!! warning
+    Vault allows `/` in the name of KV engine. This makes it difficult for `vkv` to distinguish between directories and the KV engine name..
+    
+    If your KV engine name/mount contains a `/` you have to specify it using `--engine-path|-e`, otherwise `vkv` will output the secrets wrong.
+
+    This also applies for any `vkv import ...` operations.
+
+!!! info
+    `vkv` handles 3 different path arguments, specified using `-e|-p`
+
+    1. `root path`: any normal KV mount. Use `-p`.
+    2. `engine-path`: in case your KV mount contains a `/`. Use `-e`.
+    3. `sub path`: the path to the corresponding directory within a KV mount. 
+    When using `-p` this is everything after the first `/`: e.g: `kv/prod/db/`; root path=`kv`, subpath=`prod/db`. 
+    In conjunction with a `-e` you can specify a sub-path by using -p: `-e=kv/prod -p=db`.
 
 ## Example Usage
 ```bash

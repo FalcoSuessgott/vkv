@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -116,14 +117,15 @@ func TestPrintBase(t *testing.T) {
 		var b bytes.Buffer
 		tc.opts = append(tc.opts,
 			WithWriter(&b),
-			WithEnginePath(tc.rootPath),
+			WithEnginePath(utils.NormalizePath(tc.rootPath)),
 		)
 
 		p := NewSecretPrinter(tc.opts...)
 
-		m := map[string]interface{}{}
+		m := map[string]interface{}{
+			utils.NormalizePath(tc.rootPath): tc.s,
+		}
 
-		m[tc.rootPath+"/"] = tc.s
 		require.NoError(t, p.Out(m))
 		assert.Equal(t, tc.output, b.String(), tc.name)
 	}

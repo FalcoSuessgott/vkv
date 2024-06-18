@@ -3,9 +3,6 @@ package vault
 import (
 	"fmt"
 	"path"
-	"strings"
-
-	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
 const (
@@ -24,8 +21,13 @@ func (v *Vault) GetEngineDescription(rootPath string) (string, error) {
 	}
 
 	if data != nil {
+		desc, ok := data.Data["description"]
+		if !ok {
+			return "", nil
+		}
+
 		//nolint: forcetypeassert
-		return data.Data["description"].(string), nil
+		return desc.(string), nil
 	}
 
 	return "", fmt.Errorf("could not get engine description for path: \"%s\"", rootPath)
@@ -38,8 +40,22 @@ func (v *Vault) GetEngineTypeVersion(rootPath string) (string, string, error) {
 	}
 
 	if data != nil {
-		//nolint: forcetypeassert
-		return data.Data["type"].(string), data.Data["options"].(map[string]interface{})["version"].(string), nil
+		var eType, eVersion string
+
+		t, ok := data.Data["type"]
+
+		if ok {
+			//nolint: forcetypeassert
+			eType = t.(string)
+		}
+
+		v, ok := data.Data["options"]
+		if ok {
+			//nolint: forcetypeassert
+			eVersion = v.(map[string]interface{})["version"].(string)
+		}
+
+		return eType, eVersion, nil
 	}
 
 	return "", "", fmt.Errorf("could not get engine type for path: \"%s\"", rootPath)
@@ -84,25 +100,35 @@ func (v *Vault) EnableKV1Engine(rootPath string) error {
 // EnableKV2EngineErrorIfNotForced enables a KVv2 Engine and errors if
 // already enabled, unless force is set to true.
 func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
-	rootPath, _ := utils.SplitPath(path)
-
-	if len(strings.Split(path, utils.Delimiter)) > 1 {
-		//nolint: nilerr
-		if err := v.EnableKV2Engine(rootPath); err != nil {
-			return nil
+	// check if engine exists
+	engineType, kvVersion, err := v.GetEngineTypeVersion(path)
+	// engine does not exists, so we enable it and exit
+	if err != nil {
+		if err := v.EnableKV2Engine(path); err != nil {
+			return fmt.Errorf("error enabling secret engine \"%s\": %w", path, err)
 		}
+
+		return nil
 	}
 
-	if v.EnableKV2Engine(rootPath) != nil && !force {
-		return fmt.Errorf("a secret engine under \"%s\" is already enabled. Use --force for overwriting", rootPath)
+	// engine exists, but is not of type kvv2
+	if err == nil && (engineType != "kv" || kvVersion != "2") {
+		return fmt.Errorf("engine \"%s\" is not of type kv2", path)
 	}
 
-	if err := v.DisableKV2Engine(rootPath); err != nil {
-		return fmt.Errorf("error disabling secret engine \"%s\": %w", rootPath, err)
+	// engine exists but no force flag used for using that engine
+	if err == nil && !force {
+		return fmt.Errorf("a secret engine under \"%s\" is already enabled. Use --force for overwriting", path)
 	}
 
-	if err := v.EnableKV2Engine(rootPath); err != nil {
-		return fmt.Errorf("error enabling secret engine \"%s\": %w", rootPath, err)
+	// force flag is used, so we disable the engine
+	if err := v.DisableKV2Engine(path); err != nil {
+		return fmt.Errorf("error disabling secret engine \"%s\": %w", path, err)
+	}
+
+	// enable the engine
+	if err := v.EnableKV2Engine(path); err != nil {
+		return fmt.Errorf("error enabling secret engine \"%s\": %w", path, err)
 	}
 
 	return nil
