@@ -21,6 +21,7 @@ vault kv put secret_2/sub/demo demo="hello world" user=admin password='s3cre5<'
 vault kv put secret_2/sub/sub2/demo foo=bar-updated user=user password=password
 
 
+<<<<<<< HEAD
 # # test cases
 # 1. rootpath -> rootpath
 # 2. subpath -> rootpath
@@ -30,3 +31,14 @@ vault kv put secret_2/sub/sub2/demo foo=bar-updated user=user password=password
 # 6. engie path + sub > engine path + sub
 # 7. engine path -> root path
 # 8. engine path -> subpath
+=======
+# test cases
+1. rootpath -> rootpath
+2. subpath -> rootpath
+3. subpath -> subpath
+4. root path -> enginepath
+5. enginepath -> enginepath
+6. engie path + sub > engine path + sub
+7. engine path -> root path
+8. engine path -> subpath
+>>>>>>> 5e1e421 (feat(import): support engine path)

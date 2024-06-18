@@ -11,8 +11,17 @@ import (
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/k0kubun/pp/v3"
 	"github.com/spf13/cobra"
 )
+
+var getRootPath = func(m map[string]interface{}) string {
+	for k := range m {
+		return k
+	}
+
+	return ""
+}
 
 type importOptions struct {
 	EnginePath string `env:"ENGINE_PATH"`
@@ -45,6 +54,20 @@ func NewImportCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// read existing secrets from the rootPath
+			rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
+
+			printer = prt.NewSecretPrinter(
+				prt.CustomValueLength(o.MaxValueLength),
+				prt.ShowValues(o.ShowValues),
+				prt.ToFormat(prt.Base),
+				prt.WithVaultClient(vaultClient),
+				prt.WithWriter(writer),
+				prt.ShowVersion(true),
+				prt.ShowMetadata(true),
+				prt.WithEnginePath(rootPath),
+			)
+
 			// get user input via -f or STDIN
 			input, err := o.getInput()
 			if err != nil {
@@ -93,13 +116,7 @@ func NewImportCmd() *cobra.Command {
 
 			// print preview during dryrun and exit
 			if o.DryRun {
-				// replace the root path in the secrets with the specified path
-				secretsWithNewPath := make(map[string]interface{})
-				for _, v := range secrets {
-					secretsWithNewPath = utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(v), o.EnginePath)
-				}
-
-				return o.dryRun(rootPath, subPath, secretsWithNewPath)
+				return o.dryRun(rootPath, subPath, secrets)
 			}
 
 			// enable kv engine, error if already enabled, unless force is used
@@ -130,7 +147,7 @@ func NewImportCmd() *cobra.Command {
 
 	// Input
 	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KVv2 Engine path (env: VKV_IMPORT_PATH)")
-	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path (-p) flag will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_IMPORT_PATH)")
+	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path value will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_IMPORT_ENGINE_PATH)")
 	cmd.Flags().StringVarP(&o.File, "file", "f", o.File, "path to a file containing vkv yaml or json output (env: VKV_IMPORT_FILE)")
 
 	// Options
@@ -148,6 +165,8 @@ func NewImportCmd() *cobra.Command {
 
 func (o *importOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	switch {
+	case o.EnginePath == "" && o.Path == "":
+		return errors.New("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
 	case o.Force && o.DryRun:
 		return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --force and --dry-run")
 	case o.Silent && o.DryRun:
@@ -216,8 +235,7 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 		}
 
 		// replace original path with the new engine path
-		t, _ := utils.GetRootElement(secrets)
-		newSubPath := strings.TrimPrefix(p, t)
+		newSubPath := strings.TrimPrefix(p, getRootPath(secrets))
 
 		// unless a subpath has been specified by the user
 		if subPath != "" {
@@ -237,38 +255,42 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 }
 
 func (o *importOptions) dryRun(rootPath, subPath string, secrets map[string]interface{}) error {
-	fmt.Printf("fetching KV secrets from \"%s\" (if any)\n", utils.NormalizePath(path.Join(rootPath, subPath)))
-
-	tmp, err := vaultClient.ListRecursive(rootPath, subPath, true)
-	if err != nil {
-		return fmt.Errorf("error listing secrets from \"%s/%s\": %w", rootPath, subPath, err)
-	}
-
-	if len(utils.ToMapStringInterface(tmp)) == 0 {
-		fmt.Println("no secrets found - nothing to compare with")
-	}
-
-	existingSecrets := utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(tmp), o.EnginePath)
-
-	// check whether new and existing secrets are equal
-	if fmt.Sprint(secrets) == fmt.Sprint(existingSecrets) {
-		fmt.Fprintln(writer, "")
-		fmt.Fprintln(writer, "input matches secrets - no changes needed:")
-		fmt.Fprintln(writer, "")
-
-		if err := printer.Out(existingSecrets); err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	fmt.Fprintf(writer, "deep merging provided secrets with existing secrets read from \"%s\"\n", utils.NormalizePath(path.Join(rootPath, subPath)))
 	fmt.Fprintln(writer, "")
 	fmt.Fprintln(writer, "preview:")
 	fmt.Fprintln(writer, "")
 
-	if err := printer.Out(utils.DeepMergeMaps(secrets, existingSecrets)); err != nil {
+	fmt.Println("root", rootPath, "sub", subPath)
+
+	res, err := vaultClient.ListRecursive(rootPath, "", true)
+	if err != nil {
+		return fmt.Errorf("error listing secrets from \"%s/%s\": %w", rootPath, subPath, err)
+	}
+
+	pp.Println("res", res)
+
+	existingSecrets := make(map[string]interface{})
+
+	if o.EnginePath != "" {
+		existingSecrets[rootPath] = utils.ToMapStringInterface(res)
+	} else {
+		existingSecrets = utils.PathMap(path.Join(rootPath, subPath), utils.ToMapStringInterface(res), false)
+	}
+
+	// add new secrets to it
+	newSecrets := make(map[string]interface{})
+
+	for _, v := range secrets {
+		if o.EnginePath != "" {
+			newSecrets[rootPath] = utils.ToMapStringInterface(v)
+		} else {
+			newSecrets = utils.PathMap(path.Join(rootPath, subPath), utils.ToMapStringInterface(v), false)
+		}
+	}
+
+	// deep merge both secrets
+	mergedSecrets := utils.DeepMergeMaps(newSecrets, existingSecrets)
+
+	if err := printer.Out(mergedSecrets); err != nil {
 		return err
 	}
 
@@ -283,22 +305,32 @@ func (o *importOptions) printResult(rootPath, subPath string) (map[string]interf
 	fmt.Fprintln(writer, "result:")
 	fmt.Fprintln(writer, "")
 
-	printer = prt.NewSecretPrinter(
-		prt.CustomValueLength(o.MaxValueLength),
-		prt.ShowValues(o.ShowValues),
-		prt.ToFormat(prt.Base),
-		prt.WithVaultClient(vaultClient),
-		prt.WithWriter(writer),
-		prt.ShowVersion(true),
-		prt.ShowMetadata(true),
-		prt.ShowVersion(true),
-		prt.WithEnginePath(utils.NormalizePath(rootPath)),
-	)
+	var isSecretPath bool
 
-	secrets, err := vaultClient.ListRecursive(rootPath, subPath, false)
+	// read recursive all secrets
+	s, err := vaultClient.ListRecursive(rootPath, subPath, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(secrets), o.EnginePath), nil
+	// check if path is a directory or secret path
+	if _, isSecret := vaultClient.ReadSecrets(rootPath, subPath); isSecret == nil {
+		isSecretPath = true
+	}
+
+	path := path.Join(rootPath, subPath)
+	if o.EnginePath != "" {
+		path = subPath
+	}
+
+	// prepare the output map
+	pathMap := utils.PathMap(path, utils.ToMapStringInterface(s), isSecretPath)
+
+	if o.EnginePath != "" {
+		return map[string]interface{}{
+			o.EnginePath: pathMap,
+		}, nil
+	}
+
+	return pathMap, nil
 }

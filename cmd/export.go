@@ -120,7 +120,7 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):
 		return errInvalidFlagCombination
 	case o.EnginePath == "" && o.Path == "":
-		return errors.New("no KV-paths given. Either --engine-path/-e or --path/-p needs to be specified")
+		return errors.New("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
 	case true:
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":
