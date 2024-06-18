@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/FalcoSuessgott/vkv/pkg/fs"
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 )
 
@@ -15,16 +14,6 @@ func (s *VaultSuite) TestValidateExportFlags() {
 		opts *importOptions
 		err  bool
 	}{
-		{
-			name: "path and engine path mutually exclusive",
-			args: []string{"--path=p", "--engine-path=e"},
-			err:  true,
-		},
-		{
-			name: "path or engine path required",
-			args: []string{"--show-values"},
-			err:  true,
-		},
 		{
 			name: "only keys and only paths mutually exclusive",
 			args: []string{"-p=1", "--only-keys", "--only-paths"},
@@ -55,33 +44,72 @@ func (s *VaultSuite) TestValidateExportFlags() {
 func (s *VaultSuite) TestExportImportCommand() {
 	testCases := []struct {
 		name          string
-		path          string
 		expected      string
 		err           bool
 		importCmdArgs []string
 		exportCmdArgs []string
 	}{
 		{
-			name:          "yaml",
-			path:          "yaml",
-			importCmdArgs: []string{"-f=testdata/1.yaml", "-p=yaml"},
+			name:          "import secrets, export from path",
+			importCmdArgs: []string{"-f=testdata/1.yaml"},
 			exportCmdArgs: []string{"-p=yaml", "-f=yaml", "--show-values"},
-			expected:      "testdata/1.yaml",
+			expected: `yaml/:
+  secret:
+    user: password
+`,
 		},
 		{
-			name:          "json",
-			path:          "json",
-			importCmdArgs: []string{"-f=testdata/2.json", "-p=json"},
-			exportCmdArgs: []string{"-p=json", "-f=json", "--show-values"},
-			expected:      "testdata/2.json",
+			name:          "import secrets, overwrite path, read from path",
+			importCmdArgs: []string{"-f=testdata/1.yaml", "-p=yaml2"},
+			exportCmdArgs: []string{"-p=yaml2", "-f=yaml", "--show-values"},
+			expected: `yaml2/:
+  secret:
+    user: password
+`,
 		},
 		{
-			name:          "dryrun",
-			path:          "json",
+			name:          "import secrets, overwrite path and subpath, read from path",
+			importCmdArgs: []string{"-f=testdata/1.yaml", "-p=yaml2/sub"},
+			exportCmdArgs: []string{"-p=yaml2", "-f=yaml", "--show-values"},
+			expected: `yaml2/:
+  sub/:
+    secret:
+      user: password
+`,
+		},
+		{
+			name:          "import secrets, overwrite path with engine path, export from engine path",
+			importCmdArgs: []string{"-f=testdata/2.json", "-e=engine/path"},
+			exportCmdArgs: []string{"-e=engine/path", "-f=json", "--show-values"},
+			expected: `{
+  "engine/path/": {
+    "admin": {
+      "sub": "password"
+    }
+  }
+}
+`,
+		},
+		{
+			name:          "import secrets, overwrite path with engine path and subpath, export from engine path",
+			importCmdArgs: []string{"-f=testdata/2.json", "-e=engine/path", "-p=sub"},
+			exportCmdArgs: []string{"-e=engine/path", "-f=json", "--show-values"},
+			expected: `{
+  "engine/path/": {
+    "sub/": {
+      "admin": {
+        "sub": "password"
+      }
+    }
+  }
+}
+`,
+		},
+		{
+			name:          "no output, error, dryrun",
 			err:           true,
 			importCmdArgs: []string{"-f=testdata/2.json", "-d", "-p=json"},
 			exportCmdArgs: []string{"-p=json", "-f=json", "--show-values"},
-			expected:      "testdata/2.json",
 		},
 	}
 
@@ -94,9 +122,9 @@ func (s *VaultSuite) TestExportImportCommand() {
 			importCmd := NewImportCmd()
 			importCmd.SetArgs(tc.importCmdArgs)
 
-			s.Require().NoError(importCmd.Execute(), ("import " + tc.name))
+			s.Require().NoError(importCmd.Execute(), "import "+tc.name)
 
-			// 2. read secrets and assert
+			// 2. read secrets, capture output and assert
 			b := bytes.NewBufferString("")
 			writer = b
 
@@ -105,14 +133,13 @@ func (s *VaultSuite) TestExportImportCommand() {
 
 			err := exportCmd.Execute()
 
-			s.Require().Equal(tc.err, err != nil, "export "+tc.name)
-
-			// if no error - compare exported secretd with expected value
-			if !tc.err {
+			if tc.err {
+				s.Require().Error(err, "export "+tc.name)
+			} else {
+				// if no error - compare exported secrets with expected value
 				out, _ := io.ReadAll(b)
-				exp, _ := fs.ReadFile(tc.expected)
 
-				s.Require().Equal(string(exp), string(out), "secrets "+tc.name)
+				s.Require().Equal(tc.expected, string(out), "secrets "+tc.name)
 			}
 		})
 	}

@@ -79,9 +79,7 @@ func CustomValueLength(length int) Option {
 // OnlyKeys flag for only showing secrets keys.
 func OnlyKeys(b bool) Option {
 	return func(p *Printer) {
-		if b {
-			p.onlyKeys = true
-		}
+		p.onlyKeys = b
 	}
 }
 
@@ -97,9 +95,7 @@ func WithHyperLinks(b bool) Option {
 // OnlyPaths flag for only printing kv paths.
 func OnlyPaths(b bool) Option {
 	return func(p *Printer) {
-		if b {
-			p.onlyPaths = true
-		}
+		p.onlyPaths = b
 	}
 }
 
@@ -117,30 +113,24 @@ func WithWriter(w io.Writer) Option {
 	}
 }
 
-// ShowValues flag for unmasking secrets in output.
+// ShowValues flag for displaying the secrets version.
 func ShowValues(b bool) Option {
 	return func(p *Printer) {
-		if b {
-			p.showValues = true
-		}
+		p.showValues = b
 	}
 }
 
 // ShowVersion flag for unmasking secrets in output.
 func ShowVersion(b bool) Option {
 	return func(p *Printer) {
-		if b {
-			p.showVersion = true
-		}
+		p.showVersion = b
 	}
 }
 
 // ShowMetadata flag for unmasking secrets in output.
 func ShowMetadata(b bool) Option {
 	return func(p *Printer) {
-		if b {
-			p.showMetadata = true
-		}
+		p.showMetadata = b
 	}
 }
 
@@ -191,6 +181,13 @@ func NewSecretPrinter(opts ...Option) *Printer {
 	}
 
 	return p
+}
+
+// Update update printer applies the given options.
+func Update(p *Printer, opts ...Option) {
+	for _, opt := range opts {
+		opt(p)
+	}
 }
 
 // Out prints out the secrets according all configured options.

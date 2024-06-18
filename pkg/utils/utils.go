@@ -4,6 +4,7 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"log"
 	"path"
 	"path/filepath"
@@ -22,6 +23,10 @@ const (
 // Keys type for receiving all keys of a map.
 type Keys []string
 
+func NormalizePath(path string) string {
+	return filepath.Clean(path) + Delimiter
+}
+
 // FlattenMap flattens a nested map into a single map with its.
 func FlattenMap(a, b map[string]interface{}, key string) {
 	for k, v := range a {
@@ -35,26 +40,33 @@ func FlattenMap(a, b map[string]interface{}, key string) {
 	}
 }
 
-// PathMap takes a path like "a/b/c" and returns a map like map[a] -> map[b] -> map[c].
-// if isSecretPath is true, then c does not have a / as suffix.
-func PathMap(path string, s map[string]interface{}, isSecretPath bool) map[string]interface{} {
+// UnflattenMap takes a path like "a/b/c" and returns a map like map[a] -> map[b] -> map[c].
+// elements in ignoreElements are not splitted.
+func UnflattenMap(path string, data map[string]interface{}, ignoreElements ...string) map[string]interface{} {
 	m := map[string]interface{}{}
 
 	parts := strings.Split(path, Delimiter)
 
 	if path == "" {
-		return s
+		return data
+	}
+
+	path = NormalizePath(path)
+
+	// if element is to be ignored
+	for _, ignore := range ignoreElements {
+		if strings.HasPrefix(path, NormalizePath(ignore)) {
+			m[NormalizePath(ignore)] = UnflattenMap(strings.TrimPrefix(path, NormalizePath(ignore)), data, ignoreElements...)
+
+			return m
+		}
 	}
 
 	if len(parts) > 1 {
-		m[parts[0]+Delimiter] = PathMap(strings.Join(parts[1:], Delimiter), s, isSecretPath)
+		m[NormalizePath(parts[0])] = UnflattenMap(strings.Join(parts[1:], Delimiter), data, ignoreElements...)
 	} else {
-		// if path leads to a vault kv directory, append a "/"
-		if !isSecretPath {
-			path += Delimiter
-		}
-
-		m[path] = s
+		// or dont if there is no parts left
+		m[strings.TrimSuffix(path, Delimiter)] = data
 	}
 
 	return m
@@ -69,6 +81,18 @@ func SplitPath(path string) (string, string) {
 	}
 
 	return strings.Join(parts, Delimiter), ""
+}
+
+func GetRootElement(m map[string]interface{}) (string, error) {
+	if len(m) > 1 {
+		return "", errors.New("map contains multiple keys, cannot detect root element")
+	}
+
+	for k := range m {
+		return k, nil
+	}
+
+	return "", errors.New("this shouldn't happen")
 }
 
 func removeEmptyElements(s []string) []string {

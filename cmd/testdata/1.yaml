@@ -1,4 +1,3 @@
 yaml/:
   secret:
     user: password
-

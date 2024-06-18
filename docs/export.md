@@ -3,6 +3,22 @@
 
 See the [CLI Reference](https://falcosuessgott.github.io/vkv/cmd/vkv_export/) for more details on the supported flags and env vars.
 
+!!! warning
+    Vault allows `/` in the name of a KV engine. This makes it difficult for `vkv` to distinguish between directories and the KV engine name..
+    
+    If your KV engine name/mount contains a `/` you have to specify it using `--engine-path|-e`, otherwise `vkv` will output the secrets wrong.
+
+    This also applies for any `vkv import ...` operations.
+
+!!! info
+    `vkv` handles 3 different path arguments, specified using `-e|-p`
+
+    1. `root path`: any normal KV mount. Use `-p`.
+    2. `engine-path`: in case your KV mount contains a `/`. Use `-e`.
+    3. `sub path`: the path to the corresponding directory within a KV mount. 
+    When using `-p` this is everything after the first `/`: e.g: `kv/prod/db/`; root path=`kv`, subpath=`prod/db`. 
+    In conjunction with a `-e` you can specify a sub-path by using -p: `-e=kv/prod -p=db`.
+ 
 ## base
 ```bash
 > vkv export -p secret -f=base               

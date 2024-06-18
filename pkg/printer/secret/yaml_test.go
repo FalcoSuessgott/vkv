@@ -35,7 +35,6 @@ func TestPrintYAML(t *testing.T) {
   secret:
     key: value
     user: password
-
 `,
 		},
 		{
@@ -55,7 +54,6 @@ func TestPrintYAML(t *testing.T) {
   secret:
     key: ""
     user: ""
-
 `,
 		},
 	}
