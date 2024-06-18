@@ -43,8 +43,8 @@ func NewRootCmd() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// skip vault client creation for completion, docs and manpage generation
-			if (cmd.HasParent() && cmd.Parent().Use == "completion") || cmd.Use == "docs" || cmd.Use == "man" {
+			// skip vault client creation for completion, version, help, docs and manpage generation
+			if (cmd.HasParent() && cmd.Parent().Use == "completion") || cmd.Use == "docs" || cmd.Use == "help" || cmd.Use == "version" || cmd.Use == "man" {
 				return nil
 			}
 
