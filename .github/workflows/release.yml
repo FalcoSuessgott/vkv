@@ -47,7 +47,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # if no tag test release build
