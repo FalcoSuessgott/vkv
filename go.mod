@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/hashicorp/vault/api v1.14.0
 	github.com/juju/ansiterm v1.0.0
+	github.com/k0kubun/pp/v3 v3.2.0
 	github.com/muesli/mango-cobra v1.2.0
 	github.com/muesli/roff v0.1.0
 	github.com/savioxavier/termlink v1.3.0
