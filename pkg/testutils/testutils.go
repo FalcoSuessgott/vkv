@@ -21,7 +21,7 @@ type TestContainer struct {
 func StartTestContainer(commands ...string) (*TestContainer, error) {
 	ctx := context.Background()
 
-	vaultContainer, err := vault.RunContainer(ctx,
+	vaultContainer, err := vault.Run(ctx, "hashicorp/vault:1.16.0",
 		vault.WithToken(token),
 		vault.WithInitCommand(commands...),
 	)
