@@ -59,14 +59,14 @@ func NewImportCmd() *cobra.Command {
 
 			// if no path specified, use the path from the secrets to be imported
 			if o.EnginePath == "" && o.Path == "" {
-				fmt.Println("no path specified, trying to determine root path from the provided input")
+				fmt.Fprintln(writer, "no path specified, trying to determine root path from the provided input")
 
 				rootPath, err := utils.GetRootElement(secrets)
 				if err != nil {
 					return fmt.Errorf("try specifying a destination path using -p/-e. %w", err)
 				}
 
-				fmt.Printf("using \"%s\" as KV engine path\n", rootPath)
+				fmt.Fprintf(writer, "using \"%s\" as KV engine path\n", rootPath)
 
 				// detect whether its an engine path or a normal root path
 				if len(strings.Split(rootPath, utils.Delimiter)) > 1 {
