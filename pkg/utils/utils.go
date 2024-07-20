@@ -77,10 +77,10 @@ func SplitPath(path string) (string, string) {
 	parts := removeEmptyElements(strings.Split(path, Delimiter))
 
 	if len(parts) >= 2 {
-		return parts[0], strings.Join(parts[1:], Delimiter)
+		return NormalizePath(parts[0]), strings.Join(parts[1:], Delimiter)
 	}
 
-	return strings.Join(parts, Delimiter), ""
+	return NormalizePath(strings.Join(parts, Delimiter)), ""
 }
 
 func GetRootElement(m map[string]interface{}) (string, error) {
@@ -262,7 +262,7 @@ func DeepMergeMaps(a, b map[string]interface{}) map[string]interface{} {
 func HandleEnginePath(enginePath, path string) (string, string) {
 	// if engine path has been specified use that value as the root path and append the path
 	if enginePath != "" {
-		return enginePath, path
+		return NormalizePath(enginePath), path
 	}
 
 	return SplitPath(path)
