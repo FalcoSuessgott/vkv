@@ -87,7 +87,6 @@ func NewImportCmd() *cobra.Command {
 				prt.WithWriter(writer),
 				prt.ShowVersion(true),
 				prt.ShowMetadata(true),
-				prt.ShowVersion(false),
 				prt.WithEnginePath(utils.NormalizePath(rootPath)),
 			)
 
@@ -99,7 +98,7 @@ func NewImportCmd() *cobra.Command {
 					secretsWithNewPath = utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(v), o.EnginePath)
 				}
 
-				return o.dryRun(rootPath, subPath, secretsWithNewPath)
+				return o.dryRun(rootPath, secretsWithNewPath)
 			}
 
 			// enable kv engine, error if already enabled, unless force is used
@@ -114,7 +113,7 @@ func NewImportCmd() *cobra.Command {
 
 			// show result if not silence mode
 			if !o.Silent {
-				result, err := o.printResult(rootPath, subPath)
+				result, err := o.printResult(rootPath)
 				if err != nil {
 					return err
 				}
@@ -236,19 +235,19 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 	return nil
 }
 
-func (o *importOptions) dryRun(rootPath, subPath string, secrets map[string]interface{}) error {
-	fmt.Printf("fetching KV secrets from \"%s\" (if any)\n", utils.NormalizePath(path.Join(rootPath, subPath)))
+func (o *importOptions) dryRun(rootPath string, secrets map[string]interface{}) error {
+	fmt.Printf("fetching any existing KV secrets from \"%s\" (if any)\n", utils.NormalizePath(rootPath))
 
-	tmp, err := vaultClient.ListRecursive(rootPath, subPath, true)
+	tmp, err := vaultClient.ListRecursive(rootPath, "", true)
 	if err != nil {
-		return fmt.Errorf("error listing secrets from \"%s/%s\": %w", rootPath, subPath, err)
+		return fmt.Errorf("error listing secrets from \"%s/\": %w", rootPath, err)
 	}
 
 	if len(utils.ToMapStringInterface(tmp)) == 0 {
 		fmt.Println("no secrets found - nothing to compare with")
 	}
 
-	existingSecrets := utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(tmp), o.EnginePath)
+	existingSecrets := utils.UnflattenMap(utils.NormalizePath(rootPath), utils.ToMapStringInterface(tmp), o.EnginePath)
 
 	// check whether new and existing secrets are equal
 	if fmt.Sprint(secrets) == fmt.Sprint(existingSecrets) {
@@ -263,7 +262,7 @@ func (o *importOptions) dryRun(rootPath, subPath string, secrets map[string]inte
 		return nil
 	}
 
-	fmt.Fprintf(writer, "deep merging provided secrets with existing secrets read from \"%s\"\n", utils.NormalizePath(path.Join(rootPath, subPath)))
+	fmt.Fprintf(writer, "deep merging provided secrets with existing secrets read from \"%s\"\n", utils.NormalizePath(rootPath))
 	fmt.Fprintln(writer, "")
 	fmt.Fprintln(writer, "preview:")
 	fmt.Fprintln(writer, "")
@@ -278,7 +277,7 @@ func (o *importOptions) dryRun(rootPath, subPath string, secrets map[string]inte
 	return nil
 }
 
-func (o *importOptions) printResult(rootPath, subPath string) (map[string]interface{}, error) {
+func (o *importOptions) printResult(rootPath string) (map[string]interface{}, error) {
 	fmt.Fprintln(writer, "")
 	fmt.Fprintln(writer, "result:")
 	fmt.Fprintln(writer, "")
@@ -295,10 +294,10 @@ func (o *importOptions) printResult(rootPath, subPath string) (map[string]interf
 		prt.WithEnginePath(utils.NormalizePath(rootPath)),
 	)
 
-	secrets, err := vaultClient.ListRecursive(rootPath, subPath, false)
+	secrets, err := vaultClient.ListRecursive(rootPath, "", false)
 	if err != nil {
 		return nil, err
 	}
 
-	return utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(secrets), o.EnginePath), nil
+	return utils.UnflattenMap(utils.NormalizePath(rootPath), utils.ToMapStringInterface(secrets), o.EnginePath), nil
 }

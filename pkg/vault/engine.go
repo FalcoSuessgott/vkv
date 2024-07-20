@@ -121,15 +121,15 @@ func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
 		return fmt.Errorf("a secret engine under \"%s\" is already enabled. Use --force for overwriting", path)
 	}
 
-	// force flag is used, so we disable the engine
-	if err := v.DisableKV2Engine(path); err != nil {
-		return fmt.Errorf("error disabling secret engine \"%s\": %w", path, err)
-	}
+	// // force flag is used, so we disable the engine
+	// if err := v.DisableKV2Engine(path); err != nil {
+	// 	return fmt.Errorf("error disabling secret engine \"%s\": %w", path, err)
+	// }
 
-	// enable the engine
-	if err := v.EnableKV2Engine(path); err != nil {
-		return fmt.Errorf("error enabling secret engine \"%s\": %w", path, err)
-	}
+	// // enable the engine
+	// if err := v.EnableKV2Engine(path); err != nil {
+	// 	return fmt.Errorf("error enabling secret engine \"%s\": %w", path, err)
+	// }
 
 	return nil
 }

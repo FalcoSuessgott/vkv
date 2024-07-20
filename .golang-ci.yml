@@ -5,15 +5,10 @@ linters-settings:
 linters:
   enable-all: true
   disable:
-    - scopelint
-    - maligned
-    - interfacer
-    - golint
     - testpackage
     - forbidigo
     - paralleltest
-    - exhaustivestruct
-    - goerr113
+    - err113
     - wrapcheck
     - gochecknoglobals
     - varnamelen
@@ -22,13 +17,9 @@ linters:
     - containedctx
     - ireturn
     - exhaustruct
-    - varcheck
-    - deadcode
-    - structcheck
-    - nosnakecase
-    - ifshort
     - nolintlint
     - maintidx
+    - mnd
     - dupl
     - goimports
     - gci

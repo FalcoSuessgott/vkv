@@ -30,7 +30,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.54.2
+          version: v1.59.1
           args: -c .golang-ci.yml -v --timeout=5m
         env:
           GO111MODULES: off

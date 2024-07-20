@@ -74,7 +74,12 @@ func NewExportCmd() *cobra.Command {
 				return err
 			}
 
-			result := utils.UnflattenMap(utils.NormalizePath(path.Join(enginePath, subPath)), utils.ToMapStringInterface(secrets), o.EnginePath)
+			p := path.Join(enginePath, subPath)
+			if subPath == "" {
+				p = utils.NormalizePath(p)
+			}
+
+			result := utils.UnflattenMap(p, utils.ToMapStringInterface(secrets), o.EnginePath)
 
 			if err := printer.Out(result); err != nil {
 				return err

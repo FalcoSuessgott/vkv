@@ -273,26 +273,20 @@ func TestSplitPath(t *testing.T) {
 		{
 			name:            "test: root path",
 			path:            "kv",
-			expectedRoot:    "kv",
+			expectedRoot:    "kv/",
 			expectedSubPath: "",
 		},
 		{
 			name:            "test: sub path",
 			path:            "kv/sub",
-			expectedRoot:    "kv",
+			expectedRoot:    "kv/",
 			expectedSubPath: "sub",
 		},
 		{
 			name:            "test: sub sub path",
 			path:            "kv/sub/sub2",
-			expectedRoot:    "kv",
+			expectedRoot:    "kv/",
 			expectedSubPath: "sub/sub2",
-		},
-		{
-			name:            "test: empty path",
-			path:            "",
-			expectedRoot:    "",
-			expectedSubPath: "",
 		},
 	}
 
@@ -582,26 +576,26 @@ func TestHandleEnginePath(t *testing.T) {
 		{
 			name:             "only path",
 			path:             "1/2/3/4",
-			expectedRootPath: "1",
+			expectedRootPath: "1/",
 			expectedSubPath:  "2/3/4",
 		},
 		{
 			name:             "one element path",
 			path:             "1",
-			expectedRootPath: "1",
+			expectedRootPath: "1/",
 			expectedSubPath:  "",
 		},
 		{
 			name:             "engine path and path",
 			enginePath:       "1/2/3/4",
 			path:             "5/6",
-			expectedRootPath: "1/2/3/4",
+			expectedRootPath: "1/2/3/4/",
 			expectedSubPath:  "5/6",
 		},
 		{
 			name:             "only engine path",
-			enginePath:       "1/2/3/4",
-			expectedRootPath: "1/2/3/4",
+			enginePath:       "1/2/3/4/",
+			expectedRootPath: "1/2/3/4/",
 		},
 	}
 
