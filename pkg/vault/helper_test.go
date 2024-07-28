@@ -21,13 +21,18 @@ func (s *VaultSuite) TestString() {
 					"bar":  "false",
 				},
 			},
-			exp: "bar\t= \"false\"\nfoo\t= \"12\"\nkey\t= \"value\"\nthis\t= \"one\"\n",
+			exp: "\"bar\"\t= \"false\"\n\"foo\"\t= \"12\"\n\"key\"\t= \"value\"\n\"this\"\t= \"one\"\n",
 		},
 	}
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			s.Require().Equal(tc.exp, tc.secret.String(false, -1), tc.name)
+			// disable colored output for test purposes
+			s.Suite.T().Setenv(utils.NoColorEnv, "true")
+			s.Suite.T().Setenv(utils.NoHyperlinksEnv, "true")
+			s.Suite.T().Setenv(utils.MaxValueLengthEnv, "-1")
+
+			s.Require().Equal(tc.exp, tc.secret.String(false), tc.name)
 		})
 	}
 }
@@ -51,7 +56,7 @@ func (s *VaultSuite) TestDiffString() {
 					"key": "value",
 				},
 			},
-			exp: "key\t= \"value\"\n",
+			exp: "\"key\"\t= \"value\"\n",
 		},
 		{
 			name: "added",
@@ -63,7 +68,7 @@ func (s *VaultSuite) TestDiffString() {
 					"key": "value",
 				},
 			},
-			exp: "[+] key\t= \"value\"\n",
+			exp: "[+] \"key\"\t= \"value\"\n",
 		},
 		{
 			name: "changed",
@@ -77,7 +82,7 @@ func (s *VaultSuite) TestDiffString() {
 					"key": "changed",
 				},
 			},
-			exp: "[~] key\t= \"value\" -> \"changed\"\n",
+			exp: "[~] \"key\"\t= \"value\" -> \"changed\"\n",
 		},
 		{
 			name: "deleted",
@@ -89,7 +94,7 @@ func (s *VaultSuite) TestDiffString() {
 			currentSecret: &Secret{
 				Data: map[string]interface{}{},
 			},
-			exp: "[-] key\t= \"value\"\n",
+			exp: "[-] \"key\"\t= \"value\"\n",
 		},
 		{
 			name: "complex",
@@ -109,11 +114,11 @@ func (s *VaultSuite) TestDiffString() {
 					"bar":     "false",
 				},
 			},
-			exp: `[+] another	= "one"
-bar	= "false"
-[-] foo	= "12"
-[~] key	= "value" -> "changed"
-this	= "one"
+			exp: `[+] "another"	= "one"
+"bar"	= "false"
+[-] "foo"	= "12"
+[~] "key"	= "value" -> "changed"
+"this"	= "one"
 `,
 		},
 	}
@@ -121,6 +126,8 @@ this	= "one"
 	for _, tc := range testCases {
 		// disable colored output for test purposes
 		s.Suite.T().Setenv(utils.NoColorEnv, "true")
+		s.Suite.T().Setenv(utils.NoHyperlinksEnv, "true")
+		s.Suite.T().Setenv(utils.MaxValueLengthEnv, "-1")
 
 		log, err := diff.Diff(tc.previous.Data, tc.currentSecret.Data)
 		if err != nil {
@@ -130,7 +137,7 @@ this	= "one"
 		tc.currentSecret.Changelog = log
 
 		s.Run(tc.name, func() {
-			s.Require().Equal(tc.exp, tc.currentSecret.DiffString(false, false, -1), tc.name)
+			s.Require().Equal(tc.exp, tc.currentSecret.DiffString(false), tc.name)
 		})
 	}
 }

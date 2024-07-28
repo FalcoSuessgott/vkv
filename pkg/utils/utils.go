@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,12 +24,19 @@ const (
 	// Delimiter / delimiter for splitting a path.
 	Delimiter = "/"
 
-	NoColorEnv = "NO_COLOR"
+	MaxValueLengthEnv = "MAX_VALUE_LENGTH"
+	NoColorEnv        = "NO_COLOR"
+	NoHyperlinksEnv   = "NO_HYPERLINKS"
 
-	Reset  = "\033[0m"
+	Reset = "\033[0m"
+	Bold  = "\033[1m"
+
 	Red    = "\033[31m"
 	Green  = "\033[32m"
 	Yellow = "\033[33m"
+
+	has    = "✔"
+	hasNot = "✖"
 )
 
 // Keys type for receiving all keys of a map.
@@ -38,29 +46,66 @@ func NormalizePath(path string) string {
 	return filepath.Clean(path) + Delimiter
 }
 
-var (
-	ColorRed = func(text string) string {
-		if _, ok := os.LookupEnv(NoColorEnv); !ok {
-			return fmt.Sprintf("%s%s%s", Red, text, Reset)
+func ColorRed(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Red, text, Reset)
+	}
+
+	return text
+}
+
+func ColorYellow(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Yellow, text, Reset)
+	}
+
+	return text
+}
+
+func ColorGreen(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Green, text, Reset)
+	}
+
+	return text
+}
+
+func ColorBold(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Bold, text, Reset)
+	}
+
+	return text
+}
+
+func MaskString(s interface{}) string {
+	length := 12
+
+	if v, ok := os.LookupEnv(MaxValueLengthEnv); ok {
+		i, err := strconv.Atoi(v)
+		if err != nil {
+			log.Printf("invalid value for %s - using default value %d\n", MaxValueLengthEnv, length)
 		}
 
-		return text
+		length = i
 	}
-	ColorYellow = func(text string) string {
-		if _, ok := os.LookupEnv(NoColorEnv); !ok {
-			return fmt.Sprintf("%s%s%s", Yellow, text, Reset)
-		}
 
-		return text
-	}
-	ColorGreen = func(text string) string {
-		if _, ok := os.LookupEnv(NoColorEnv); !ok {
-			return fmt.Sprintf("%s%s%s", Green, text, Reset)
-		}
+	n := fmt.Sprintf("%s", s)
 
-		return text
+	if len(n) > length && length != -1 {
+		return strings.Repeat("*", length)
 	}
-)
+
+	return strings.Repeat("*", len(n))
+}
+
+func ResolveCap(v bool) string {
+	if v {
+		return ColorGreen(has)
+	}
+
+	return ColorRed(hasNot)
+}
 
 // FlattenMap flattens a nested map into a single map with its.
 func FlattenMap(a, b map[string]interface{}, key string) {
@@ -81,10 +126,6 @@ func UnflattenMap[T any](path string, v []*T, ignoreElements ...string) map[stri
 	m := map[string]interface{}{}
 
 	parts := strings.Split(path, Delimiter)
-
-	// if path == "" {
-	// 	return
-	// }
 
 	path = NormalizePath(path)
 
@@ -317,14 +358,4 @@ func ParseEnvs(prefix string, i interface{}) error {
 
 func TimeAgo(t time.Time) string {
 	return timeago.Parse(t)
-}
-
-func MaskString(s interface{}, length int) string {
-	n := fmt.Sprintf("%s", s)
-
-	if len(n) > length && length != -1 {
-		return strings.Repeat("*", length)
-	}
-
-	return strings.Repeat("*", len(n))
 }

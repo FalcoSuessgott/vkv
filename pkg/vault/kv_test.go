@@ -1,157 +1,176 @@
 package vault
 
-// import (
-// 	"path"
+import (
+	"fmt"
+	"path"
+)
 
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/require"
-// )
+func (s *VaultSuite) TestListRecursive() {
+	testCases := []struct {
+		name     string
+		kv       *KVSecrets
+		err      bool
+		v1       bool
+		expected map[string][]*Secret
+	}{
+		{
+			name: "simple secret",
+			kv:   exampleKVSecrets(true),
+			expected: map[string][]*Secret{
+				"secret/test/admin": {
+					{
+						Version:        1,
+						CustomMetadata: map[string]interface{}{"key": "value"},
+						Data: map[string]interface{}{
+							"foo": "bar",
+						},
+					},
+					{
+						Version: 2,
+						Data: map[string]interface{}{
+							"foo": "bar",
+							"new": "element",
+						},
+					},
+					{
+						Version: 3,
+						Data: map[string]interface{}{
+							"foo": "change",
+							"new": "element",
+						},
+					},
+				},
+			},
+		},
+	}
 
-// func (s *VaultSuite) TestListRecursive() {
-// 	testCases := []struct {
-// 		name     string
-// 		rootPath string
-// 		subPath  string
-// 		err      bool
-// 		v1       bool
-// 		secrets  Secrets
-// 		expected Secrets
-// 	}{
-// 		{
-// 			name:     "simple secret",
-// 			rootPath: "kvv2",
-// 			subPath:  "subpath",
-// 			secrets: map[string]interface{}{
-// 				"sub": map[string]interface{}{
-// 					"user": "password",
-// 				},
-// 				"sub2": map[string]interface{}{
-// 					"user": false,
-// 				},
-// 			},
-// 			expected: map[string]interface{}{
-// 				"kvv2": Secrets{
-// 					"sub": map[string]interface{}{
-// 						"user": "password",
-// 					},
-// 					"sub2": map[string]interface{}{
-// 						"user": false,
-// 					},
-// 				},
-// 			},
-// 		},
-// 		{
-// 			name:     "simple secret",
-// 			rootPath: "kvv1",
-// 			v1:       true,
-// 			subPath:  "subpath",
-// 			secrets: map[string]interface{}{
-// 				"sub": map[string]interface{}{
-// 					"user": "password",
-// 				},
-// 				"sub2": map[string]interface{}{
-// 					"user": false,
-// 				},
-// 			},
-// 			expected: map[string]interface{}{
-// 				"kvv1": Secrets{
-// 					"sub": map[string]interface{}{
-// 						"user": "password",
-// 					},
-// 					"sub2": map[string]interface{}{
-// 						"user": false,
-// 					},
-// 				},
-// 			},
-// 		},
-// 	}
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			// write secrets
+			for path, secrets := range tc.kv.Secrets {
+				for _, secret := range secrets {
+					if !secret.Deleted && !secret.Destroyed && len(secret.Data) > 0 {
+						s.Suite.Require().NoError(s.client.WriteSecrets(tc.kv.MountPath, path, secret.Data), "writing secrets "+tc.name)
+					}
+				}
+			}
 
-// 	for _, tc := range testCases {
-// 		s.Run(tc.name, func() {
-// 			// write secrets
-// 			if tc.v1 {
-// 				require.NoError(s.Suite.T(), s.client.EnableKV1Engine(tc.rootPath))
-// 			} else {
-// 				require.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
-// 			}
+			// read secrets
+			data, err := s.client.NewKVSecrets(tc.kv.MountPath, "", false, true)
+			s.Require().NoError(err, "reading secrets "+tc.name)
 
-// 			for k, secrets := range tc.secrets {
-// 				if m, ok := secrets.(map[string]interface{}); ok {
-// 					require.NoError(s.Suite.T(), s.client.WriteSecrets(tc.rootPath, path.Join(tc.subPath, k), m))
-// 				}
-// 			}
+			fmt.Println(data.Secrets)
 
-// 			// read secrets
-// 			res := make(Secrets)
-// 			secrets, err := s.client.ListRecursive(tc.rootPath, tc.subPath, false)
-// 			require.NoError(s.Suite.T(), err)
+			// assert
+			for p, secrets := range tc.expected {
+				_, ok := data.Secrets[path.Join(tc.kv.MountPath, p)]
 
-// 			res[tc.rootPath] = *secrets
+				s.Require().True(ok, "matching paths "+tc.name)
 
-// 			// assert
-// 			if tc.err {
-// 				require.Error(s.Suite.T(), err)
-// 			} else {
-// 				require.NoError(s.Suite.T(), err)
-// 				assert.Equal(s.Suite.T(), tc.expected, res, tc.name)
-// 			}
+				for i, version := range secrets {
+					s.Require().Equal(version.Data, data.Secrets[path.Join(tc.kv.MountPath, p)][i].Data, "matching data "+tc.name)
+				}
+			}
+		})
+	}
+}
 
-// 			require.NoError(s.Suite.T(), s.client.DisableKV2Engine(tc.rootPath))
-// 		})
-// 	}
-// }
+func (s *VaultSuite) TestGetDescription() {
+	s.Run("description", func() {
+		desc, err := s.client.GetEngineDescription("secret")
 
-// func (s *VaultSuite) TestReadSecretMetadataVersion() {
-// 	testCases := []struct {
-// 		name     string
-// 		rootPath string
-// 		subPath  string
-// 		secrets  Secrets
-// 		version  string
-// 		metadata interface{}
-// 	}{
-// 		{
-// 			name:     "simple secret",
-// 			rootPath: "kv",
-// 			subPath:  "subpath",
-// 			secrets: map[string]interface{}{
-// 				"sub": map[string]interface{}{
-// 					"user": "password",
-// 				},
-// 				"sub2": map[string]interface{}{
-// 					"user": false,
-// 				},
-// 			},
-// 			metadata: nil,
-// 			version:  "1",
-// 		},
-// 	}
+		s.Require().NoError(err)
 
-// 	for _, tc := range testCases {
-// 		s.Run(tc.name, func() {
-// 			// write secrets
-// 			require.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
+		s.Require().Equal("key/value secret storage", desc)
+	})
+}
 
-// 			for k, v := range tc.secrets {
-// 				if m, ok := v.(map[string]interface{}); ok {
-// 					require.NoError(s.Suite.T(), s.client.WriteSecrets(tc.rootPath, path.Join(tc.subPath, k), m), tc.name)
-// 				}
-// 			}
+func (s *VaultSuite) TestGetEngineVersionType() {
+	s.Run("description", func() {
+		engineType, version, err := s.client.GetEngineTypeVersion("secret")
 
-// 			// read metadata
-// 			for k := range tc.secrets {
-// 				md, err := s.client.ReadSecretMetadata(tc.rootPath, path.Join(tc.subPath, k))
-// 				require.NoError(s.Suite.T(), err, tc.name)
-// 				require.EqualValues(s.Suite.T(), tc.metadata, md, "we currently cant write metadata")
+		s.Require().NoError(err)
 
-// 				v, err := s.client.ReadSecretVersion(tc.rootPath, path.Join(tc.subPath, k))
-// 				require.NoError(s.Suite.T(), err, tc.name)
+		s.Require().Equal("kv", engineType)
+		s.Require().Equal("2", version)
+	})
+}
 
-// 				// assert
-// 				require.EqualValues(s.Suite.T(), tc.version, v, "version")
-// 			}
+func (s *VaultSuite) TestEnableKV2EngineErrorIfNotForced() {
+	testCases := []struct {
+		name    string
+		force   bool
+		path    string
+		prepare bool
+		err     bool
+	}{
+		{
+			name:  "engine does not exist, no force",
+			force: false,
+			path:  "case-1",
+			err:   false,
+		},
+		{
+			name:    "engine does exist, no force",
+			force:   false,
+			prepare: true,
+			path:    "case-2",
+			err:     true,
+		},
+		{
+			name:    "engine does exist, force",
+			force:   true,
+			prepare: true,
+			path:    "case-3",
+			err:     false,
+		},
+		{
+			name:    "engine does exist, no force",
+			force:   false,
+			prepare: true,
+			path:    "case-4",
+			err:     true,
+		},
+	}
 
-// 			require.NoError(s.Suite.T(), s.client.DisableKV2Engine(tc.rootPath))
-// 		})
-// 	}
-// }
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			if tc.prepare {
+				s.Require().NoError(s.client.EnableKV2Engine(tc.path))
+			}
+
+			err := s.client.EnableKV2EngineErrorIfNotForced(tc.force, tc.path)
+
+			s.Require().Equal(tc.err, err != nil, tc.name)
+		})
+	}
+}
+
+func (s *VaultSuite) TestListAllKVSecretEngines() {
+	testCases := []struct {
+		name     string
+		engines  []string
+		expected Engines
+	}{
+		{
+			name:    "test",
+			engines: []string{"1", "2", "3"},
+			expected: Engines{
+				"": []string{"secret/", "1/", "2/", "3/"}, // enabled by default
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			for _, engine := range tc.engines {
+				s.Require().NoError(s.client.EnableKV2Engine(engine), tc.name)
+			}
+
+			res, err := s.client.ListAllKVSecretEngines("")
+			s.Require().NoError(err, tc.name)
+
+			s.Require().ElementsMatch(tc.expected[""], res[""], tc.name)
+		})
+	}
+}

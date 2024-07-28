@@ -9,57 +9,68 @@ import (
 	"github.com/andreyvit/diff"
 )
 
-func (s *VaultSuite) TestPrinterDefault() {
+func (s *VaultSuite) TestPrinterFormats() {
 	testCases := []struct {
-		name    string
-		printer string
-		fOpts   *FormatOptions
-		kv      *KVSecrets
-		err     bool
+		name   string
+		format string
+		fOpts  *FormatOptions
+		kv     *KVSecrets
+		err    bool
 	}{
 		{
-			name:    "default",
-			printer: "default",
-			kv:      exampleKVSecrets(),
-			fOpts: &FormatOptions{
-				ShowDiff:    false,
-				OnlyKeys:    false,
-				MaskSecrets: false,
-			},
+			name:   "default",
+			format: "default",
+			kv:     exampleKVSecrets(false),
+			fOpts:  &FormatOptions{},
 		},
 		{
-			name:    "default_diff",
-			printer: "default",
-			kv:      exampleKVSecrets(),
-			fOpts: &FormatOptions{
-				ShowDiff: true,
-			},
+			name:   "default_masked",
+			format: "default",
+			kv:     exampleKVSecrets(false),
+			fOpts:  &FormatOptions{maskSecrets: true},
 		},
 		{
-			name:    "default_masked",
-			printer: "default",
-			kv:      exampleKVSecrets(),
-			fOpts: &FormatOptions{
-				MaskSecrets:    true,
-				MaxValueLength: 12,
-			},
+			name:   "full",
+			format: "full",
+			kv:     exampleKVSecrets(true),
+			fOpts:  &FormatOptions{},
 		},
 		{
-			name:    "default_only-keys",
-			printer: "default",
-			kv:      exampleKVSecrets(),
-			fOpts: &FormatOptions{
-				OnlyKeys: true,
-			},
+			name:   "full_masked",
+			format: "full",
+			kv:     exampleKVSecrets(true),
+			fOpts:  &FormatOptions{maskSecrets: true},
 		},
 		{
-			name:    "default_only-keys_diff",
-			printer: "default",
-			kv:      exampleKVSecrets(),
-			fOpts: &FormatOptions{
-				ShowDiff: true,
-				OnlyKeys: true,
-			},
+			name:   "full_masked-diff",
+			format: "full",
+			kv:     exampleKVSecrets(true),
+			fOpts:  &FormatOptions{maskSecrets: true, showDiff: true},
+		},
+		{
+			name:   "json",
+			format: "json",
+			kv:     exampleKVSecrets(true),
+			fOpts:  &FormatOptions{},
+		},
+		// TODO: yaml is marshalled unpredictably
+		// {
+		// 	name:   "yaml",
+		// 	format: "yaml",
+		// 	kv:     exampleKVSecrets(),
+		// 	fOpts:  &FormatOptions{},
+		// },
+		{
+			name:   "export",
+			format: "export",
+			kv:     exampleKVSecrets(true),
+			fOpts:  &FormatOptions{},
+		},
+		{
+			name:   "policy",
+			format: "policy",
+			kv:     exampleKVSecrets(true),
+			fOpts:  &FormatOptions{},
 		},
 	}
 
@@ -69,14 +80,15 @@ func (s *VaultSuite) TestPrinterDefault() {
 			var b bytes.Buffer
 			opts := printer.PrinterOptions{}
 			opts.Writer = &b
-			opts.Format = tc.printer
+			opts.Format = tc.format
 
 			// dependency injection
 			tc.kv.Vault = s.client
 
 			// disable colored output for test purposes
-			s.Suite.T().Setenv("NO_COLOR", "true")
-			s.Suite.T().Setenv("NO_HYPERLINKS", "true")
+			s.Suite.T().Setenv(utils.NoColorEnv, "true")
+			s.Suite.T().Setenv(utils.NoHyperlinksEnv, "true")
+			s.Suite.T().Setenv(utils.MaxValueLengthEnv, "-1")
 
 			// run printer
 			err := printer.Print(tc.kv.PrinterFuncs(tc.fOpts), opts)
@@ -103,8 +115,8 @@ func (s *VaultSuite) TestPrinterDefault() {
 	}
 }
 
-func exampleKVSecrets() *KVSecrets {
-	return &KVSecrets{
+func exampleKVSecrets(allVersion bool) *KVSecrets {
+	s := &KVSecrets{
 		MountPath:   utils.NormalizePath("secret"),
 		Type:        "kvv2",
 		Description: "test",
@@ -117,25 +129,38 @@ func exampleKVSecrets() *KVSecrets {
 						"foo": "bar",
 					},
 				},
-				{
-					Version: 2,
-					Data: map[string]interface{}{
-						"foo": "bar",
-						"new": "element",
-					},
-				},
-				{
-					Version: 3,
-					Data: map[string]interface{}{
-						"foo": "change",
-						"new": "element",
-					},
-				},
-				{
-					Version: 4,
-					Data:    map[string]interface{}{},
-				},
 			},
 		},
 	}
+
+	if allVersion {
+		s.Secrets["secret/test/admin"] = append(
+			s.Secrets["secret/test/admin"],
+			&Secret{
+				Version: 2,
+				Data: map[string]interface{}{
+					"foo": "bar",
+					"new": "element",
+				},
+			},
+			&Secret{
+				Version: 3,
+				Data: map[string]interface{}{
+					"foo": "change",
+					"new": "element",
+				},
+			},
+			&Secret{
+				Version: 4,
+				Data:    map[string]interface{}{},
+				Deleted: true,
+			},
+			&Secret{
+				Version:   5,
+				Data:      map[string]interface{}{},
+				Destroyed: true,
+			})
+	}
+
+	return s
 }

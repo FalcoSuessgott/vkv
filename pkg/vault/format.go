@@ -1,34 +1,54 @@
 package vault
 
+import (
+	"log"
+
+	"github.com/FalcoSuessgott/vkv/pkg/fs"
+)
+
 // Option list of available options for modifying the output.
 type Option func(*FormatOptions)
 
 // Printer struct that holds all options used for displaying the secrets.
 type FormatOptions struct {
-	ShowDiff       bool
-	OnlyKeys       bool
-	MaskSecrets    bool
-	MaxValueLength int
-}
-
-// OnlyKeys flag for only showing secrets keys.
-func OnlyKeys() Option {
-	return func(p *FormatOptions) {
-		p.OnlyKeys = true
-	}
+	showDiff    bool
+	maskSecrets bool
+	template    []byte
 }
 
 // hMaskSecrets flag for only showing secrets keys.
 func MaskSecrets() Option {
 	return func(p *FormatOptions) {
-		p.MaskSecrets = true
+		p.maskSecrets = true
 	}
 }
 
 // WithMaskSecrets flag for only showing secrets keys.
 func ShowDiff() Option {
 	return func(p *FormatOptions) {
-		p.ShowDiff = true
+		p.showDiff = true
+	}
+}
+
+// WithTemplate sets the template file.
+func WithTemplate(str, path string) Option {
+	return func(p *FormatOptions) {
+		if str != "" {
+			p.template = []byte(str)
+
+			return
+		}
+
+		if path != "" {
+			out, err := fs.ReadFile(path)
+			if err != nil {
+				log.Fatalf("error reading %s: %s", path, err.Error())
+			}
+
+			p.template = out
+
+			return
+		}
 	}
 }
 
@@ -39,8 +59,6 @@ func NewFormatOptions(opts ...Option) *FormatOptions {
 	for _, opt := range opts {
 		opt(fOpts)
 	}
-
-	fOpts.MaxValueLength = 12
 
 	return fOpts
 }

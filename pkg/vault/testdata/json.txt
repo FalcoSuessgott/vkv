@@ -1,0 +1,64 @@
+{
+  "mount_path": "secret/",
+  "type": "kvv2",
+  "description": "test",
+  "secrets": {
+    "secret/test/admin": [
+      {
+        "data": {
+          "foo": "bar"
+        },
+        "custom_metadata": {
+          "key": "value"
+        },
+        "version": 1,
+        "version_created_time": "0001-01-01T00:00:00Z",
+        "destroyed": false,
+        "deleted": false,
+        "deletion_time": "0001-01-01T00:00:00Z"
+      },
+      {
+        "data": {
+          "foo": "bar",
+          "new": "element"
+        },
+        "custom_metadata": null,
+        "version": 2,
+        "version_created_time": "0001-01-01T00:00:00Z",
+        "destroyed": false,
+        "deleted": false,
+        "deletion_time": "0001-01-01T00:00:00Z"
+      },
+      {
+        "data": {
+          "foo": "change",
+          "new": "element"
+        },
+        "custom_metadata": null,
+        "version": 3,
+        "version_created_time": "0001-01-01T00:00:00Z",
+        "destroyed": false,
+        "deleted": false,
+        "deletion_time": "0001-01-01T00:00:00Z"
+      },
+      {
+        "data": {},
+        "custom_metadata": null,
+        "version": 4,
+        "version_created_time": "0001-01-01T00:00:00Z",
+        "destroyed": false,
+        "deleted": true,
+        "deletion_time": "0001-01-01T00:00:00Z"
+      },
+      {
+        "data": {},
+        "custom_metadata": null,
+        "version": 5,
+        "version_created_time": "0001-01-01T00:00:00Z",
+        "destroyed": true,
+        "deleted": false,
+        "deletion_time": "0001-01-01T00:00:00Z"
+      }
+    ]
+  }
+}

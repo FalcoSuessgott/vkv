@@ -27,16 +27,6 @@ const (
 
 	defaultTimestamp = "00010101000000"
 	dateFormat       = "Monday, 02-Jan-06 15:04:05"
-
-	has    = "✔"
-	hasNot = "✖"
-
-	capCreate = "create"
-	capRead   = "read"
-	capUpdate = "update"
-	capDelete = "delete"
-	capList   = "list"
-	capRoot   = "root"
 )
 
 // Vault represents a vault struct used for reading and writing secrets.
@@ -59,11 +49,12 @@ type KVSecrets struct {
 // Secret is a single KV secret
 type Secret struct {
 	Data               map[string]interface{} `json:"data"`
-	Changelog          diff.Changelog
+	Changelog          diff.Changelog         `json:"-"`
 	CustomMetadata     map[string]interface{} `json:"custom_metadata"`
 	Version            int                    `json:"version"`
 	VersionCreatedTime time.Time              `json:"version_created_time"`
 	Destroyed          bool                   `json:"destroyed"`
+	Deleted            bool                   `json:"deleted"`
 	DeletionTime       time.Time              `json:"deletion_time"`
 }
 

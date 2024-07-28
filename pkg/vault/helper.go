@@ -18,7 +18,7 @@ import (
 func (kv *KVSecrets) Title() string {
 	return fmt.Sprintf("%s [%s] %s",
 		func() string {
-			if _, ok := os.LookupEnv("NO_HYPERLINKS"); ok {
+			if _, ok := os.LookupEnv(utils.NoHyperlinksEnv); ok {
 				return kv.MountPath
 			}
 
@@ -62,16 +62,6 @@ func (kv *KVSecrets) ComputeDiffChangelog() error {
 	return nil
 }
 
-func (kv *KVSecrets) OnlyKeys() {
-	for _, secrets := range kv.Secrets {
-		for _, s := range secrets {
-			for k := range s.Data {
-				s.Data[k] = ""
-			}
-		}
-	}
-}
-
 func (kv *KVSecrets) SecretName(p string) string {
 	name := strings.TrimSuffix(p, utils.Delimiter)
 
@@ -81,7 +71,7 @@ func (kv *KVSecrets) SecretName(p string) string {
 	}
 
 	if !strings.HasSuffix(p, utils.Delimiter) {
-		if _, ok := os.LookupEnv("NO_HYPERLINKS"); ok {
+		if _, ok := os.LookupEnv(utils.NoHyperlinksEnv); ok {
 			return name
 		}
 
@@ -105,7 +95,7 @@ func (s Secret) Title() string {
 	status := "created"
 	tAgo := timeago.Parse(s.VersionCreatedTime)
 
-	if s.DeletionTime.Format("20060102150405") != defaultTimestamp {
+	if s.Deleted {
 		status = "deleted"
 		tAgo = timeago.Parse(s.DeletionTime)
 	}
@@ -128,31 +118,27 @@ func (s Secret) Metadata() string {
 }
 
 // String returns a string representation of the secret.
-func (s *Secret) String(mask bool, length int) string {
+func (s *Secret) String(mask bool) string {
 	str := ""
 
 	for _, k := range utils.SortMapKeys(s.Data) {
-		if s.Data[k] == "" {
-			str += fmt.Sprintf("%s\n", k)
-		} else {
-			v := fmt.Sprintf("%s", s.Data[k])
+		v := fmt.Sprintf("%s", s.Data[k])
 
-			if mask {
-				v = utils.MaskString(v, length)
-			}
-
-			str += fmt.Sprintf("%s\t= \"%s\"\n", k, v)
+		if mask {
+			v = utils.MaskString(v)
 		}
+
+		str += fmt.Sprintf("\"%s\"\t= \"%s\"\n", utils.ColorGreen(k), utils.ColorGreen(v))
 	}
 
 	return str
 }
 
 // DiffString returns a string representing the changes compared to the previous secrets version.
-func (s *Secret) DiffString(onlyKeys, mask bool, length int) string {
+func (s *Secret) DiffString(mask bool) string {
 	// if no changelog, secret and previous version match, output the secret
 	if s.Changelog == nil || len(s.Changelog) == 0 {
-		return s.String(mask, length)
+		return s.String(mask)
 	}
 
 	var (
@@ -166,50 +152,39 @@ func (s *Secret) DiffString(onlyKeys, mask bool, length int) string {
 
 		switch change.Type {
 		case diff.CREATE:
-			v := fmt.Sprintf("\"%s\"", change.To)
+			v := fmt.Sprintf("\"%s\"", utils.ColorGreen(change.To.(string)))
 
 			if mask {
-				v = utils.MaskString(v, length)
-			}
-
-			if onlyKeys {
-				v = ""
+				v = fmt.Sprintf("\"%s\"", utils.ColorGreen(utils.MaskString(change.To)))
 			}
 
 			m[change.Path[0]] = struct{ op, v string }{
-				op: fmt.Sprintf("%s %s", utils.ColorGreen("[+]"), change.Path[0]),
+				op: fmt.Sprintf("%s \"%s\"", utils.ColorGreen("[+]"), utils.ColorGreen(change.Path[0])),
 				v:  v,
 			}
 		case diff.UPDATE:
-			v := fmt.Sprintf("\"%s\" -> \"%s\"", change.From, change.To)
+			v := fmt.Sprintf("\"%s\" -> \"%s\"", utils.ColorYellow(change.From.(string)), utils.ColorYellow(change.To.(string)))
 
 			if mask {
 				v = fmt.Sprintf("\"%s\" -> \"%s\"",
-					utils.MaskString(change.From, length),
-					utils.MaskString(change.To, length))
-			}
-
-			if onlyKeys {
-				v = ""
+					utils.ColorYellow(utils.MaskString(change.From)),
+					utils.ColorYellow(utils.MaskString(change.To)))
 			}
 
 			m[change.Path[0]] = struct{ op, v string }{
-				op: fmt.Sprintf("%s %s", utils.ColorYellow("[~]"), change.Path[0]),
+				op: fmt.Sprintf("%s \"%s\"", utils.ColorYellow("[~]"), utils.ColorYellow(change.Path[0])),
 				v:  v,
 			}
 
 		case diff.DELETE:
-			v := fmt.Sprintf("\"%s\"", change.From)
-			if mask {
-				v = fmt.Sprintf("\"%s\"", utils.MaskString(change.From, length))
-			}
+			v := fmt.Sprintf("\"%s\"", utils.ColorRed(change.From.(string)))
 
-			if onlyKeys {
-				v = ""
+			if mask {
+				v = fmt.Sprintf("\"%s\"", utils.ColorRed(utils.MaskString(change.From)))
 			}
 
 			m[change.Path[0]] = struct{ op, v string }{
-				op: fmt.Sprintf("%s %s", utils.ColorRed("[-]"), change.Path[0]),
+				op: fmt.Sprintf("%s \"%s\"", utils.ColorRed("[-]"), change.Path[0]),
 				v:  v,
 			}
 		}
@@ -219,16 +194,12 @@ func (s *Secret) DiffString(onlyKeys, mask bool, length int) string {
 	for k, value := range s.Data {
 		if !slices.Contains(keys, k) {
 			data := struct{ op, v string }{
-				op: k,
+				op: fmt.Sprintf("\"%s\"", k),
 				v:  fmt.Sprintf("\"%s\"", value),
 			}
 
 			if mask {
-				data.v = utils.MaskString(data.v, length)
-			}
-
-			if onlyKeys {
-				data.v = ""
+				data.v = fmt.Sprintf("\"%s\"", utils.MaskString(value))
 			}
 
 			m[k] = data
@@ -244,23 +215,8 @@ func (s *Secret) DiffString(onlyKeys, mask bool, length int) string {
 	slices.Sort(mapKeys)
 
 	for _, k := range mapKeys {
-		if m[k].v == "" {
-			str += fmt.Sprintf("%s\n", m[k].op)
-		} else {
-			str += fmt.Sprintf("%s\t= %s\n", m[k].op, m[k].v)
-		}
+		str += fmt.Sprintf("%s\t= %s\n", m[k].op, m[k].v)
 	}
 
 	return str
-}
-
-func (kv *Secret) Mask(length int) {
-	for k, v := range kv.Data {
-		n := fmt.Sprintf("%s", v)
-		if len(n) > length && length != -1 {
-			kv.Data[k] = strings.Repeat("*", length)
-		} else {
-			kv.Data[k] = strings.Repeat("*", len(n))
-		}
-	}
 }

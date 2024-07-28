@@ -8,7 +8,7 @@ import (
 )
 
 // String renders byte array input with the given data.
-func Apply(tmpl []byte, input interface{}) (bytes.Buffer, error) {
+func Apply(tmpl []byte, input interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 
 	tpl, err := template.New("template").
@@ -16,12 +16,12 @@ func Apply(tmpl []byte, input interface{}) (bytes.Buffer, error) {
 		Funcs(sprig.FuncMap()).
 		Parse(string(tmpl))
 	if err != nil {
-		return buf, err
+		return nil, err
 	}
 
 	if err := tpl.Execute(&buf, input); err != nil {
-		return buf, err
+		return nil, err
 	}
 
-	return buf, nil
+	return buf.Bytes(), nil
 }

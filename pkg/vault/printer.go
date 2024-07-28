@@ -3,12 +3,16 @@ package vault
 import (
 	"bytes"
 	"fmt"
+	"runtime"
+	"slices"
 	"strings"
 
-	"github.com/FalcoSuessgott/vkv/pkg/markdown"
 	"github.com/FalcoSuessgott/vkv/pkg/printer"
+	"github.com/FalcoSuessgott/vkv/pkg/render"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/juju/ansiterm"
+	"github.com/olekukonko/tablewriter"
+	"github.com/samber/lo"
 	"github.com/xlab/treeprint"
 )
 
@@ -17,28 +21,29 @@ func (kv *KVSecrets) PrinterFuncs(fOpts *FormatOptions) printer.PrinterFuncMap {
 	return printer.PrinterFuncMap{
 		"yaml":     kv.PrintYAML(),
 		"json":     kv.PrintJSON(),
-		"default":  kv.PrintDetailed(fOpts),
+		"default":  kv.PrintDefault(fOpts),
+		"full":     kv.PrintDetailed(fOpts),
 		"policy":   kv.PrintPolicy(),
-		"template": kv.PrintTemplate(),
+		"template": kv.PrintTemplate(fOpts),
 		"export":   kv.PrintExport(),
-		"markdown": kv.PrintMarkdown(),
+		"markdown": kv.PrintMarkdown(fOpts),
 	}
+}
+
+func (kv *KVSecrets) PrintDefault(fOpts *FormatOptions) printer.PrinterFunc {
+	return kv.PrintDetailed(&FormatOptions{
+		maskSecrets: fOpts.maskSecrets,
+		showDiff:    false,
+	})
 }
 
 func (kv *KVSecrets) PrintDetailed(fOpts *FormatOptions) printer.PrinterFunc {
 	return func() ([]byte, error) {
-		// prepare data before computing print output
-		if fOpts.ShowDiff {
-			if err := kv.ComputeDiffChangelog(); err != nil {
-				return nil, fmt.Errorf("failed to compute diff changelog: %w", err)
-			}
+		if err := kv.ComputeDiffChangelog(); err != nil {
+			return nil, fmt.Errorf("failed to compute diff changelog: %w", err)
 		}
 
-		if fOpts.OnlyKeys {
-			kv.OnlyKeys()
-		}
-
-		tree := treeprint.NewWithRoot(kv.Title())
+		tree := treeprint.NewWithRoot(utils.ColorBold(kv.Title()))
 		secrets := make(map[string]interface{})
 
 		// transform the paths of the secrets by splitting them at "/"
@@ -63,7 +68,7 @@ func (kv *KVSecrets) PrintDetailed(fOpts *FormatOptions) printer.PrinterFunc {
 }
 
 func (kv *KVSecrets) branch(p string, m interface{}, fOpts *FormatOptions) treeprint.Tree {
-	tree := treeprint.NewWithRoot(kv.SecretName(p))
+	tree := treeprint.NewWithRoot(utils.ColorBold(kv.SecretName(p)))
 
 	// here its just a secret path, so we need to go deeper
 	if strings.HasSuffix(p, utils.Delimiter) {
@@ -76,11 +81,11 @@ func (kv *KVSecrets) branch(p string, m interface{}, fOpts *FormatOptions) treep
 
 	// here is the actual secrets
 	if secret, ok := m.([]*Secret); ok {
-		tree = treeprint.NewWithRoot(kv.SecretName(p))
+		tree = treeprint.NewWithRoot(utils.ColorBold(kv.SecretName(p)))
 
 		// if metadata, add it
 		if secret[0].Metadata() != "" {
-			tree = treeprint.NewWithRoot(fmt.Sprintf("%s {%s}", kv.SecretName(p), secret[0].Metadata()))
+			tree = treeprint.NewWithRoot(utils.ColorBold(fmt.Sprintf("%s {%s}", kv.SecretName(p), secret[0].Metadata())))
 		}
 
 		// iterate backwards, so latest secret is first
@@ -92,11 +97,11 @@ func (kv *KVSecrets) branch(p string, m interface{}, fOpts *FormatOptions) treep
 			w := ansiterm.NewTabWriter(&b, 0, 0, 1, ' ', 0)
 			t := treeprint.NewWithRoot("")
 
-			str := s.String(fOpts.MaskSecrets, fOpts.MaxValueLength)
-			if fOpts.ShowDiff {
-				str = s.DiffString(fOpts.OnlyKeys, fOpts.MaskSecrets, fOpts.MaxValueLength)
-			}
+			str := s.String(fOpts.maskSecrets)
 
+			if fOpts.showDiff {
+				str = s.DiffString(fOpts.maskSecrets)
+			}
 			fmt.Fprintln(w, str)
 
 			// write to buffer
@@ -109,7 +114,7 @@ func (kv *KVSecrets) branch(p string, m interface{}, fOpts *FormatOptions) treep
 				}
 			}
 
-			tree.AddMetaBranch(s.Title(), t)
+			tree.AddMetaBranch(utils.ColorBold(s.Title()), t)
 		}
 	}
 
@@ -118,13 +123,47 @@ func (kv *KVSecrets) branch(p string, m interface{}, fOpts *FormatOptions) treep
 
 func (kv *KVSecrets) PrintPolicy() printer.PrinterFunc {
 	return func() ([]byte, error) {
-		return []byte("policy printer"), nil
+		var b bytes.Buffer
+		w := ansiterm.NewTabWriter(&b, 0, 0, 1, ' ', 0)
+
+		fmt.Fprint(w, utils.ColorBold("PATH\tCREATE\tREAD\tUPDATE\tDELETE\tLIST\tROOT\n"))
+
+		for path := range kv.Secrets {
+			cap, err := kv.GetCapabilities(path)
+			if err != nil {
+				return nil, err
+			}
+
+			fmt.Fprintf(w, "%s\t%s", utils.ColorBold(path), cap)
+		}
+
+		w.Flush()
+
+		return bytes.TrimSpace(b.Bytes()), nil
 	}
 }
 
-func (kv *KVSecrets) PrintTemplate() printer.PrinterFunc {
+func (kv *KVSecrets) PrintTemplate(fOpts *FormatOptions) printer.PrinterFunc {
 	return func() ([]byte, error) {
-		return []byte("template printer"), nil
+		data := make(map[string]interface{})
+
+		for path, secrets := range kv.Secrets {
+			// find the latest version that contains secrets
+			for i := len(secrets) - 1; i >= 0; i-- {
+				if len(secrets[i].Data) > 0 {
+					data[path] = secrets[i].Data
+
+					break
+				}
+			}
+		}
+
+		out, err := render.Apply([]byte(fOpts.template), data)
+		if err != nil {
+			return nil, err
+		}
+
+		return bytes.TrimSpace(out), nil
 	}
 }
 
@@ -133,45 +172,99 @@ func (kv *KVSecrets) PrintExport() printer.PrinterFunc {
 		var b bytes.Buffer
 
 		for _, secrets := range kv.Secrets {
-			// get the latest secret
-			for k, v := range secrets[len(secrets)-1].Data {
-				b.Write([]byte(fmt.Sprintf("export %s='%v'\n", k, v)))
+			data := make(map[string]interface{})
+
+			// find the latest version that contains secrets
+			for i := len(secrets) - 1; i >= 0; i-- {
+				if len(secrets[i].Data) > 0 {
+					data = secrets[i].Data
+
+					break
+				}
+			}
+
+			if len(data) != 0 {
+				// output in export format depending on OS
+				for _, k := range utils.SortMapKeys(data) {
+					switch os := runtime.GOOS; os {
+					case "windows":
+						fmt.Fprintf(&b, "set %s='%v'\n", k, data[k])
+					case "linux", "darwin":
+						fmt.Fprintf(&b, "export %s='%v'\n", k, data[k])
+					default:
+						return nil, fmt.Errorf("unsupported OS: %s", os)
+					}
+				}
 			}
 		}
 
-		return b.Bytes(), nil
+		return bytes.TrimSpace(b.Bytes()), nil
 	}
 }
 
 func (kv *KVSecrets) PrintJSON() printer.PrinterFunc {
 	return func() ([]byte, error) {
-		return utils.ToJSON(kv)
+		out, err := utils.ToJSON(kv)
+
+		return bytes.TrimSpace(out), err
 	}
 }
 
 func (kv *KVSecrets) PrintYAML() printer.PrinterFunc {
 	return func() ([]byte, error) {
-		return utils.ToYAML(kv)
+		out, err := utils.ToYAML(kv)
+
+		return bytes.TrimSpace(out), err
 	}
 }
 
-func (kv *KVSecrets) PrintMarkdown() printer.PrinterFunc {
+func (kv *KVSecrets) PrintMarkdown(fOpts *FormatOptions) printer.PrinterFunc {
 	return func() ([]byte, error) {
-		header := []string{"secret", "key", "value", "version", "metadata"}
-		rows := [][]string{}
+		var b bytes.Buffer
+		header := []string{"path", "key", "value", "version", "metadata", "last update"}
 
-		for path, secrets := range kv.Secrets {
-			for i := len(secrets) - 1; i >= 0; i-- {
-				s := secrets[i]
+		table := tablewriter.NewWriter(&b)
+		table.SetHeader(header)
+		table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+		table.SetCenterSeparator("|")
+		table.SetAutoMergeCellsByColumnIndex([]int{0})
+		table.SetCaption(true, kv.Title())
 
-				for k, v := range s.Data {
-					rows = append(rows, []string{path, k, fmt.Sprintf("%v", v), fmt.Sprintf("%d", s.Version), s.Metadata()})
+		paths := lo.Keys(kv.Secrets)
+
+		slices.Sort(paths)
+
+		for _, path := range paths {
+			secret := kv.Secrets[path][len(kv.Secrets[path])-1]
+
+			version := fmt.Sprintf("%d", secret.Version)
+
+			// secret is deleted
+			if secret.Deleted {
+				version = fmt.Sprintf("%s (deleted)", version)
+				table.Append([]string{path, "", "", version, secret.Metadata(), secret.DeletionTime.Format(dateFormat)})
+			}
+
+			// secret is destroyed
+			if secret.Destroyed {
+				version = fmt.Sprintf("%s (destroyed)", version)
+				table.Append([]string{path, "", "", version, secret.Metadata(), ""})
+			}
+
+			// secrets exists
+			for _, k := range utils.SortMapKeys(secret.Data) {
+				v := fmt.Sprintf("%s", secret.Data[k])
+
+				if fOpts.maskSecrets {
+					v = utils.MaskString(v)
 				}
 
-				// append an empty row for better readability
-				rows = append(rows, make([]string, len(header)))
+				table.Append([]string{path, k, v, version, secret.Metadata(), secret.VersionCreatedTime.Format(dateFormat)})
 			}
 		}
-		return markdown.Table(header, rows)
+
+		table.Render()
+
+		return b.Bytes(), nil
 	}
 }

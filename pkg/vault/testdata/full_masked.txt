@@ -1,0 +1,17 @@
+secret/ [kvv2] (test)
+└── test
+    └── admin {key=value}
+        ├── [Version 5 destroyed 292 years ago]  
+        │   
+        ├── [Version 4 deleted 292 years ago]  
+        │   
+        ├── [Version 3 created 292 years ago]  
+        │   ├── "foo" = "******"
+        │   └── "new" = "*******"
+        │   
+        ├── [Version 2 created 292 years ago]  
+        │   ├── "foo" = "***"
+        │   └── "new" = "*******"
+        │   
+        └── [Version 1 created 292 years ago]  
+            └── "foo" = "***"
