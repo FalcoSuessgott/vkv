@@ -5,19 +5,38 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"os"
 	"path"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 
-	"github.com/caarlos0/env/v6"
+	"github.com/SerhiiCho/timeago/v2"
+	"github.com/caarlos0/env/v11"
 	"github.com/ghodss/yaml"
 )
 
 const (
 	// Delimiter / delimiter for splitting a path.
 	Delimiter = "/"
+
+	MaxValueLengthEnv = "MAX_VALUE_LENGTH"
+	NoColorEnv        = "NO_COLOR"
+	NoHyperlinksEnv   = "NO_HYPERLINKS"
+
+	Reset = "\033[0m"
+	Bold  = "\033[1m"
+
+	Red    = "\033[31m"
+	Green  = "\033[32m"
+	Yellow = "\033[33m"
+
+	has    = "✔"
+	hasNot = "✖"
 )
 
 // Keys type for receiving all keys of a map.
@@ -25,6 +44,67 @@ type Keys []string
 
 func NormalizePath(path string) string {
 	return filepath.Clean(path) + Delimiter
+}
+
+func ColorRed(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Red, text, Reset)
+	}
+
+	return text
+}
+
+func ColorYellow(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Yellow, text, Reset)
+	}
+
+	return text
+}
+
+func ColorGreen(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Green, text, Reset)
+	}
+
+	return text
+}
+
+func ColorBold(text string) string {
+	if _, ok := os.LookupEnv(NoColorEnv); !ok {
+		return fmt.Sprintf("%s%s%s", Bold, text, Reset)
+	}
+
+	return text
+}
+
+func MaskString(s interface{}) string {
+	length := 12
+
+	if v, ok := os.LookupEnv(MaxValueLengthEnv); ok {
+		i, err := strconv.Atoi(v)
+		if err != nil {
+			log.Printf("invalid value for %s - using default value %d\n", MaxValueLengthEnv, length)
+		}
+
+		length = i
+	}
+
+	n := fmt.Sprintf("%s", s)
+
+	if len(n) > length && length != -1 {
+		return strings.Repeat("*", length)
+	}
+
+	return strings.Repeat("*", len(n))
+}
+
+func ResolveCap(v bool) string {
+	if v {
+		return ColorGreen(has)
+	}
+
+	return ColorRed(hasNot)
 }
 
 // FlattenMap flattens a nested map into a single map with its.
@@ -42,31 +122,27 @@ func FlattenMap(a, b map[string]interface{}, key string) {
 
 // UnflattenMap takes a path like "a/b/c" and returns a map like map[a] -> map[b] -> map[c].
 // elements in ignoreElements are not splitted.
-func UnflattenMap(path string, data map[string]interface{}, ignoreElements ...string) map[string]interface{} {
+func UnflattenMap[T any](path string, v []*T, ignoreElements ...string) map[string]interface{} {
 	m := map[string]interface{}{}
 
 	parts := strings.Split(path, Delimiter)
-
-	if path == "" {
-		return data
-	}
 
 	path = NormalizePath(path)
 
 	// if element is to be ignored
 	for _, ignore := range ignoreElements {
 		if strings.HasPrefix(path, NormalizePath(ignore)) {
-			m[NormalizePath(ignore)] = UnflattenMap(strings.TrimPrefix(path, NormalizePath(ignore)), data, ignoreElements...)
+			m[NormalizePath(ignore)] = UnflattenMap[T](strings.TrimPrefix(path, NormalizePath(ignore)), v, ignoreElements...)
 
 			return m
 		}
 	}
 
 	if len(parts) > 1 {
-		m[NormalizePath(parts[0])] = UnflattenMap(strings.Join(parts[1:], Delimiter), data, ignoreElements...)
+		m[NormalizePath(parts[0])] = UnflattenMap[T](strings.Join(parts[1:], Delimiter), v, ignoreElements...)
 	} else {
 		// or dont if there is no parts left
-		m[strings.TrimSuffix(path, Delimiter)] = data
+		m[strings.TrimSuffix(path, Delimiter)] = v
 	}
 
 	return m
@@ -273,9 +349,13 @@ func ParseEnvs(prefix string, i interface{}) error {
 		Prefix: prefix,
 	}
 
-	if err := env.Parse(i, opts); err != nil {
+	if err := env.ParseWithOptions(i, opts); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func TimeAgo(t time.Time) string {
+	return timeago.Parse(t)
 }

@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -11,13 +12,8 @@ import (
 	"github.com/hashicorp/vault/api/tokenhelper"
 )
 
-// Vault represents a vault struct used for reading and writing secrets.
-type Vault struct {
-	Client *api.Client
-}
-
 // NewDefaultClient returns a new vault client wrapper.
-func NewDefaultClient() (*Vault, error) {
+func NewDefaultClient(ctx context.Context) (*Vault, error) {
 	// create vault client using defaults (recommended)
 	c, err := api.NewClient(nil)
 	if err != nil {
@@ -63,7 +59,10 @@ func NewDefaultClient() (*Vault, error) {
 		return nil, fmt.Errorf("not authenticated, perhaps not a valid token: %w", err)
 	}
 
-	return &Vault{Client: c}, nil
+	return &Vault{
+		Client:  c,
+		Context: ctx,
+	}, nil
 }
 
 // NewClient returns a new vault client wrapper.

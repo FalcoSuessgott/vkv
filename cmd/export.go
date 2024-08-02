@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"path"
 	"strings"
 
-	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
+	prt "github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
+	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/spf13/cobra"
 )
 
@@ -17,22 +17,17 @@ type exportOptions struct {
 	Path       string `env:"PATH"`
 	EnginePath string `env:"ENGINE_PATH"`
 
-	OnlyKeys       bool `env:"ONLY_KEYS"`
-	OnlyPaths      bool `env:"ONLY_PATHS"`
-	ShowValues     bool `env:"SHOW_VALUES"`
-	ShowVersion    bool `env:"SHOW_VERSION" envDefault:"true"`
-	ShowMetadata   bool `env:"SHOW_METADATA" envDefault:"true"`
-	WithHyperLink  bool `env:"WITH_HYPERLINK" envDefault:"true"`
-	MaxValueLength int  `env:"MAX_VALUE_LENGTH" envDefault:"12"`
-
 	SkipErrors bool `env:"SKIP_ERRORS" envDefault:"false"`
+
+	ShowValues bool `env:"SHOW_VALUES"`
+
+	AllVersions bool `env:"ALL_VERSIONS"`
 
 	TemplateFile   string `env:"TEMPLATE_FILE"`
 	TemplateString string `env:"TEMPLATE_STRING"`
 
-	FormatString string `env:"FORMAT" envDefault:"base"`
-
-	outputFormat prt.OutputFormat
+	FormatString  string `env:"FORMAT" envDefault:"default"`
+	FormatOptions []vault.Option
 }
 
 // NewExportCmd export subcommand.
@@ -52,36 +47,19 @@ func NewExportCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			enginePath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
+			rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
-			printer = prt.NewSecretPrinter(
-				prt.OnlyKeys(o.OnlyKeys),
-				prt.OnlyPaths(o.OnlyPaths),
-				prt.CustomValueLength(o.MaxValueLength),
-				prt.ShowValues(o.ShowValues),
-				prt.WithTemplate(o.TemplateString, o.TemplateFile),
-				prt.ToFormat(o.outputFormat),
-				prt.WithVaultClient(vaultClient),
-				prt.WithWriter(writer),
-				prt.ShowVersion(o.ShowVersion),
-				prt.ShowMetadata(o.ShowMetadata),
-				prt.WithHyperLinks(o.WithHyperLink),
-				prt.WithEnginePath(utils.NormalizePath(enginePath)),
-			)
+			// TODO: consider passing the context through
 
-			secrets, err := vaultClient.ListRecursive(enginePath, subPath, o.SkipErrors)
+			kv, err := vaultClient.NewKVSecrets(rootPath, subPath, o.SkipErrors, o.AllVersions)
 			if err != nil {
 				return err
 			}
 
-			p := path.Join(enginePath, subPath)
-			if subPath == "" {
-				p = utils.NormalizePath(p)
-			}
+			opts := prt.DefaultPrinterOptions()
+			opts.Format = o.FormatString
 
-			result := utils.UnflattenMap(p, utils.ToMapStringInterface(secrets), o.EnginePath)
-
-			if err := printer.Out(result); err != nil {
+			if err := prt.Print(kv.PrinterFuncs(vault.NewFormatOptions(o.FormatOptions...)), opts); err != nil {
 				return err
 			}
 
@@ -92,29 +70,20 @@ func NewExportCmd() *cobra.Command {
 	cmd.Flags().SortFlags = false
 
 	// Input
-	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KV Engine path (env: VKV_EXPORT_PATH")
-	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path (-p) flag will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_EXPORT_ENGINE_PATH)")
+	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, fmt.Sprintf("KV Engine path (env: %s)", envVarExportPrefix+"_PATH"))
+	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path value will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_EXPORT_ENGINE_PATH)")
 	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "don't exit on errors (permission denied, deleted secrets) (env: VKV_EXPORT_SKIP_ERRORS)")
+	cmd.Flags().BoolVarP(&o.AllVersions, "all-versions", "a", o.AllVersions, "wether to fetch all KVv2 secret versions (env: VKV_EXPORT_ALL_VERSIONS)")
 
 	// Modify
-	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")
-	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env: VKV_EXPORT_ONLY_PATHS)")
-	cmd.Flags().BoolVar(&o.ShowVersion, "show-version", o.ShowVersion, "show the secret version (env: VKV_EXPORT_VERSION)")
-	cmd.Flags().BoolVar(&o.ShowMetadata, "show-metadata", o.ShowMetadata, "show the secrets metadata (env: VKV_EXPORT_METADATA)")
 	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_EXPORT_SHOW_VALUES)")
-	cmd.Flags().BoolVar(&o.WithHyperLink, "with-hyperlink", o.WithHyperLink, "don't link to the Vault UI (env: VKV_EXPORT_WITH_HYPERLINK)")
-
-	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
-		"(env: VKV_EXPORT_MAX_VALUE_LENGTH)")
 
 	// Template
 	cmd.Flags().StringVar(&o.TemplateFile, "template-file", o.TemplateFile, "path to a file containing Go-template syntax to render the KV entries (env: VKV_EXPORT_TEMPLATE_FILE)")
 	cmd.Flags().StringVar(&o.TemplateString, "template-string", o.TemplateString, "template string containing Go-template syntax to render KV entries (env: VKV_EXPORT_TEMPLATE_STRING)")
 
 	// Output format
-	//nolint: lll
-	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "available output formats: \"base\", \"json\", \"yaml\", \"export\", \"policy\", \"markdown\", \"template\" "+
-		"(env: VKV_EXPORT_FORMAT)")
+	cmd.Flags().StringVarP(&o.FormatString, "format", "f", o.FormatString, "one of the allowed output formats env: VKV_EXPORT_FORMAT)")
 
 	return cmd
 }
@@ -122,56 +91,43 @@ func NewExportCmd() *cobra.Command {
 // nolint: cyclop, goconst
 func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	switch {
-	case (o.OnlyKeys && o.ShowValues), (o.OnlyPaths && o.ShowValues), (o.OnlyKeys && o.OnlyPaths):
-		return errInvalidFlagCombination
 	case o.EnginePath == "" && o.Path == "":
-		return errors.New("no KV-paths given. Either --engine-path/-e or --path/-p needs to be specified")
-	case true:
-		switch strings.ToLower(o.FormatString) {
-		case "yaml", "yml":
-			o.outputFormat = prt.YAML
-			o.OnlyKeys = false
-			o.OnlyPaths = false
-			o.MaxValueLength = -1
-			o.ShowValues = true
-		case "json":
-			o.outputFormat = prt.JSON
-			o.OnlyKeys = false
-			o.OnlyPaths = false
-			o.MaxValueLength = -1
-			o.ShowValues = true
-		case "export":
-			o.outputFormat = prt.Export
-			o.OnlyKeys = false
-			o.OnlyPaths = false
-			o.ShowValues = true
-			o.MaxValueLength = -1
-		case "markdown":
-			o.outputFormat = prt.Markdown
-		case "base":
-			o.outputFormat = prt.Base
-		case "policy":
-			o.outputFormat = prt.Policy
-			o.OnlyKeys = false
-			o.OnlyPaths = false
-			o.ShowValues = true
-		case "template", "tmpl":
-			o.outputFormat = prt.Template
-			o.OnlyKeys = false
-			o.OnlyPaths = false
-			o.ShowValues = true
-			o.MaxValueLength = -1
+		return errors.New("no KV-paths given. Either --engine-path / -e or --path / -p needs to be specified")
+	case o.EnginePath != "" && o.Path != "":
+		return errors.New("cannot specify both engine-path and path")
+	}
 
-			if o.TemplateFile != "" && o.TemplateString != "" {
-				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
-			}
-
-			if o.TemplateFile == "" && o.TemplateString == "" {
-				return fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
-			}
-		default:
-			return prt.ErrInvalidFormat
+	switch strings.ToLower(o.FormatString) {
+	// for certain output formats we dont mask secrets
+	case "yaml", "yml", "json", "export", "policy":
+		o.ShowValues = true
+	// for some we make it configurable
+	case "markdown", "default":
+		if !o.ShowValues {
+			o.FormatOptions = append(o.FormatOptions, vault.MaskSecrets())
 		}
+	case "full":
+		o.AllVersions = true
+
+		if !o.ShowValues {
+			o.FormatOptions = append(o.FormatOptions, vault.MaskSecrets())
+		}
+
+		o.FormatOptions = append(o.FormatOptions, vault.ShowDiff())
+	case "template", "tmpl":
+		o.ShowValues = true
+
+		if o.TemplateFile != "" && o.TemplateString != "" {
+			return fmt.Errorf("%w: %s", errInvalidFlagCombination, "cannot specify both --template-file and --template-string")
+		}
+
+		if o.TemplateFile == "" && o.TemplateString == "" {
+			return fmt.Errorf("%w: %s", errInvalidFlagCombination, "either --template-file or --template-string is required")
+		}
+
+		o.FormatOptions = append(o.FormatOptions, vault.WithTemplate(o.TemplateString, o.TemplateFile))
+	default:
+		return prt.ErrInvalidPrinterFormat
 	}
 
 	return nil

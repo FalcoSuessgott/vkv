@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
-	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -45,83 +44,48 @@ func NewImportCmd() *cobra.Command {
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// printer = prt.NewSecretPrinter(
+			// 	prt.CustomValueLength(o.MaxValueLength),
+			// 	prt.ShowValues(o.ShowValues),
+			// 	prt.ToFormat(prt.Base),
+			// 	prt.WithVaultClient(vaultClient),
+			// 	prt.WithWriter(writer),
+			// 	prt.ShowVersion(true),
+			// 	prt.ShowMetadata(true),
+			// 	prt.WithEnginePath(o.Path),
+			// )
+
 			// get user input via -f or STDIN
-			input, err := o.getInput()
-			if err != nil {
-				return err
-			}
+			// input, err := o.getInput()
+			// if err != nil {
+			// 	return err
+			// }
 
-			// parse input
-			secrets, err := o.parseInput(input)
-			if err != nil {
-				return err
-			}
+			// // parse input
+			// secrets, err := o.parseInput(input)
+			// if err != nil {
+			// 	return err
+			// }
 
-			// if no path specified, use the path from the secrets to be imported
-			if o.EnginePath == "" && o.Path == "" {
-				fmt.Fprintln(writer, "no path specified, trying to determine root path from the provided input")
-
-				rootPath, err := utils.GetRootElement(secrets)
-				if err != nil {
-					return fmt.Errorf("try specifying a destination path using -p/-e. %w", err)
-				}
-
-				fmt.Fprintf(writer, "using \"%s\" as KV engine path\n", rootPath)
-
-				// detect whether its an engine path or a normal root path
-				if len(strings.Split(rootPath, utils.Delimiter)) > 1 {
-					o.EnginePath = rootPath
-				} else {
-					o.Path = rootPath
-				}
-			}
-
-			// read existing secrets from the rootPath
-			rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
-
-			printer = prt.NewSecretPrinter(
-				prt.CustomValueLength(o.MaxValueLength),
-				prt.ShowValues(o.ShowValues),
-				prt.ToFormat(prt.Base),
-				prt.WithVaultClient(vaultClient),
-				prt.WithWriter(writer),
-				prt.ShowVersion(true),
-				prt.ShowMetadata(true),
-				prt.WithEnginePath(utils.NormalizePath(rootPath)),
-			)
-
-			// print preview during dryrun and exit
-			if o.DryRun {
-				// replace the root path in the secrets with the specified path
-				secretsWithNewPath := make(map[string]interface{})
-				for _, v := range secrets {
-					secretsWithNewPath = utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(v), o.EnginePath)
-				}
-
-				return o.dryRun(rootPath, secretsWithNewPath)
-			}
+			// // print preview during dryrun and exit
+			// if o.DryRun {
+			// 	return o.dryRun(secrets)
+			// }
 
 			// enable kv engine, error if already enabled, unless force is used
-			if err := vaultClient.EnableKV2EngineErrorIfNotForced(o.Force, rootPath); err != nil {
-				return err
-			}
+			// if err := vaultClient.EnableKV2EngineErrorIfNotForced(o.Force, rootPath); err != nil {
+			// 	return err
+			// }
 
 			// write secrets
-			if err := o.writeSecrets(rootPath, subPath, secrets); err != nil {
-				return err
-			}
+			// if err := o.writeSecrets(rootPath, subPath, secrets); err != nil {
+			// 	return err
+			// }
 
 			// show result if not silence mode
-			if !o.Silent {
-				result, err := o.printResult(rootPath)
-				if err != nil {
-					return err
-				}
-
-				if err := printer.Out(result); err != nil {
-					return err
-				}
-			}
+			// if !o.Silent {
+			// 	return o.printResult()
+			// }
 
 			return nil
 		},
@@ -235,69 +199,55 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 	return nil
 }
 
-func (o *importOptions) dryRun(rootPath string, secrets map[string]interface{}) error {
-	fmt.Printf("fetching any existing KV secrets from \"%s\" (if any)\n", utils.NormalizePath(rootPath))
+// func (o *importOptions) dryRun(secrets map[string]interface{}) error {
+// 	fmt.Fprintln(writer, "")
+// 	fmt.Fprintln(writer, "preview:")
+// 	fmt.Fprintln(writer, "")
 
-	tmp, err := vaultClient.ListRecursive(rootPath, "", true)
-	if err != nil {
-		return fmt.Errorf("error listing secrets from \"%s/\": %w", rootPath, err)
-	}
+// 	// read existing ecrets from the rootPath
+// 	rootPath, _ := utils.SplitPath(o.Path)
+// 	existingSecrets := make(map[string]interface{})
 
-	if len(utils.ToMapStringInterface(tmp)) == 0 {
-		fmt.Println("no secrets found - nothing to compare with")
-	}
+// 	tmp, err := vaultClient.ListRecursive(rootPath, "", false)
+// 	if err == nil {
+// 		existingSecrets = utils.PathMap(rootPath, utils.ToMapStringInterface(tmp), false)
+// 	}
 
-	existingSecrets := utils.UnflattenMap(utils.NormalizePath(rootPath), utils.ToMapStringInterface(tmp), o.EnginePath)
+// 	// add new secrets to it
+// 	newSecrets := make(map[string]interface{})
+// 	for _, v := range secrets {
+// 		newSecrets = utils.PathMap(o.Path, utils.ToMapStringInterface(v), false)
+// 	}
 
-	// check whether new and existing secrets are equal
-	if fmt.Sprint(secrets) == fmt.Sprint(existingSecrets) {
-		fmt.Fprintln(writer, "")
-		fmt.Fprintln(writer, "input matches secrets - no changes needed:")
-		fmt.Fprintln(writer, "")
+// 	// deep merge both secrets
+// 	mergedSecrets := utils.DeepMergeMaps(newSecrets, existingSecrets)
+// 	if err := printer.Out(mergedSecrets); err != nil {
+// 		return err
+// 	}
 
-		if err := printer.Out(existingSecrets); err != nil {
-			return err
-		}
+// 	fmt.Fprintln(writer, "")
+// 	fmt.Fprintln(writer, "apply changes by using the --force flag")
 
-		return nil
-	}
+// 	return nil
+// }
 
-	fmt.Fprintf(writer, "deep merging provided secrets with existing secrets read from \"%s\"\n", utils.NormalizePath(rootPath))
-	fmt.Fprintln(writer, "")
-	fmt.Fprintln(writer, "preview:")
-	fmt.Fprintln(writer, "")
+// func (o *importOptions) printResult() error {
+// 	fmt.Fprintln(writer, "")
+// 	fmt.Fprintln(writer, "result:")
+// 	fmt.Fprintln(writer, "")
 
-	if err := printer.Out(utils.DeepMergeMaps(secrets, existingSecrets)); err != nil {
-		return err
-	}
+// 	rootPath, _ := utils.SplitPath(o.Path)
 
-	fmt.Fprintln(writer, "")
-	fmt.Fprintln(writer, "apply changes by using the --force flag")
+// 	s, err := vaultClient.ListRecursive(rootPath, "", false)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	secrets := utils.PathMap(rootPath, utils.ToMapStringInterface(s), false)
 
-func (o *importOptions) printResult(rootPath string) (map[string]interface{}, error) {
-	fmt.Fprintln(writer, "")
-	fmt.Fprintln(writer, "result:")
-	fmt.Fprintln(writer, "")
+// 	if err := printer.Print(secrets); err != nil {
+// 		return err
+// 	}
 
-	printer = prt.NewSecretPrinter(
-		prt.CustomValueLength(o.MaxValueLength),
-		prt.ShowValues(o.ShowValues),
-		prt.ToFormat(prt.Base),
-		prt.WithVaultClient(vaultClient),
-		prt.WithWriter(writer),
-		prt.ShowVersion(true),
-		prt.ShowMetadata(true),
-		prt.ShowVersion(true),
-		prt.WithEnginePath(utils.NormalizePath(rootPath)),
-	)
-
-	secrets, err := vaultClient.ListRecursive(rootPath, "", false)
-	if err != nil {
-		return nil, err
-	}
-
-	return utils.UnflattenMap(utils.NormalizePath(rootPath), utils.ToMapStringInterface(secrets), o.EnginePath), nil
-}
+// 	return nil
+// }

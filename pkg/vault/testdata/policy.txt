@@ -1,0 +1,2 @@
+PATH              CREATE READ UPDATE DELETE LIST ROOT
+secret/test/admin ✔      ✔    ✔      ✔      ✔    ✔

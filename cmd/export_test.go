@@ -3,8 +3,6 @@ package cmd
 import (
 	"bytes"
 	"io"
-
-	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 )
 
 func (s *VaultSuite) TestValidateExportFlags() {
@@ -145,65 +143,65 @@ func (s *VaultSuite) TestExportImportCommand() {
 	}
 }
 
-func (s *VaultSuite) TestExportOutputFormat() {
-	testCases := []struct {
-		name     string
-		expected prt.OutputFormat
-		err      bool
-	}{
-		{
-			name:     "json",
-			expected: prt.JSON,
-		},
-		{
-			name:     "yaml",
-			expected: prt.YAML,
-		},
-		{
-			name:     "yml",
-			expected: prt.YAML,
-		},
-		{
-			name:     "invalid",
-			err:      true,
-			expected: prt.YAML,
-		},
-		{
-			name:     "export",
-			expected: prt.Export,
-		},
-		{
-			name:     "markdown",
-			expected: prt.Markdown,
-		},
-		{
-			name:     "base",
-			expected: prt.Base,
-		},
-		{
-			name:     "template",
-			expected: prt.Template,
-		},
-		{
-			name:     "tmpl",
-			expected: prt.Template,
-		},
-	}
+// func (s *VaultSuite) TestExportOutputFormat() {
+// 	testCases := []struct {
+// 		name     string
+// 		expected prt.OutputFormat
+// 		err      bool
+// 	}{
+// 		{
+// 			name:     "json",
+// 			expected: prt.JSON,
+// 		},
+// 		{
+// 			name:     "yaml",
+// 			expected: prt.YAML,
+// 		},
+// 		{
+// 			name:     "yml",
+// 			expected: prt.YAML,
+// 		},
+// 		{
+// 			name:     "invalid",
+// 			err:      true,
+// 			expected: prt.YAML,
+// 		},
+// 		{
+// 			name:     "export",
+// 			expected: prt.Export,
+// 		},
+// 		{
+// 			name:     "markdown",
+// 			expected: prt.Markdown,
+// 		},
+// 		{
+// 			name:     "base",
+// 			expected: prt.Base,
+// 		},
+// 		{
+// 			name:     "template",
+// 			expected: prt.Template,
+// 		},
+// 		{
+// 			name:     "tmpl",
+// 			expected: prt.Template,
+// 		},
+// 	}
 
-	for _, tc := range testCases {
-		o := &exportOptions{
-			FormatString:   tc.name,
-			Path:           "kv",
-			TemplateString: "tmpl",
-		}
+// 	for _, tc := range testCases {
+// 		o := &exportOptions{
+// 			FormatString:   tc.name,
+// 			Path:           "kv",
+// 			TemplateString: "tmpl",
+// 		}
 
-		err := o.validateFlags(nil, nil)
+// 		err := o.validateFlags(nil, nil)
 
-		s.Require().Equal(tc.err, err != nil, "error "+tc.name)
+// 		s.Require().Equal(tc.err, err != nil, "error "+tc.name)
 
-		// if no error -> assert output format
-		if !tc.err {
-			s.Require().Equal(tc.expected, o.outputFormat, "format "+tc.name)
-		}
-	}
-}
+// 		// if no error -> assert output format
+// 		if !tc.err {
+// 			s.Require().Equal(tc.expected, o.outputFormat, "format "+tc.name)
+// 		}
+// 	}
+// }

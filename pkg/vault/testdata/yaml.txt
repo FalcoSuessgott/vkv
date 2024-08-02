@@ -1,0 +1,39 @@
+description: test
+mount_path: secret/
+secrets:
+  secret/test/admin:
+    - Changelog: null
+      custom_metadata:
+        key: value
+      data:
+        foo: bar
+      deletion_time: '0001-01-01T00:00:00Z'
+      destroyed: false
+      version: 1
+      version_created_time: '0001-01-01T00:00:00Z'
+    - Changelog: null
+      custom_metadata: null
+      data:
+        foo: bar
+        new: element
+      deletion_time: '0001-01-01T00:00:00Z'
+      destroyed: false
+      version: 2
+      version_created_time: '0001-01-01T00:00:00Z'
+    - Changelog: null
+      custom_metadata: null
+      data:
+        foo: change
+        new: element
+      deletion_time: '0001-01-01T00:00:00Z'
+      destroyed: false
+      version: 3
+      version_created_time: '0001-01-01T00:00:00Z'
+    - Changelog: null
+      custom_metadata: null
+      data: {}
+      deletion_time: '0001-01-01T00:00:00Z'
+      destroyed: false
+      version: 4
+      version_created_time: '0001-01-01T00:00:00Z'
+type: kvv2

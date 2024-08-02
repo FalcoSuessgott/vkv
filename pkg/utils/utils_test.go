@@ -163,70 +163,70 @@ func TestGetRootElement(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestUnflattenMap(t *testing.T) {
-	testCases := []struct {
-		name           string
-		path           string
-		m              map[string]interface{}
-		ignoreElements []string
-		expected       map[string]interface{}
-	}{
-		{
-			name: "simple",
-			path: "root/sub",
-			m: map[string]interface{}{
-				"k":  "v",
-				"k2": 12,
-			},
-			expected: map[string]interface{}{
-				"root/": map[string]interface{}{
-					"sub": map[string]interface{}{
-						"k":  "v",
-						"k2": 12,
-					},
-				},
-			},
-		},
-		{
-			name: "simple with ignored fields",
-			path: "root/sub",
-			m: map[string]interface{}{
-				"k":  "v",
-				"k2": 12,
-			},
-			ignoreElements: []string{"root/sub"},
-			expected: map[string]interface{}{
-				"root/sub/": map[string]interface{}{
-					"k":  "v",
-					"k2": 12,
-				},
-			},
-		},
-		{
-			name: "complex with ignored fields",
-			path: "root/sub/a/b/c",
-			m: map[string]interface{}{
-				"k":  "v",
-				"k2": 12,
-			},
-			ignoreElements: []string{"root/sub", "b/c"},
-			expected: map[string]interface{}{
-				"root/sub/": map[string]interface{}{
-					"a/": map[string]interface{}{
-						"b/c/": map[string]interface{}{
-							"k":  "v",
-							"k2": 12,
-						},
-					},
-				},
-			},
-		},
-	}
+// func TestUnflattenMap(t *testing.T) {
+// 	testCases := []struct {
+// 		name           string
+// 		path           string
+// 		m              map[string]interface{}
+// 		ignoreElements []string
+// 		expected       map[string]interface{}
+// 	}{
+// 		{
+// 			name: "simple",
+// 			path: "root/sub",
+// 			m: map[string]interface{}{
+// 				"k":  "v",
+// 				"k2": 12,
+// 			},
+// 			expected: map[string]interface{}{
+// 				"root/": map[string]interface{}{
+// 					"sub": map[string]interface{}{
+// 						"k":  "v",
+// 						"k2": 12,
+// 					},
+// 				},
+// 			},
+// 		},
+// 		{
+// 			name: "simple with ignored fields",
+// 			path: "root/sub",
+// 			m: map[string]interface{}{
+// 				"k":  "v",
+// 				"k2": 12,
+// 			},
+// 			ignoreElements: []string{"root/sub"},
+// 			expected: map[string]interface{}{
+// 				"root/sub/": map[string]interface{}{
+// 					"k":  "v",
+// 					"k2": 12,
+// 				},
+// 			},
+// 		},
+// 		{
+// 			name: "complex with ignored fields",
+// 			path: "root/sub/a/b/c",
+// 			m: map[string]interface{}{
+// 				"k":  "v",
+// 				"k2": 12,
+// 			},
+// 			ignoreElements: []string{"root/sub", "b/c"},
+// 			expected: map[string]interface{}{
+// 				"root/sub/": map[string]interface{}{
+// 					"a/": map[string]interface{}{
+// 						"b/c/": map[string]interface{}{
+// 							"k":  "v",
+// 							"k2": 12,
+// 						},
+// 					},
+// 				},
+// 			},
+// 		},
+// 	}
 
-	for _, tc := range testCases {
-		assert.Equal(t, tc.expected, UnflattenMap(tc.path, tc.m, tc.ignoreElements...), tc.name)
-	}
-}
+// 	for _, tc := range testCases {
+// 		assert.Equal(t, tc.expected, UnflattenMap(tc.path, tc.m, tc.ignoreElements...), tc.name)
+// 	}
+// }
 
 func TestRemoveEmptyElements(t *testing.T) {
 	testCases := []struct {

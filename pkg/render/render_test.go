@@ -16,7 +16,7 @@ func TestRenderTemplate(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, "This is a test template which replaces certain values!", result.String())
+	assert.Equal(t, "This is a test template which replaces certain values!", string(result))
 }
 
 func TestRenderInvalidString(t *testing.T) {
