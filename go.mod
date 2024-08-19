@@ -1,8 +1,7 @@
 module github.com/FalcoSuessgott/vkv
 
 go 1.21
-
-toolchain go1.21.1
+toolchain go1.22.5
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
@@ -290,7 +289,7 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
-	mvdan.cc/gofumpt v0.6.0
+	mvdan.cc/gofumpt v0.7.0
 )
 
 require (
