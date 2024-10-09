@@ -1,0 +1,2068 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="recursively list secrets from Vaults KV2 engine in various formats">
+      
+      
+        <meta name="author" content="FalcoSuessgott">
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../installation/">
+      
+      
+      <link rel="icon" href="../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Quickstart - vkv</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-7LC1CWDZ0M"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-7LC1CWDZ0M",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-7LC1CWDZ0M",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#quickstart" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="vkv" class="md-header__button md-logo" aria-label="vkv" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            vkv
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Quickstart
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/FalcoSuessgott/vkv" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    FalcoSuessgott/vkv
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href=".." class="md-tabs__link">
+          
+  
+    
+  
+  Docs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cmd/vkv/" class="md-tabs__link">
+          
+  
+    
+  
+  CLI Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="vkv" class="md-nav__button md-logo" aria-label="vkv" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    vkv
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/FalcoSuessgott/vkv" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    FalcoSuessgott/vkv
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href=".." class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Docs
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Quickstart
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Quickstart
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spin-up-a-development-vault-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spin up a development Vault server
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify connection
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#write-secrets-to-vault-using-vault" class="md-nav__link">
+    <span class="md-ellipsis">
+      Write secrets to Vault using vault
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#list-secrets-using-vkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      List secrets using vkv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import-secrets-using-vkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import secrets using vkv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-kvv2-snapshots-using-vkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create KVv2 Snapshots using vkv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restore-vkv-snapshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restore vkv snapshots
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authentication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Export
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../import/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Import
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../snapshots/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Snapshots
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_10" id="__nav_1_10_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Advanced Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example_diff/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    diff
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example_fzf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    fzf
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example_kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example_sops/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    sops
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example_direnv/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    direnv
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example_migrate_kvv1_kvv2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migrate Secrets from KVv1 to KVv2
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11" id="__nav_1_11_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    CI/CD Integrations
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            CI/CD Integrations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cicd_gitlab/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Gitlab CI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cicd_github/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Github Action
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cicd_azure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Devops
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    CLI Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            CLI Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_version/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv version
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv export
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_import/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv import
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_list/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv list
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_list_engines/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv list engines
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_list_namespaces/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv list namespaces
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_snapshot/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv snapshot
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_snapshot_save/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv snapshot save
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_snapshot_restore/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv snapshot restore
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_completion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv completion
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_completion_bash/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv completion bash
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_completion_zsh/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv completion zsh
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cmd/vkv_completion_fish/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    vkv completion fish
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spin-up-a-development-vault-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spin up a development Vault server
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify connection
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#write-secrets-to-vault-using-vault" class="md-nav__link">
+    <span class="md-ellipsis">
+      Write secrets to Vault using vault
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#list-secrets-using-vkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      List secrets using vkv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import-secrets-using-vkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import secrets using vkv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-kvv2-snapshots-using-vkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create KVv2 Snapshots using vkv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restore-vkv-snapshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restore vkv snapshots
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+    <a href="https://github.com/FalcoSuessgott/vkv/edit/master/docs/quickstart.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h1>
+<p>This guide will run you through some of the features of <code>vkv</code>.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<p>In order to perform all of the described tasks, you will need the following tools:</p>
+<ul>
+<li>a Linux/MacOS Shell</li>
+<li><code>docker</code> installed and running (alternatively <code>vault</code> CLI can be used)</li>
+<li><code>vkv</code> installed (follow https://falcosuessgott.github.io/vkv/02_installation/)</li>
+</ul>
+<h2 id="spin-up-a-development-vault-server">Spin up a development Vault server<a class="headerlink" href="#spin-up-a-development-vault-server" title="Permanent link">&para;</a></h2>
+<p>First, we setup a development Vault server. </p>
+<p>Open a terminal and run:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">8200</span>:8200<span class="w"> </span>hashicorp/vault<span class="w"> </span>server<span class="w"> </span>-dev<span class="w"> </span>-dev-root-token-id<span class="o">=</span>root
+</span></code></pre></div>
+<p>You should then be able to visit <code>http://127.0.0.1:8200</code> in your browser and see a Vault login page.</p>
+<p>The <code>root</code> token is <code>root</code>.</p>
+<h2 id="verify-connection">Verify connection<a class="headerlink" href="#verify-connection" title="Permanent link">&para;</a></h2>
+<p>Once you have exported the required environment variables, you can verify your connection with the vault CLI by running:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">VAULT_ADDR</span><span class="o">=</span><span class="s2">&quot;http://127.0.0.1:8200&quot;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">VAULT_TOKEN</span><span class="o">=</span><span class="s2">&quot;root&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>vault<span class="w"> </span>status
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Key<span class="w">             </span>Value
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>---<span class="w">             </span>-----
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>Seal<span class="w"> </span>Type<span class="w">       </span>shamir
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>Initialized<span class="w">     </span><span class="nb">true</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Sealed<span class="w">          </span><span class="nb">false</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>Total<span class="w"> </span>Shares<span class="w">    </span><span class="m">1</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>Threshold<span class="w">       </span><span class="m">1</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>Version<span class="w">         </span><span class="m">1</span>.12.1
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>Build<span class="w"> </span>Date<span class="w">      </span><span class="m">2022</span>-10-27T12:32:05Z
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>Storage<span class="w"> </span>Type<span class="w">    </span>inmem
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>Cluster<span class="w"> </span>Name<span class="w">    </span>vault-cluster-1bbeabe8
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>Cluster<span class="w"> </span>ID<span class="w">      </span>405e99ab-5f8c-18ca-dafb-228c91add2f4
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>HA<span class="w"> </span>Enabled<span class="w">      </span><span class="nb">false</span>
+</span></code></pre></div>
+<p>If <code>vault status</code> returned an output like this you good to go to the next step</p>
+<h2 id="write-secrets-to-vault-using-vault">Write secrets to Vault using <code>vault</code><a class="headerlink" href="#write-secrets-to-vault-using-vault" title="Permanent link">&para;</a></h2>
+<p>In a development Vault server a <code>KVv2</code> under <code>secret/</code> is enabled by default.
+We want to write some secrets using <code>vault</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>vault<span class="w"> </span>kv<span class="w"> </span>put<span class="w"> </span>-mount<span class="o">=</span>secret<span class="w"> </span>admin<span class="w"> </span><span class="nv">username</span><span class="o">=</span>user<span class="w"> </span><span class="nv">password</span><span class="o">=</span>passw0rd
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>vault<span class="w"> </span>kv<span class="w"> </span>metadata<span class="w"> </span>put<span class="w"> </span>-mount<span class="o">=</span>secret<span class="w"> </span>-custom-metadata<span class="o">=</span><span class="nv">key</span><span class="o">=</span>value<span class="w"> </span>admin
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>vault<span class="w"> </span>kv<span class="w"> </span>put<span class="w"> </span>-mount<span class="o">=</span>secret<span class="w"> </span>db/prod<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">username</span><span class="o">=</span>user<span class="w"> </span><span class="nv">password</span><span class="o">=</span>passw0rd-prod
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>vault<span class="w"> </span>kv<span class="w"> </span>put<span class="w"> </span>-mount<span class="o">=</span>secret<span class="w"> </span>db/dev<span class="w"> </span><span class="nv">env</span><span class="o">=</span>dev<span class="w"> </span><span class="nv">username</span><span class="o">=</span>user<span class="w"> </span><span class="nv">password</span><span class="o">=</span>passw0rd-dev
+</span></code></pre></div>
+<h2 id="list-secrets-using-vkv">List secrets using <code>vkv</code><a class="headerlink" href="#list-secrets-using-vkv" title="Permanent link">&para;</a></h2>
+<p><code>vkv</code> requires at least <code>VAULT_ADDR</code> and <code>VAULT_TOKEN</code> if the <code>vault status</code> command works, <code>vkv</code> will also work.</p>
+<p>We can now use <code>vkv</code> to list all of our secrets recursively:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--path<span class="w"> </span>secret<span class="w">                                            </span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>secret/<span class="w"> </span><span class="o">[</span><span class="nv">desc</span><span class="o">=</span>key/value<span class="w"> </span>secret<span class="w"> </span>storage<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">type</span><span class="o">=</span>kv2<span class="o">]</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├──<span class="w"> </span>admin<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">sub</span><span class="o">=</span>********
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>└──<span class="w"> </span>sub
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">demo</span><span class="o">=</span>***********
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>******
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>*****
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span>└──<span class="w"> </span>sub2
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">        </span>└──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">2</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">admin</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">admin</span><span class="o">=</span>***
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>********
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">            </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>****
+</span></code></pre></div>
+<p>Here are some explanations:
+* <code>vkv</code> prints the description and the engine type + version</p>
+<ul>
+<li>
+<p><code>vkv</code> masks the secrets per default, you can disable this by using <code>--show-values</code> or <code>VKV_EXPORT_SHOW_VALUES=true</code></p>
+</li>
+<li>
+<p><code>vkv</code> limits the length of the secrets per default to <code>12</code> for readability purposes (You can set you own value length by using <code>--max-value-length=XX</code> or <code>VKV_EXPORT_MAX_VALUE_LENGTH=XX</code>)</p>
+</li>
+<li>
+<p><code>v1</code> indicates the secret version (disable by using <code>--show-version</code>) or <code>VKV_EXPORT_SHOW_VERSION=false</code></p>
+</li>
+<li>
+<p><code>[key=value]</code> represents the custom metadata that we added to the secret in step 3. (disable by <code>--show-metadata</code> or (<code>VKV_EXPORT_SHOW_METADATA=false</code>)</p>
+</li>
+<li>
+<p>every secret is a hyperlink which links to the secret in the Vault UI  (disable with <code>--with-hyperlink=false</code> or <code>VKV_EXPORT_WITH_HYPERLINK</code>). Works only for supported terminals (see <a href="https://github.com/savioxavier/termlink/blob/master/termlink.go#L80">https://github.com/savioxavier/termlink/blob/master/termlink.go#L80</a>)</p>
+</li>
+</ul>
+<p>This output format is the default format called <code>base</code>. <code>vkv</code> has many other useful output formats. </p>
+<p>You can see them all using this oneliner:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span>base<span class="w"> </span>yaml<span class="w"> </span>json<span class="w"> </span>markdown<span class="w"> </span>policy<span class="w"> </span>export<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;\n===&gt; Output Format: </span><span class="nv">$f</span><span class="s2"> &lt;===\n&quot;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-p<span class="w"> </span>secret<span class="w"> </span>--format<span class="o">=</span><span class="nv">$f</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">done</span><span class="w"> </span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="o">===</span>&gt;<span class="w"> </span>Output<span class="w"> </span>Format:<span class="w"> </span>base<span class="w"> </span>&lt;<span class="o">===</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--path<span class="w"> </span>secret<span class="w">                                            </span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>secret/<span class="w"> </span><span class="o">[</span><span class="nv">desc</span><span class="o">=</span>key/value<span class="w"> </span>secret<span class="w"> </span>storage<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">type</span><span class="o">=</span>kv2<span class="o">]</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>├──<span class="w"> </span>admin<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">sub</span><span class="o">=</span>********
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>└──<span class="w"> </span>sub
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">demo</span><span class="o">=</span>***********
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>******
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>*****
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">    </span>└──<span class="w"> </span>sub2
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">        </span>└──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">2</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">admin</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">admin</span><span class="o">=</span>***
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>********
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">            </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>****
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="o">===</span>&gt;<span class="w"> </span>Output<span class="w"> </span>Format:<span class="w"> </span>yaml<span class="w"> </span>&lt;<span class="o">===</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>secret/:
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">  </span>admin:
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">    </span>password:<span class="w"> </span><span class="s1">&#39;********&#39;</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">    </span>username:<span class="w"> </span><span class="s1">&#39;****&#39;</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">  </span>db/:
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="w">    </span>dev:
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="w">      </span>env:<span class="w"> </span><span class="s1">&#39;***&#39;</span>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">      </span>password:<span class="w"> </span><span class="s1">&#39;************&#39;</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="w">      </span>username:<span class="w"> </span><span class="s1">&#39;****&#39;</span>
+</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="w">    </span>prod:
+</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="w">      </span>env:<span class="w"> </span><span class="s1">&#39;****&#39;</span>
+</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="w">      </span>password:<span class="w"> </span><span class="s1">&#39;*************&#39;</span>
+</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="w">      </span>username:<span class="w"> </span><span class="s1">&#39;****&#39;</span>
+</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>
+</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a>
+</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="o">===</span>&gt;<span class="w"> </span>Output<span class="w"> </span>Format:<span class="w"> </span>json<span class="w"> </span>&lt;<span class="o">===</span>
+</span><span id="__span-4-42"><a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="o">{</span>
+</span><span id="__span-4-43"><a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="w">  </span><span class="s2">&quot;secret/&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-4-44"><a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a><span class="w">    </span><span class="s2">&quot;admin&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-4-45"><a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a><span class="w">      </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;********&quot;</span>,
+</span><span id="__span-4-46"><a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="w">      </span><span class="s2">&quot;username&quot;</span>:<span class="w"> </span><span class="s2">&quot;****&quot;</span>
+</span><span id="__span-4-47"><a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="w">    </span><span class="o">}</span>,
+</span><span id="__span-4-48"><a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a><span class="w">    </span><span class="s2">&quot;db/&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-4-49"><a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a><span class="w">      </span><span class="s2">&quot;dev&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-4-50"><a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a><span class="w">        </span><span class="s2">&quot;env&quot;</span>:<span class="w"> </span><span class="s2">&quot;***&quot;</span>,
+</span><span id="__span-4-51"><a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a><span class="w">        </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;************&quot;</span>,
+</span><span id="__span-4-52"><a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a><span class="w">        </span><span class="s2">&quot;username&quot;</span>:<span class="w"> </span><span class="s2">&quot;****&quot;</span>
+</span><span id="__span-4-53"><a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a><span class="w">      </span><span class="o">}</span>,
+</span><span id="__span-4-54"><a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a><span class="w">      </span><span class="s2">&quot;prod&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-4-55"><a id="__codelineno-4-55" name="__codelineno-4-55" href="#__codelineno-4-55"></a><span class="w">        </span><span class="s2">&quot;env&quot;</span>:<span class="w"> </span><span class="s2">&quot;****&quot;</span>,
+</span><span id="__span-4-56"><a id="__codelineno-4-56" name="__codelineno-4-56" href="#__codelineno-4-56"></a><span class="w">        </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;*************&quot;</span>,
+</span><span id="__span-4-57"><a id="__codelineno-4-57" name="__codelineno-4-57" href="#__codelineno-4-57"></a><span class="w">        </span><span class="s2">&quot;username&quot;</span>:<span class="w"> </span><span class="s2">&quot;****&quot;</span>
+</span><span id="__span-4-58"><a id="__codelineno-4-58" name="__codelineno-4-58" href="#__codelineno-4-58"></a><span class="w">      </span><span class="o">}</span>
+</span><span id="__span-4-59"><a id="__codelineno-4-59" name="__codelineno-4-59" href="#__codelineno-4-59"></a><span class="w">    </span><span class="o">}</span>
+</span><span id="__span-4-60"><a id="__codelineno-4-60" name="__codelineno-4-60" href="#__codelineno-4-60"></a><span class="w">  </span><span class="o">}</span>
+</span><span id="__span-4-61"><a id="__codelineno-4-61" name="__codelineno-4-61" href="#__codelineno-4-61"></a><span class="o">}</span>
+</span><span id="__span-4-62"><a id="__codelineno-4-62" name="__codelineno-4-62" href="#__codelineno-4-62"></a>
+</span><span id="__span-4-63"><a id="__codelineno-4-63" name="__codelineno-4-63" href="#__codelineno-4-63"></a><span class="o">===</span>&gt;<span class="w"> </span>Output<span class="w"> </span>Format:<span class="w"> </span>markdown<span class="w"> </span>&lt;<span class="o">===</span>
+</span><span id="__span-4-64"><a id="__codelineno-4-64" name="__codelineno-4-64" href="#__codelineno-4-64"></a><span class="p">|</span><span class="w">      </span>PATH<span class="w">      </span><span class="p">|</span><span class="w">   </span>KEY<span class="w">    </span><span class="p">|</span><span class="w">    </span>VALUE<span class="w">     </span><span class="p">|</span><span class="w"> </span>VERSION<span class="w"> </span><span class="p">|</span><span class="w"> </span>METADATA<span class="w">  </span><span class="p">|</span>
+</span><span id="__span-4-65"><a id="__codelineno-4-65" name="__codelineno-4-65" href="#__codelineno-4-65"></a><span class="p">|</span>----------------<span class="p">|</span>----------<span class="p">|</span>--------------<span class="p">|</span>---------<span class="p">|</span>-----------<span class="p">|</span>
+</span><span id="__span-4-66"><a id="__codelineno-4-66" name="__codelineno-4-66" href="#__codelineno-4-66"></a><span class="p">|</span><span class="w"> </span>secret/admin<span class="w">   </span><span class="p">|</span><span class="w"> </span>password<span class="w"> </span><span class="p">|</span><span class="w"> </span>********<span class="w">     </span><span class="p">|</span><span class="w">       </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span>value<span class="w"> </span><span class="p">|</span>
+</span><span id="__span-4-67"><a id="__codelineno-4-67" name="__codelineno-4-67" href="#__codelineno-4-67"></a><span class="p">|</span><span class="w">                </span><span class="p">|</span><span class="w"> </span>username<span class="w"> </span><span class="p">|</span><span class="w"> </span>****<span class="w">         </span><span class="p">|</span><span class="w">         </span><span class="p">|</span><span class="w">           </span><span class="p">|</span>
+</span><span id="__span-4-68"><a id="__codelineno-4-68" name="__codelineno-4-68" href="#__codelineno-4-68"></a><span class="p">|</span><span class="w"> </span>secret/db/dev<span class="w">  </span><span class="p">|</span><span class="w"> </span>env<span class="w">      </span><span class="p">|</span><span class="w"> </span>***<span class="w">          </span><span class="p">|</span><span class="w">       </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w">           </span><span class="p">|</span>
+</span><span id="__span-4-69"><a id="__codelineno-4-69" name="__codelineno-4-69" href="#__codelineno-4-69"></a><span class="p">|</span><span class="w">                </span><span class="p">|</span><span class="w"> </span>password<span class="w"> </span><span class="p">|</span><span class="w"> </span>************<span class="w"> </span><span class="p">|</span><span class="w">         </span><span class="p">|</span><span class="w">           </span><span class="p">|</span>
+</span><span id="__span-4-70"><a id="__codelineno-4-70" name="__codelineno-4-70" href="#__codelineno-4-70"></a><span class="p">|</span><span class="w">                </span><span class="p">|</span><span class="w"> </span>username<span class="w"> </span><span class="p">|</span><span class="w"> </span>****<span class="w">         </span><span class="p">|</span><span class="w">         </span><span class="p">|</span><span class="w">           </span><span class="p">|</span>
+</span><span id="__span-4-71"><a id="__codelineno-4-71" name="__codelineno-4-71" href="#__codelineno-4-71"></a><span class="p">|</span><span class="w"> </span>secret/db/prod<span class="w"> </span><span class="p">|</span><span class="w"> </span>env<span class="w">      </span><span class="p">|</span><span class="w"> </span>****<span class="w">         </span><span class="p">|</span><span class="w">       </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w">           </span><span class="p">|</span>
+</span><span id="__span-4-72"><a id="__codelineno-4-72" name="__codelineno-4-72" href="#__codelineno-4-72"></a><span class="p">|</span><span class="w">                </span><span class="p">|</span><span class="w"> </span>password<span class="w"> </span><span class="p">|</span><span class="w"> </span>************<span class="w"> </span><span class="p">|</span><span class="w">         </span><span class="p">|</span><span class="w">           </span><span class="p">|</span>
+</span><span id="__span-4-73"><a id="__codelineno-4-73" name="__codelineno-4-73" href="#__codelineno-4-73"></a><span class="p">|</span><span class="w">                </span><span class="p">|</span><span class="w"> </span>username<span class="w"> </span><span class="p">|</span><span class="w"> </span>****<span class="w">         </span><span class="p">|</span><span class="w">         </span><span class="p">|</span><span class="w">           </span><span class="p">|</span>
+</span><span id="__span-4-74"><a id="__codelineno-4-74" name="__codelineno-4-74" href="#__codelineno-4-74"></a>
+</span><span id="__span-4-75"><a id="__codelineno-4-75" name="__codelineno-4-75" href="#__codelineno-4-75"></a><span class="o">===</span>&gt;<span class="w"> </span>Output<span class="w"> </span>Format:<span class="w"> </span>policy<span class="w"> </span>&lt;<span class="o">===</span>
+</span><span id="__span-4-76"><a id="__codelineno-4-76" name="__codelineno-4-76" href="#__codelineno-4-76"></a>PATH<span class="w">            </span>CREATE<span class="w">  </span>READ<span class="w">    </span>UPDATE<span class="w">  </span>DELETE<span class="w">  </span>LIST<span class="w">    </span>ROOT
+</span><span id="__span-4-77"><a id="__codelineno-4-77" name="__codelineno-4-77" href="#__codelineno-4-77"></a>secret/admin<span class="w">    </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✔
+</span><span id="__span-4-78"><a id="__codelineno-4-78" name="__codelineno-4-78" href="#__codelineno-4-78"></a>secret/db/dev<span class="w">   </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✔
+</span><span id="__span-4-79"><a id="__codelineno-4-79" name="__codelineno-4-79" href="#__codelineno-4-79"></a>secret/db/prod<span class="w">  </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✖<span class="w">       </span>✔
+</span><span id="__span-4-80"><a id="__codelineno-4-80" name="__codelineno-4-80" href="#__codelineno-4-80"></a>
+</span><span id="__span-4-81"><a id="__codelineno-4-81" name="__codelineno-4-81" href="#__codelineno-4-81"></a><span class="o">===</span>&gt;<span class="w"> </span>Output<span class="w"> </span>Format:<span class="w"> </span><span class="nb">export</span><span class="w"> </span>&lt;<span class="o">===</span>
+</span><span id="__span-4-82"><a id="__codelineno-4-82" name="__codelineno-4-82" href="#__codelineno-4-82"></a><span class="nb">export</span><span class="w"> </span><span class="nv">env</span><span class="o">=</span><span class="s1">&#39;prod&#39;</span>
+</span><span id="__span-4-83"><a id="__codelineno-4-83" name="__codelineno-4-83" href="#__codelineno-4-83"></a><span class="nb">export</span><span class="w"> </span><span class="nv">password</span><span class="o">=</span><span class="s1">&#39;passw0rd-prod&#39;</span>
+</span><span id="__span-4-84"><a id="__codelineno-4-84" name="__codelineno-4-84" href="#__codelineno-4-84"></a><span class="nb">export</span><span class="w"> </span><span class="nv">username</span><span class="o">=</span><span class="s1">&#39;user&#39;</span>
+</span></code></pre></div>
+<p>Most of these formats, offer various commandline flags, such as <code>--show-secrets</code>, <code>--only-paths</code>, <code>--only-keys</code>, <code>--max-value-length</code> to modify the output. These flags can also be set through environment variables:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">VKV_EXPORT_FORMAT</span><span class="o">=</span>JSON<span class="w"> </span><span class="nv">VKV_EXPORT_SHOW_VALUES</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-p<span class="w"> </span>secret
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="o">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="s2">&quot;secret/&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="s2">&quot;admin&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;passw0rd&quot;</span>,
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">      </span><span class="s2">&quot;username&quot;</span>:<span class="w"> </span><span class="s2">&quot;user&quot;</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="o">}</span>,
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="s2">&quot;db/&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="s2">&quot;dev&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="s2">&quot;env&quot;</span>:<span class="w"> </span><span class="s2">&quot;dev&quot;</span>,
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">        </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;passw0rd-dev&quot;</span>,
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">        </span><span class="s2">&quot;username&quot;</span>:<span class="w"> </span><span class="s2">&quot;user&quot;</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="o">}</span>,
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">      </span><span class="s2">&quot;prod&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">        </span><span class="s2">&quot;env&quot;</span>:<span class="w"> </span><span class="s2">&quot;prod&quot;</span>,
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">        </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;passw0rd-prod&quot;</span>,
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">        </span><span class="s2">&quot;username&quot;</span>:<span class="w"> </span><span class="s2">&quot;user&quot;</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">      </span><span class="o">}</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="o">}</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">  </span><span class="o">}</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="o">}</span>
+</span></code></pre></div>
+<h2 id="import-secrets-using-vkv">Import secrets using <code>vkv</code><a class="headerlink" href="#import-secrets-using-vkv" title="Permanent link">&para;</a></h2>
+<p>Meanwhile <code>vkv export</code> can be used to store secrets, <code>vkv import</code> is used to import secrets from a <code>vkv export</code> command (either <code>yaml</code> or <code>json</code> format is accepted).</p>
+<p>Knowing this, we can copy a secret engine to another secret engine:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-p<span class="w"> </span>secret<span class="w"> </span>-f<span class="o">=</span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>vkv<span class="w"> </span>import<span class="w"> </span>-<span class="w"> </span>-p<span class="w"> </span>copy
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>reading<span class="w"> </span>secrets<span class="w"> </span>from<span class="w"> </span>STDIN
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>parsing<span class="w"> </span>secrets<span class="w"> </span>from<span class="w"> </span>YAML
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;copy/db/dev&quot;</span><span class="w"> </span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;copy/db/prod&quot;</span><span class="w"> </span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;copy/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>successfully<span class="w"> </span>imported<span class="w"> </span>all<span class="w"> </span>secrets
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>result:
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>copy/<span class="w"> </span><span class="o">[</span><span class="nv">type</span><span class="o">=</span>kv2<span class="o">]</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>├──<span class="w"> </span>admin<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">sub</span><span class="o">=</span>********
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>└──<span class="w"> </span>sub
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">demo</span><span class="o">=</span>***********
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>******
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>*****
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span>└──<span class="w"> </span>sub2
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">        </span>└──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">2</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">admin</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">admin</span><span class="o">=</span>***
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>********
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">            </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>****
+</span></code></pre></div>
+<p>Or even to another Vault instance:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-p<span class="w"> </span>secret<span class="w"> </span>-f<span class="o">=</span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">VAULT_ADDR</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="nv">VAULT_TOKEN</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="w"> </span>vkv<span class="w"> </span>import<span class="w"> </span>-<span class="w"> </span>-p<span class="w"> </span>copy
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="o">[</span>...<span class="o">]</span>
+</span></code></pre></div>
+<p>The <code>-</code> tells <code>vkv</code> to read the secrets from STDIN. You cal also specify a file using the <code>--file</code> parameter.</p>
+<p><code>vkv</code> will create the <code>KVv2</code> engine if it doesn't exist. If the engine indeed exists, <code>vkv</code> will error unless <code>--force</code> is used.</p>
+<p>You can also copy sub-paths to other engines:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-p<span class="w"> </span>secret/admin<span class="w"> </span>-f<span class="o">=</span>yaml<span class="w"> </span>--show-values<span class="p">|</span><span class="w"> </span>vkv<span class="w"> </span>import<span class="w"> </span>-<span class="w"> </span>-p<span class="w"> </span>admin
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>reading<span class="w"> </span>secrets<span class="w"> </span>from<span class="w"> </span>STDIN
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>parsing<span class="w"> </span>secrets<span class="w"> </span>from<span class="w"> </span>YAML
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;admin/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>successfully<span class="w"> </span>imported<span class="w"> </span>all<span class="w"> </span>secrets
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>result:
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>admin/
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>└──<span class="w"> </span>admin<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>********
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span>└──<span class="w"> </span><span class="nv">username</span><span class="o">=</span>****
+</span></code></pre></div>
+<h2 id="create-kvv2-snapshots-using-vkv">Create KVv2 Snapshots using <code>vkv</code><a class="headerlink" href="#create-kvv2-snapshots-using-vkv" title="Permanent link">&para;</a></h2>
+<p><code>vkv</code> enables you to create and restore snapshots of all KVv2 engines in all namespaces of a Vault instance (requires an appropiate token + policy):</p>
+<p>Consider the following namespaces and KVv2 engines on a Vault Enterprise instance:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># list all namespaces</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>vkv<span class="w"> </span>list<span class="w"> </span>namespaces<span class="w"> </span>--all
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>sub
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>sub/sub2
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="nb">test</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>test/test2
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>test/test2/test3
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="c1"># list all engines with their respective namespace as the prefix</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>vkv<span class="w"> </span>list<span class="w"> </span>engines<span class="w"> </span>--all<span class="w"> </span>--include-ns-prefix
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>secret
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>secret_2
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>sub/sub2/sub_sub2_secret
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>sub/sub2/sub_sub2_secret_2
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>sub/sub_secret
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>sub/sub_secret_2
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>test/test2/test3/test_test2_test3_secret
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>test/test2/test3/test_test2_test3_secret_2
+</span></code></pre></div>
+<p>You can create a snapshot of those KVv2 engines by running:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>vkv<span class="w"> </span>snapshot<span class="w"> </span>save<span class="w"> </span>--destination<span class="w"> </span>vkv-export-<span class="k">$(</span>date<span class="w"> </span><span class="s1">&#39;+%Y-%m-%d&#39;</span><span class="k">)</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>created<span class="w"> </span>vkv-export-2022-12-29
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>created<span class="w"> </span>vkv-export-2022-12-29/secret.yaml
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>created<span class="w"> </span>vkv-export-2022-12-29/secret_2.yaml
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>created<span class="w"> </span>vkv-export-2022-12-29/sub
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>created<span class="w"> </span>vkv-export-2022-12-29/sub/sub_secret_2.yaml
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>created<span class="w"> </span>vkv-export-2022-12-29/sub/sub_secret.yaml
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>created<span class="w"> </span>vkv-export-2022-12-29/sub/sub2
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>created<span class="w"> </span>vkv-export-2022-12-29/sub/sub2/sub_sub2_secret.yaml
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>created<span class="w"> </span>vkv-export-2022-12-29/sub/sub2/sub_sub2_secret_2.yaml
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>created<span class="w"> </span>vkv-export-2022-12-29/test
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>created<span class="w"> </span>vkv-export-2022-12-29/test/test2
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>created<span class="w"> </span>vkv-export-2022-12-29/test/test2/test3
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>created<span class="w"> </span>vkv-export-2022-12-29/test/test2/test3/test_test2_test3_secret.yaml
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>created<span class="w"> </span>vkv-export-2022-12-29/test/test2/test3/test_test2_test3_secret_2.yaml
+</span></code></pre></div>
+<p>As you can see: <code>vkv</code> exported all engines and wrote them to the specified directory:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>vkv-export-2022-12-29/
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>├──<span class="w"> </span>secret_2.yaml
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>├──<span class="w"> </span>secret.yaml
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>├──<span class="w"> </span>sub
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>│<span class="w">   </span>├──<span class="w"> </span>sub2
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>sub_sub2_secret_2.yaml
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>sub_sub2_secret.yaml
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>│<span class="w">   </span>├──<span class="w"> </span>sub_secret_2.yaml
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>│<span class="w">   </span>└──<span class="w"> </span>sub_secret.yaml
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>└──<span class="w"> </span><span class="nb">test</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span>└──<span class="w"> </span>test2
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">        </span>└──<span class="w"> </span>test3
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">            </span>├──<span class="w"> </span>test_test2_test3_secret_2.yaml
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">            </span>└──<span class="w"> </span>test_test2_test3_secret.yaml
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="m">5</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">8</span><span class="w"> </span>files
+</span></code></pre></div>
+<p>whereas one file is the JSON output of a single KVv2 engine:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>cat<span class="w"> </span>vkv-export-2022-12-29/secret.yaml<span class="w">  </span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="o">{</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="s2">&quot;admin&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="s2">&quot;sub&quot;</span>:<span class="w"> </span><span class="s2">&quot;password&quot;</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="o">}</span>,
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="s2">&quot;demo&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="s2">&quot;foo&quot;</span>:<span class="w"> </span><span class="s2">&quot;bar&quot;</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="o">}</span>,
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">  </span><span class="s2">&quot;sub/&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="s2">&quot;demo&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">      </span><span class="s2">&quot;demo&quot;</span>:<span class="w"> </span><span class="s2">&quot;hello world&quot;</span>,
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">      </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;s3cre5&quot;</span>,
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">      </span><span class="s2">&quot;user&quot;</span>:<span class="w"> </span><span class="s2">&quot;admin&quot;</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">    </span><span class="o">}</span>,
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">    </span><span class="s2">&quot;sub2/&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">      </span><span class="s2">&quot;demo&quot;</span>:<span class="w"> </span><span class="o">{</span>
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">        </span><span class="s2">&quot;admin&quot;</span>:<span class="w"> </span><span class="s2">&quot;key&quot;</span>,
+</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">        </span><span class="s2">&quot;foo&quot;</span>:<span class="w"> </span><span class="s2">&quot;bar&quot;</span>,
+</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="w">        </span><span class="s2">&quot;password&quot;</span>:<span class="w"> </span><span class="s2">&quot;password&quot;</span>,
+</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">        </span><span class="s2">&quot;user&quot;</span>:<span class="w"> </span><span class="s2">&quot;user&quot;</span>
+</span><span id="__span-12-21"><a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">      </span><span class="o">}</span>
+</span><span id="__span-12-22"><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">    </span><span class="o">}</span>
+</span><span id="__span-12-23"><a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">  </span><span class="o">}</span>
+</span><span id="__span-12-24"><a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="o">}</span>
+</span></code></pre></div>
+<p>You could <code>.tar.gz</code> those directories and save those encrypted files in a secure fashion.</p>
+<h2 id="restore-vkv-snapshots">Restore vkv snapshots<a class="headerlink" href="#restore-vkv-snapshots" title="Permanent link">&para;</a></h2>
+<p>In order to restore a <code>vkv</code> snapshot the <code>snapshot restore</code> command is invoked:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># no KVv2 engines configured</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>vkv<span class="w"> </span>list<span class="w"> </span>engines<span class="w"> </span>--all<span class="w"> </span>--include-ns-prefix<span class="w">                      </span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>no<span class="w"> </span>engines<span class="w"> </span>found.
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="c1"># restore a snapshot</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>vkv<span class="w"> </span>snapshot<span class="w"> </span>restore<span class="w"> </span>--source<span class="w"> </span>vkv-export-2022-12-29
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>secret
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>secret_2
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret_2/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret_2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret_2/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;secret_2/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>namespace:<span class="w"> </span><span class="s2">&quot;sub&quot;</span>
+</span><span id="__span-13-18"><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>namespace:<span class="w"> </span><span class="s2">&quot;sub2&quot;</span>
+</span><span id="__span-13-19"><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>sub_sub2_secret
+</span><span id="__span-13-20"><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-21"><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-22"><a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-23"><a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-24"><a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>sub_sub2_secret_2
+</span><span id="__span-13-25"><a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret_2/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-26"><a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret_2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-27"><a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret_2/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-28"><a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="o">[</span>sub/sub2<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_sub2_secret_2/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-29"><a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>sub_secret
+</span><span id="__span-13-30"><a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-31"><a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-32"><a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-33"><a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-34"><a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>sub_secret_2
+</span><span id="__span-13-35"><a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret_2/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-36"><a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret_2/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-37"><a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret_2/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-38"><a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a><span class="o">[</span>sub<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;sub_secret_2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-39"><a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a><span class="o">[</span>root<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>namespace:<span class="w"> </span><span class="s2">&quot;test&quot;</span>
+</span><span id="__span-13-40"><a id="__codelineno-13-40" name="__codelineno-13-40" href="#__codelineno-13-40"></a><span class="o">[</span>test<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>namespace:<span class="w"> </span><span class="s2">&quot;test2&quot;</span>
+</span><span id="__span-13-41"><a id="__codelineno-13-41" name="__codelineno-13-41" href="#__codelineno-13-41"></a><span class="o">[</span>test/test2<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>namespace:<span class="w"> </span><span class="s2">&quot;test3&quot;</span>
+</span><span id="__span-13-42"><a id="__codelineno-13-42" name="__codelineno-13-42" href="#__codelineno-13-42"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>test_test2_test3_secret
+</span><span id="__span-13-43"><a id="__codelineno-13-43" name="__codelineno-13-43" href="#__codelineno-13-43"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-44"><a id="__codelineno-13-44" name="__codelineno-13-44" href="#__codelineno-13-44"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-45"><a id="__codelineno-13-45" name="__codelineno-13-45" href="#__codelineno-13-45"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-46"><a id="__codelineno-13-46" name="__codelineno-13-46" href="#__codelineno-13-46"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-47"><a id="__codelineno-13-47" name="__codelineno-13-47" href="#__codelineno-13-47"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>restore<span class="w"> </span>engine:<span class="w"> </span>test_test2_test3_secret_2
+</span><span id="__span-13-48"><a id="__codelineno-13-48" name="__codelineno-13-48" href="#__codelineno-13-48"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret_2/admin&quot;</span><span class="w"> </span>
+</span><span id="__span-13-49"><a id="__codelineno-13-49" name="__codelineno-13-49" href="#__codelineno-13-49"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret_2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-50"><a id="__codelineno-13-50" name="__codelineno-13-50" href="#__codelineno-13-50"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret_2/sub/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-51"><a id="__codelineno-13-51" name="__codelineno-13-51" href="#__codelineno-13-51"></a><span class="o">[</span>test/test2/test3<span class="o">]</span><span class="w"> </span>writing<span class="w"> </span>secret<span class="w"> </span><span class="s2">&quot;test_test2_test3_secret_2/sub/sub2/demo&quot;</span><span class="w"> </span>
+</span><span id="__span-13-52"><a id="__codelineno-13-52" name="__codelineno-13-52" href="#__codelineno-13-52"></a>
+</span><span id="__span-13-53"><a id="__codelineno-13-53" name="__codelineno-13-53" href="#__codelineno-13-53"></a><span class="c1"># verify engines have been created</span>
+</span><span id="__span-13-54"><a id="__codelineno-13-54" name="__codelineno-13-54" href="#__codelineno-13-54"></a>vkv<span class="w"> </span>list<span class="w"> </span>engines<span class="w"> </span>--all<span class="w"> </span>--include-ns-prefix
+</span><span id="__span-13-55"><a id="__codelineno-13-55" name="__codelineno-13-55" href="#__codelineno-13-55"></a>secret
+</span><span id="__span-13-56"><a id="__codelineno-13-56" name="__codelineno-13-56" href="#__codelineno-13-56"></a>secret_2
+</span><span id="__span-13-57"><a id="__codelineno-13-57" name="__codelineno-13-57" href="#__codelineno-13-57"></a>sub/sub2/sub_sub2_secret
+</span><span id="__span-13-58"><a id="__codelineno-13-58" name="__codelineno-13-58" href="#__codelineno-13-58"></a>sub/sub2/sub_sub2_secret_2
+</span><span id="__span-13-59"><a id="__codelineno-13-59" name="__codelineno-13-59" href="#__codelineno-13-59"></a>sub/sub_secret
+</span><span id="__span-13-60"><a id="__codelineno-13-60" name="__codelineno-13-60" href="#__codelineno-13-60"></a>sub/sub_secret_2
+</span><span id="__span-13-61"><a id="__codelineno-13-61" name="__codelineno-13-61" href="#__codelineno-13-61"></a>test/test2/test3/test_test2_test3_secret
+</span><span id="__span-13-62"><a id="__codelineno-13-62" name="__codelineno-13-62" href="#__codelineno-13-62"></a>test/test2/test3/test_test2_test3_secret_2
+</span></code></pre></div>
+<p><strong>Please note, that <code>vkv snapshot restore</code> is an experimental feature, you should always double check <code>vkv</code>s beahviour on a development Vault before running it against a production Vault</strong></p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1-2.1-2M12.5 7v5.2l4 2.4-1 1L11 13V7h1.5M11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2v1.8Z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 2, 2024</span>
+  </span>
+
+    
+    
+    
+      
+  
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Contributors">
+      
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4Z"/></svg>
+      
+    </span>
+    <nav>
+      
+        <a href="mailto:49699333+dependabot[bot]@users.noreply.github.com">dependabot[bot]</a>
+    </nav>
+  </span>
+
+    
+    
+  </aside>
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: vkv">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                vkv
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../installation/" class="md-footer__link md-footer__link--next" aria-label="Next: Installation">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Installation
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.indexes", "content.code.copy", "content.action.edit", "navigation.top", "navigation.expand", "navigation.footer"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
