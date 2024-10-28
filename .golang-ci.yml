@@ -28,3 +28,6 @@ linters:
     - revive
     - depguard
     - tagalign
+    - copyloopvar
+    - intrange
+    - execinquery
