@@ -52,7 +52,7 @@ func (s *VaultSuite) TestVaultConnection() {
 
 func TestVaultSuite(t *testing.T) {
 	// github actions doesn't offer the docker socket, which we need to run this test suite
-	if runtime.GOOS == "linux" {
+	if runtime.GOOS != "windows" {
 		suite.Run(t, new(VaultSuite))
 	}
 }

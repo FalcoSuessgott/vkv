@@ -39,6 +39,57 @@ func (s *VaultSuite) SetupSubTest() {
 	s.client = v
 }
 
+func (s *VaultSuite) TestGetToken() {
+	testCases := []struct {
+		name     string
+		envVars  map[string]string
+		expToken string
+		err      bool
+	}{
+		{
+			name:     "vault token",
+			expToken: "token",
+			envVars: map[string]string{
+				"VAULT_TOKEN": "token",
+			},
+		},
+		{
+			name:     "vkv login command",
+			expToken: "testtoken",
+			envVars: map[string]string{
+				"VKV_LOGIN_COMMAND": "echo testtoken",
+			},
+		},
+		{
+			name: "none",
+			err:  true,
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			// unsetting any local VAULT_TOKEN env var
+			os.Unsetenv("VAULT_TOKEN")
+
+			// set env vars
+			for k, v := range tc.envVars {
+				s.T().Setenv(k, v)
+			}
+
+			// invoke token
+			t, err := getToken()
+
+			// assert
+			if tc.err {
+				s.Require().Error(err, tc.name)
+			} else {
+				s.Require().NoError(err, tc.name)
+				s.Require().Equal(tc.expToken, t, tc.name)
+			}
+		})
+	}
+}
+
 func (s *VaultSuite) TestNewClient() {
 	testCases := []struct {
 		name                           string
@@ -120,7 +171,7 @@ func (s *VaultSuite) TestNewClient() {
 func TestVaultSuite(t *testing.T) {
 	// github actions doenst offer the docker sock, which we need
 	// to run this test suite
-	if runtime.GOOS == "linux" {
+	if runtime.GOOS != "windows" {
 		suite.Run(t, new(VaultSuite))
 	}
 }
