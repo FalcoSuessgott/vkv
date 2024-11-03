@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"log"
 	"runtime"
@@ -67,7 +66,7 @@ func (s *VaultSuite) TestMode() {
 			expected: `e2e/ [type=kv2]
 ├── sub [v=1]
 │   └── user=********
-│
+│   
 └── sub2 [v=1]
     └── key=*****
 `,
@@ -103,12 +102,13 @@ func (s *VaultSuite) TestMode() {
 			}
 
 			err := NewRootCmd().Execute()
-			fmt.Println(err)
-			// run vkv
-			s.Require().Equal(tc.err, err != nil, "error "+tc.name)
 
-			// assert output
-			if !tc.err {
+			// run vkv
+			if tc.err {
+				s.Require().Error(err, "error "+tc.name)
+			} else {
+				s.Require().NoError(err, "no error "+tc.name)
+
 				out, _ := io.ReadAll(b)
 				s.Require().Equal(tc.expected, string(out), tc.name)
 			}
