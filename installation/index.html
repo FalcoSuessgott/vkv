@@ -466,6 +466,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#brew" class="md-nav__link">
+    <span class="md-ellipsis">
+      brew
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#curl" class="md-nav__link">
     <span class="md-ellipsis">
       cURL
@@ -1413,6 +1422,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#brew" class="md-nav__link">
+    <span class="md-ellipsis">
+      brew
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#curl" class="md-nav__link">
     <span class="md-ellipsis">
       cURL
@@ -1481,42 +1499,45 @@
 
 
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
+<h2 id="brew">brew<a class="headerlink" href="#brew" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew<span class="w"> </span>install<span class="w"> </span>falcosuessgott/tap/vkv
+</span></code></pre></div>
 <h2 id="curl">cURL<a class="headerlink" href="#curl" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">version</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>https://api.github.com/repos/falcosuessgott/vkv/releases/latest<span class="w"> </span>-s<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.name<span class="w"> </span>-r<span class="k">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>curl<span class="w"> </span>-OL<span class="w"> </span><span class="s2">&quot;https://github.com/FalcoSuessgott/vkv/releases/download/</span><span class="si">${</span><span class="nv">version</span><span class="si">}</span><span class="s2">/vkv_</span><span class="k">$(</span>uname<span class="k">)</span><span class="s2">_</span><span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span><span class="s2">.tar.gz&quot;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>tar<span class="w"> </span>xzf<span class="w"> </span>vkv_<span class="k">$(</span>uname<span class="k">)</span>_<span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span>.tar.gz
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>chmod<span class="w"> </span>u+x<span class="w"> </span>vkv
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>./vkv<span class="w"> </span>version
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">version</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>https://api.github.com/repos/falcosuessgott/vkv/releases/latest<span class="w"> </span>-s<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.name<span class="w"> </span>-r<span class="k">)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>curl<span class="w"> </span>-OL<span class="w"> </span><span class="s2">&quot;https://github.com/FalcoSuessgott/vkv/releases/download/</span><span class="si">${</span><span class="nv">version</span><span class="si">}</span><span class="s2">/vkv_</span><span class="k">$(</span>uname<span class="k">)</span><span class="s2">_</span><span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span><span class="s2">.tar.gz&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>tar<span class="w"> </span>xzf<span class="w"> </span>vkv_<span class="k">$(</span>uname<span class="k">)</span>_<span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span>.tar.gz
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>chmod<span class="w"> </span>u+x<span class="w"> </span>vkv
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>./vkv<span class="w"> </span>version
 </span></code></pre></div>
 <h2 id="packages">Packages<a class="headerlink" href="#packages" title="Permanent link">&para;</a></h2>
 <p><code>vkv</code> is releases RPM- &amp; DEB packages and Windows &amp; MacOS Binaries.</p>
 <p>You can find and download all artifacts in the <a href="https://github.com/FalcoSuessgott/vkv/releases">release</a> section.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Ubutu / Debian</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>dpkg<span class="w"> </span>-i<span class="w"> </span>vkv_&lt;version&gt;.deb
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># RHEL / CentOS / Fedora</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>yum<span class="w"> </span>localinstall<span class="w"> </span>vkv_&lt;version&gt;.rpm
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Alpine</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>apk<span class="w"> </span>add<span class="w"> </span>--allow-untrusted<span class="w"> </span>vkv_&lt;version&gt;.apk
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># tar.gz</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>tar<span class="w"> </span>xzf<span class="w"> </span>vkv_&lt;version&gt;.tar.gz
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>chmod<span class="w"> </span>u+x<span class="w"> </span>./vkv
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Ubutu / Debian</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>dpkg<span class="w"> </span>-i<span class="w"> </span>vkv_&lt;version&gt;.deb
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># RHEL / CentOS / Fedora</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>yum<span class="w"> </span>localinstall<span class="w"> </span>vkv_&lt;version&gt;.rpm
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Alpine</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>apk<span class="w"> </span>add<span class="w"> </span>--allow-untrusted<span class="w"> </span>vkv_&lt;version&gt;.apk
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># tar.gz</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>tar<span class="w"> </span>xzf<span class="w"> </span>vkv_&lt;version&gt;.tar.gz
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>chmod<span class="w"> </span>u+x<span class="w"> </span>./vkv
 </span></code></pre></div>
 <h2 id="using-go">Using <code>go</code><a class="headerlink" href="#using-go" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>go<span class="w"> </span>install<span class="w"> </span>github.com/FalcoSuessgott/vkv@latest
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>vkv
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>go<span class="w"> </span>install<span class="w"> </span>github.com/FalcoSuessgott/vkv@latest
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>vkv
 </span></code></pre></div>
 <h2 id="from-sources">From Sources<a class="headerlink" href="#from-sources" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># requires go to be installed</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/FalcoSuessgott/vkv
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nb">cd</span><span class="w"> </span>vkv
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>go<span class="w"> </span>install
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># requires go to be installed</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/FalcoSuessgott/vkv
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">cd</span><span class="w"> </span>vkv
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>go<span class="w"> </span>install
 </span></code></pre></div>
 <h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># ghcr.io</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span><span class="nv">VAULT_ADDR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">VAULT_ADDR</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-e<span class="w"> </span><span class="nv">VAULT_TOKEN</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">VAULT_TOKEN</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>ghcr.io/falcosuessgott/vkv
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># ghcr.io</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span><span class="nv">VAULT_ADDR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">VAULT_ADDR</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-e<span class="w"> </span><span class="nv">VAULT_TOKEN</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">VAULT_TOKEN</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>ghcr.io/falcosuessgott/vkv
 </span></code></pre></div>
 
 
@@ -1555,8 +1576,8 @@
     <nav>
       
         <a href="mailto:tommorelly@gmail.com">Tom Morelly</a>, 
-        <a href="mailto:tom-morelly@gmx.de">Tom Morelly</a>, 
-        <a href="mailto:tom.morelly@clearroute.io">Tom Morelly</a>
+        <a href="mailto:tom.morelly@clearroute.io">Tom Morelly</a>, 
+        <a href="mailto:tom-morelly@gmx.de">Tom Morelly</a>
     </nav>
   </span>
 
