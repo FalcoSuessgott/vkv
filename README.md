@@ -19,7 +19,7 @@
 ## Quickstart
 
 ```bash
-# Installation
+# Installation. For MacOS: "brew install falcosuessgott/tap/vkv"
 version=$(curl https://api.github.com/repos/falcosuessgott/vkv/releases/latest -s | jq .name -r)
 curl -OL "https://github.com/FalcoSuessgott/vkv/releases/download/${version}/vkv_$(uname)_$(uname -m).tar.gz"
 tar xzf vkv_$(uname)_$(uname -m).tar.gz

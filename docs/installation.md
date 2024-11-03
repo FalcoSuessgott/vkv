@@ -1,5 +1,9 @@
 # Installation
 
+## brew
+```bash
+brew install falcosuessgott/tap/vkv
+```
 ## cURL
 ```bash
 version=$(curl https://api.github.com/repos/falcosuessgott/vkv/releases/latest -s | jq .name -r)
