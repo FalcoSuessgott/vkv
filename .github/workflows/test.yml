@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - run: go generate -tags tools tools/tools.go
 
       - uses: actions/setup-go@v5

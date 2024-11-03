@@ -6,7 +6,7 @@ See the [CLI Reference](https://github.com/FalcoSuessgott/vkv/cmd/vkv_server/) f
 ## Server side
 ```bash
 export VAULT_ADDR="..."
-export VAULT_TOKEN="..." 
+export VAULT_TOKEN="..."
 > vkv server --path secret
 listening on 127.0.0.1:8080
 ```

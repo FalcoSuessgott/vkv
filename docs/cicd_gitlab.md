@@ -24,8 +24,8 @@ default:
       command: ["server"]
       alias: vkv
   # global before_scripts block
-  before_script: 
-    # install curl, or wget in your job container   
+  before_script:
+    # install curl, or wget in your job container
     - apk add --no-cache curl
 
     # curl/wget vkv on /export, which will expot all secrets from VKV_SERVER_PATH, eval the output into your shell
@@ -42,5 +42,5 @@ default:
 test:
   stage: test
   script:
-    - make test 
+    - make test
 ```

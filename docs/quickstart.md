@@ -9,7 +9,7 @@ In order to perform all of the described tasks, you will need the following tool
 * `vkv` installed (follow https://falcosuessgott.github.io/vkv/02_installation/)
 
 ## Spin up a development Vault server
-First, we setup a development Vault server. 
+First, we setup a development Vault server.
 
 Open a terminal and run:
 
@@ -46,7 +46,7 @@ HA Enabled      false
 If `vault status` returned an output like this you good to go to the next step
 
 
-## Write secrets to Vault using `vault` 
+## Write secrets to Vault using `vault`
 In a development Vault server a `KVv2` under `secret/` is enabled by default.
 We want to write some secrets using `vault`:
 
@@ -63,7 +63,7 @@ vault kv put -mount=secret db/dev env=dev username=user password=passw0rd-dev
 We can now use `vkv` to list all of our secrets recursively:
 
 ```bash
-vkv export --path secret                                            
+vkv export --path secret
 secret/ [desc=key/value secret storage] [type=kv2]
 ├── admin [v=1] [key=value]
 │   └── sub=********
@@ -86,16 +86,16 @@ Here are some explanations:
 * `vkv` prints the description and the engine type + version
 
 * `vkv` masks the secrets per default, you can disable this by using `--show-values` or `VKV_EXPORT_SHOW_VALUES=true`
-  
+
 * `vkv` limits the length of the secrets per default to `12` for readability purposes (You can set you own value length by using `--max-value-length=XX` or `VKV_EXPORT_MAX_VALUE_LENGTH=XX`)
-  
+
 * `v1` indicates the secret version (disable by using `--show-version`) or `VKV_EXPORT_SHOW_VERSION=false`
-  
+
 * `[key=value]` represents the custom metadata that we added to the secret in step 3. (disable by `--show-metadata` or (`VKV_EXPORT_SHOW_METADATA=false`)
 
 * every secret is a hyperlink which links to the secret in the Vault UI  (disable with `--with-hyperlink=false` or `VKV_EXPORT_WITH_HYPERLINK`). Works only for supported terminals (see [https://github.com/savioxavier/termlink/blob/master/termlink.go#L80](https://github.com/savioxavier/termlink/blob/master/termlink.go#L80))
 
-This output format is the default format called `base`. `vkv` has many other useful output formats. 
+This output format is the default format called `base`. `vkv` has many other useful output formats.
 
 You can see them all using this oneliner:
 
@@ -103,10 +103,10 @@ You can see them all using this oneliner:
 for f in base yaml json markdown policy export; do
 echo -n "\n===> Output Format: $f <===\n"
 vkv export -p secret --format=$f;
-done 
+done
 
 ===> Output Format: base <===
-vkv export --path secret                                            
+vkv export --path secret
 secret/ [desc=key/value secret storage] [type=kv2]
 ├── admin [v=1] [key=value]
 │   └── sub=********
@@ -221,9 +221,9 @@ Knowing this, we can copy a secret engine to another secret engine:
 vkv export -p secret -f=yaml | vkv import - -p copy
 reading secrets from STDIN
 parsing secrets from YAML
-writing secret "copy/db/dev" 
-writing secret "copy/db/prod" 
-writing secret "copy/admin" 
+writing secret "copy/db/dev"
+writing secret "copy/db/prod"
+writing secret "copy/admin"
 successfully imported all secrets
 
 result:
@@ -263,7 +263,7 @@ You can also copy sub-paths to other engines:
 vkv export -p secret/admin -f=yaml --show-values| vkv import - -p admin
 reading secrets from STDIN
 parsing secrets from YAML
-writing secret "admin/admin" 
+writing secret "admin/admin"
 successfully imported all secrets
 
 result:
@@ -344,7 +344,7 @@ vkv-export-2022-12-29/
 whereas one file is the JSON output of a single KVv2 engine:
 
 ```bash
-cat vkv-export-2022-12-29/secret.yaml  
+cat vkv-export-2022-12-29/secret.yaml
 {
   "admin": {
     "sub": "password"
@@ -378,56 +378,56 @@ In order to restore a `vkv` snapshot the `snapshot restore` command is invoked:
 
 ```bash
 # no KVv2 engines configured
-vkv list engines --all --include-ns-prefix                      
+vkv list engines --all --include-ns-prefix
 [ERROR] no engines found.
 
 # restore a snapshot
 vkv snapshot restore --source vkv-export-2022-12-29
 [root] restore engine: secret
-[root] writing secret "secret/admin" 
-[root] writing secret "secret/demo" 
-[root] writing secret "secret/sub/demo" 
-[root] writing secret "secret/sub/sub2/demo" 
+[root] writing secret "secret/admin"
+[root] writing secret "secret/demo"
+[root] writing secret "secret/sub/demo"
+[root] writing secret "secret/sub/sub2/demo"
 [root] restore engine: secret_2
-[root] writing secret "secret_2/admin" 
-[root] writing secret "secret_2/demo" 
-[root] writing secret "secret_2/sub/demo" 
-[root] writing secret "secret_2/sub/sub2/demo" 
+[root] writing secret "secret_2/admin"
+[root] writing secret "secret_2/demo"
+[root] writing secret "secret_2/sub/demo"
+[root] writing secret "secret_2/sub/sub2/demo"
 [root] restore namespace: "sub"
 [sub] restore namespace: "sub2"
 [sub/sub2] restore engine: sub_sub2_secret
-[sub/sub2] writing secret "sub_sub2_secret/admin" 
-[sub/sub2] writing secret "sub_sub2_secret/demo" 
-[sub/sub2] writing secret "sub_sub2_secret/sub/demo" 
-[sub/sub2] writing secret "sub_sub2_secret/sub/sub2/demo" 
+[sub/sub2] writing secret "sub_sub2_secret/admin"
+[sub/sub2] writing secret "sub_sub2_secret/demo"
+[sub/sub2] writing secret "sub_sub2_secret/sub/demo"
+[sub/sub2] writing secret "sub_sub2_secret/sub/sub2/demo"
 [sub/sub2] restore engine: sub_sub2_secret_2
-[sub/sub2] writing secret "sub_sub2_secret_2/admin" 
-[sub/sub2] writing secret "sub_sub2_secret_2/demo" 
-[sub/sub2] writing secret "sub_sub2_secret_2/sub/sub2/demo" 
-[sub/sub2] writing secret "sub_sub2_secret_2/sub/demo" 
+[sub/sub2] writing secret "sub_sub2_secret_2/admin"
+[sub/sub2] writing secret "sub_sub2_secret_2/demo"
+[sub/sub2] writing secret "sub_sub2_secret_2/sub/sub2/demo"
+[sub/sub2] writing secret "sub_sub2_secret_2/sub/demo"
 [sub] restore engine: sub_secret
-[sub] writing secret "sub_secret/admin" 
-[sub] writing secret "sub_secret/demo" 
-[sub] writing secret "sub_secret/sub/demo" 
-[sub] writing secret "sub_secret/sub/sub2/demo" 
+[sub] writing secret "sub_secret/admin"
+[sub] writing secret "sub_secret/demo"
+[sub] writing secret "sub_secret/sub/demo"
+[sub] writing secret "sub_secret/sub/sub2/demo"
 [sub] restore engine: sub_secret_2
-[sub] writing secret "sub_secret_2/sub/demo" 
-[sub] writing secret "sub_secret_2/sub/sub2/demo" 
-[sub] writing secret "sub_secret_2/admin" 
-[sub] writing secret "sub_secret_2/demo" 
+[sub] writing secret "sub_secret_2/sub/demo"
+[sub] writing secret "sub_secret_2/sub/sub2/demo"
+[sub] writing secret "sub_secret_2/admin"
+[sub] writing secret "sub_secret_2/demo"
 [root] restore namespace: "test"
 [test] restore namespace: "test2"
 [test/test2] restore namespace: "test3"
 [test/test2/test3] restore engine: test_test2_test3_secret
-[test/test2/test3] writing secret "test_test2_test3_secret/sub/sub2/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret/admin" 
-[test/test2/test3] writing secret "test_test2_test3_secret/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret/sub/demo" 
+[test/test2/test3] writing secret "test_test2_test3_secret/sub/sub2/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret/admin"
+[test/test2/test3] writing secret "test_test2_test3_secret/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret/sub/demo"
 [test/test2/test3] restore engine: test_test2_test3_secret_2
-[test/test2/test3] writing secret "test_test2_test3_secret_2/admin" 
-[test/test2/test3] writing secret "test_test2_test3_secret_2/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/sub2/demo" 
+[test/test2/test3] writing secret "test_test2_test3_secret_2/admin"
+[test/test2/test3] writing secret "test_test2_test3_secret_2/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/sub2/demo"
 
 # verify engines have been created
 vkv list engines --all --include-ns-prefix
@@ -443,4 +443,3 @@ test/test2/test3/test_test2_test3_secret_2
 
 
 **Please note, that `vkv snapshot restore` is an experimental feature, you should always double check `vkv`s beahviour on a development Vault before running it against a production Vault**
-

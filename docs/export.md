@@ -1,11 +1,11 @@
 # Export
-`vkv export` requires an engine path (`--path` or `--engine-path`) and supports the following export formats (specify via `--format` flag). 
+`vkv export` requires an engine path (`--path` or `--engine-path`) and supports the following export formats (specify via `--format` flag).
 
 See the [CLI Reference](https://falcosuessgott.github.io/vkv/cmd/vkv_export/) for more details on the supported flags and env vars.
 
 !!! warning
     Vault allows `/` in the name of a KV engine. This makes it difficult for `vkv` to distinguish between directories and the KV engine name..
-    
+
     If your KV engine name/mount contains a `/` you have to specify it using `--engine-path|-e`, otherwise `vkv` will output the secrets wrong.
 
     This also applies for any `vkv import ...` operations.
@@ -15,13 +15,13 @@ See the [CLI Reference](https://falcosuessgott.github.io/vkv/cmd/vkv_export/) fo
 
     1. `root path`: any normal KV mount. Use `-p`.
     2. `engine-path`: in case your KV mount contains a `/`. Use `-e`.
-    3. `sub path`: the path to the corresponding directory within a KV mount. 
-    When using `-p` this is everything after the first `/`: e.g: `kv/prod/db/`; root path=`kv`, subpath=`prod/db`. 
+    3. `sub path`: the path to the corresponding directory within a KV mount.
+    When using `-p` this is everything after the first `/`: e.g: `kv/prod/db/`; root path=`kv`, subpath=`prod/db`.
     In conjunction with a `-e` you can specify a sub-path by using -p: `-e=kv/prod -p=db`.
- 
+
 ## base
 ```bash
-> vkv export -p secret -f=base               
+> vkv export -p secret -f=base
 secret/ [desc=key/value secret storage] [type=kv2]
 ├── admin [v=1] [key=value]
 │   └── sub=********
@@ -42,7 +42,7 @@ secret/ [desc=key/value secret storage] [type=kv2]
 
 ## yaml
 ```bash
-> vkv export -p secret -f=yaml                       
+> vkv export -p secret -f=yaml
 secret/:
   admin:
     sub: '********'
@@ -107,7 +107,7 @@ key
 
 ## policy
 ```bash
-> vkv export -p secret -f=policy 
+> vkv export -p secret -f=policy
 PATH                    CREATE  READ    UPDATE  DELETE  LIST    ROOT
 secret/sub/sub2/demo    ✖       ✖       ✖       ✖       ✖       ✔
 secret/admin            ✖       ✖       ✖       ✖       ✖       ✔
@@ -117,7 +117,7 @@ secret/sub/demo         ✖       ✖       ✖       ✖       ✖       ✔
 
 ## markdown
 ```bash
-> vkv export -p secret -f=markdown      
+> vkv export -p secret -f=markdown
 |         PATH         |   KEY    |    VALUE    | VERSION |       METADATA        |
 |----------------------|----------|-------------|---------|-----------------------|
 | secret/admin         | sub      | ********    |       1 | key=value             |
@@ -132,7 +132,7 @@ secret/sub/demo         ✖       ✖       ✖       ✖       ✖       ✔
 ```
 
 ## template
-`template` is a special output format that allows you, render the output using Golangs template engine. Format `template` requires either a `--template-file` or a `--template-string` flag or the equivalent env vars. 
+`template` is a special output format that allows you, render the output using Golangs template engine. Format `template` requires either a `--template-file` or a `--template-string` flag or the equivalent env vars.
 
 The secrets are passed as map with the secret path as the key and the actual secrets as values:
 

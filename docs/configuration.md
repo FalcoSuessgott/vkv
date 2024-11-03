@@ -18,8 +18,8 @@ example:
 ```bash
 VKV_EXPORT_PATH=secret VKV_MODE=export vkv
 secret/
-├── v1: admin [key=value]   
-│   └── sub=********        
+├── v1: admin [key=value]
+│   └── sub=********
 ├── v1: demo
 │   └── foo=***
 └── sub/

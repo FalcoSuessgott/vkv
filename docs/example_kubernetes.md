@@ -1,6 +1,6 @@
 # Kubernetes
 
-`vkv` comes in container images, which enable you to run scheduled snapshots in a kubernetes cluster. 
+`vkv` comes in container images, which enable you to run scheduled snapshots in a kubernetes cluster.
 
 The idea is to schedule a cronjob which snapshots a vault server and writes the snapshot files to a persistent volume.
 
@@ -82,7 +82,7 @@ spec:
               - name: VAULT_TOKEN
                 value: hvs.xxxx # change to your token
             volumeMounts:
-              - name: local-persistent-storage 
+              - name: local-persistent-storage
                 mountPath: /mnt
           restartPolicy: OnFailure
           volumes:

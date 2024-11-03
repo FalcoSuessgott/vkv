@@ -40,7 +40,7 @@ vkv
 # requires go to be installed
 git clone https://github.com/FalcoSuessgott/vkv
 cd vkv
-go install 
+go install
 ```
 
 ## Docker

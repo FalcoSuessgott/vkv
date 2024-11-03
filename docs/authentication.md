@@ -1,13 +1,13 @@
 # Authentication
 
-`vkv` supports all of Vaults [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) as well as any configured [Token helpers](https://developer.hashicorp.com/vault/docs/commands/token-helper). 
+`vkv` supports all of Vaults [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) as well as any configured [Token helpers](https://developer.hashicorp.com/vault/docs/commands/token-helper).
 
 In order to authenticate you will have to set at least one of the `VAULT_ADDR` or `VKV_LOGIN_COMMAND` and `VAULT_TOKEN` env vars.
 
 ## MacOS/Linux
 ```
 export VAULT_ADDR="http://127.0.0.1:8200"
-export VAULT_TOKEN="hvs.XXX" 
+export VAULT_TOKEN="hvs.XXX"
 vkv export --path <KVv2-path>
 ```
 

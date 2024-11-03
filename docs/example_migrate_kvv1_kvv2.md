@@ -17,7 +17,7 @@ $> vkv export -p kvv1 -f=json | vkv import -p kv
 v2
 reading secrets from STDIN
 parsing secrets from JSON
-writing secret "kvv2/dev" 
+writing secret "kvv2/dev"
 successfully imported all secrets
 
 result:
@@ -37,10 +37,10 @@ kvv2/
 You can also move a KV mount within another engine:
 
 ```bash
-$> vkv export -p kvv1 -f=json | vkv import -p engine/subpath --force 
+$> vkv export -p kvv1 -f=json | vkv import -p engine/subpath --force
 reading secrets from STDIN
 parsing secrets from JSON
-writing secret "engine/subpath/dev" 
+writing secret "engine/subpath/dev"
 successfully imported all secrets
 
 result:

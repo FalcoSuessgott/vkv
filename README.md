@@ -54,12 +54,12 @@ secret/ [desc=key/value secret storage] [type=kv2] # engine description & type
 ├── demo [v=1]
 │   └── foo=***
 └── sub
-    ├── demo [v=1] 
+    ├── demo [v=1]
     │   ├── demo=***********
     │   ├── password=******
     │   └── user=*****
     └── sub2
-        └── demo [v=2] [admin=false key=value] 
+        └── demo [v=2] [admin=false key=value]
             ├── admin=***
             ├── foo=***
             ├── password=********

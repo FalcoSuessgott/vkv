@@ -1,19 +1,16 @@
 repos:
-  - repo: https://github.com/tekwizely/pre-commit-golang
-    rev: v1.0.0-rc.1
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
     hooks:
-      - id: go-build-mod
-      - id: go-test-mod
-      - id: go-vet-mod
-      - id: go-staticcheck-mod
-      - id: go-fmt
-      - id: go-fumpt
-      - id: go-imports
-      - id: go-lint
-      - id: golangci-lint-mod
-        args: [-c.golang-ci.yml]
-
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
-    hooks:
-      - id: hadolint
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-case-conflict
+      - id: check-symlinks
+      - id: check-json
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: no-commit-to-branch
+        args: [--branch, main]
+      - id: pretty-format-json
+        args: [--autofix, --no-sort-keys]

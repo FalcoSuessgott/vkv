@@ -14,7 +14,7 @@ export VAULT_TOKEN="$(cat ~/.vault-token)"
 eval $(vkv export -p kv/secrets -f export)
 ```
 
-Now if you go into that directory and run `direnv allow`, 
+Now if you go into that directory and run `direnv allow`,
 you have the secrets under `kv/secrets` exported as env various:
 
 ```bash

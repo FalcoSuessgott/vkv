@@ -1,6 +1,6 @@
 # fzf
 
-using `vault secrets list` and a little bit of `jq`-logic, we can get a list of all KV-engines visible for the token. 
+using `vault secrets list` and a little bit of `jq`-logic, we can get a list of all KV-engines visible for the token.
 
 If we pipe this into `fzf` we can get a handy little  preview-app:
 

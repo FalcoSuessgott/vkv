@@ -72,7 +72,7 @@ vkv-export-2022-12-29/
 whereas one file is the JSON output of a single KVv2 engine:
 
 ```bash
-cat vkv-export-2022-12-29/secret.yaml  
+cat vkv-export-2022-12-29/secret.yaml
 {
   "admin": {
     "sub": "password"
@@ -106,56 +106,56 @@ In order to restore a `vkv` snapshot the `snapshot restore` command is invoked:
 
 ```bash
 # no KVv2 engines configured
-vkv list engines --all --include-ns-prefix                      
+vkv list engines --all --include-ns-prefix
 [ERROR] no engines found.
 
 # restore a snapshot
 vkv snapshot restore --source vkv-export-2022-12-29
 [root] restore engine: secret
-[root] writing secret "secret/admin" 
-[root] writing secret "secret/demo" 
-[root] writing secret "secret/sub/demo" 
-[root] writing secret "secret/sub/sub2/demo" 
+[root] writing secret "secret/admin"
+[root] writing secret "secret/demo"
+[root] writing secret "secret/sub/demo"
+[root] writing secret "secret/sub/sub2/demo"
 [root] restore engine: secret_2
-[root] writing secret "secret_2/admin" 
-[root] writing secret "secret_2/demo" 
-[root] writing secret "secret_2/sub/demo" 
-[root] writing secret "secret_2/sub/sub2/demo" 
+[root] writing secret "secret_2/admin"
+[root] writing secret "secret_2/demo"
+[root] writing secret "secret_2/sub/demo"
+[root] writing secret "secret_2/sub/sub2/demo"
 [root] restore namespace: "sub"
 [sub] restore namespace: "sub2"
 [sub/sub2] restore engine: sub_sub2_secret
-[sub/sub2] writing secret "sub_sub2_secret/admin" 
-[sub/sub2] writing secret "sub_sub2_secret/demo" 
-[sub/sub2] writing secret "sub_sub2_secret/sub/demo" 
-[sub/sub2] writing secret "sub_sub2_secret/sub/sub2/demo" 
+[sub/sub2] writing secret "sub_sub2_secret/admin"
+[sub/sub2] writing secret "sub_sub2_secret/demo"
+[sub/sub2] writing secret "sub_sub2_secret/sub/demo"
+[sub/sub2] writing secret "sub_sub2_secret/sub/sub2/demo"
 [sub/sub2] restore engine: sub_sub2_secret_2
-[sub/sub2] writing secret "sub_sub2_secret_2/admin" 
-[sub/sub2] writing secret "sub_sub2_secret_2/demo" 
-[sub/sub2] writing secret "sub_sub2_secret_2/sub/sub2/demo" 
-[sub/sub2] writing secret "sub_sub2_secret_2/sub/demo" 
+[sub/sub2] writing secret "sub_sub2_secret_2/admin"
+[sub/sub2] writing secret "sub_sub2_secret_2/demo"
+[sub/sub2] writing secret "sub_sub2_secret_2/sub/sub2/demo"
+[sub/sub2] writing secret "sub_sub2_secret_2/sub/demo"
 [sub] restore engine: sub_secret
-[sub] writing secret "sub_secret/admin" 
-[sub] writing secret "sub_secret/demo" 
-[sub] writing secret "sub_secret/sub/demo" 
-[sub] writing secret "sub_secret/sub/sub2/demo" 
+[sub] writing secret "sub_secret/admin"
+[sub] writing secret "sub_secret/demo"
+[sub] writing secret "sub_secret/sub/demo"
+[sub] writing secret "sub_secret/sub/sub2/demo"
 [sub] restore engine: sub_secret_2
-[sub] writing secret "sub_secret_2/sub/demo" 
-[sub] writing secret "sub_secret_2/sub/sub2/demo" 
-[sub] writing secret "sub_secret_2/admin" 
-[sub] writing secret "sub_secret_2/demo" 
+[sub] writing secret "sub_secret_2/sub/demo"
+[sub] writing secret "sub_secret_2/sub/sub2/demo"
+[sub] writing secret "sub_secret_2/admin"
+[sub] writing secret "sub_secret_2/demo"
 [root] restore namespace: "test"
 [test] restore namespace: "test2"
 [test/test2] restore namespace: "test3"
 [test/test2/test3] restore engine: test_test2_test3_secret
-[test/test2/test3] writing secret "test_test2_test3_secret/sub/sub2/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret/admin" 
-[test/test2/test3] writing secret "test_test2_test3_secret/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret/sub/demo" 
+[test/test2/test3] writing secret "test_test2_test3_secret/sub/sub2/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret/admin"
+[test/test2/test3] writing secret "test_test2_test3_secret/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret/sub/demo"
 [test/test2/test3] restore engine: test_test2_test3_secret_2
-[test/test2/test3] writing secret "test_test2_test3_secret_2/admin" 
-[test/test2/test3] writing secret "test_test2_test3_secret_2/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/demo" 
-[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/sub2/demo" 
+[test/test2/test3] writing secret "test_test2_test3_secret_2/admin"
+[test/test2/test3] writing secret "test_test2_test3_secret_2/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/demo"
+[test/test2/test3] writing secret "test_test2_test3_secret_2/sub/sub2/demo"
 
 # verify engines have been created
 vkv list engines --all --include-ns-prefix

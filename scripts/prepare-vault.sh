@@ -9,7 +9,7 @@ vault kv put secret/demo foo=bar
 vault kv put secret/admin sub=password
 vault kv put secret/sub/demo demo="hello world" user=admin password='s3cre5<'
 vault kv put secret/sub/sub2/demo foo=bar user=user password=password
-vault kv put secret/sub/sub2/demo foo=bar user=user password=password 
+vault kv put secret/sub/sub2/demo foo=bar user=user password=password
 vault kv metadata put -mount=secret -custom-metadata=key=value admin
 vault kv metadata put -mount=secret -custom-metadata=key=value -custom-metadata=admin=false sub/sub2/demo
 vault policy write kv assets/kv-policy.hcl

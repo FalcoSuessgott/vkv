@@ -15,7 +15,7 @@ plugins:
       enable_creation_date: false
 
 nav:
-  - Docs: 
+  - Docs:
     - index.md
     - quickstart.md
     - installation.md
@@ -25,7 +25,7 @@ nav:
     - import.md
     - server.md
     - snapshots.md
-    - Advanced Examples: 
+    - Advanced Examples:
       - example_diff.md
       - example_fzf.md
       - example_kubernetes.md
@@ -53,7 +53,7 @@ nav:
     - cmd/vkv_completion_bash.md
     - cmd/vkv_completion_zsh.md
     - cmd/vkv_completion_fish.md
-    
+
 markdown_extensions:
   - pymdownx.superfences:
       custom_fences:
@@ -87,7 +87,7 @@ theme:
     view: material/eye
     repo: fontawesome/brands/github
   name: material
-  
+
   favicon: assets/favicon.ico
   logo: assets/logo.png
   language: en
