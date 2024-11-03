@@ -50,6 +50,7 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP: ${{ secrets.HOMEBREW_TAP }}
       # if no tag test release build
       -
         name: Run GoReleaser skip publishing
@@ -60,3 +61,4 @@ jobs:
           args: release --skip=publish --skip=validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP: ${{ secrets.HOMEBREW_TAP }}

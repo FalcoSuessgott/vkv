@@ -18,7 +18,7 @@ func TestReadFile(t *testing.T) {
 		{
 			name:    "valid",
 			path:    "testdata/file_1.txt",
-			content: []byte("Hello World"),
+			content: []byte("Hello World\n"),
 			err:     false,
 		},
 		{

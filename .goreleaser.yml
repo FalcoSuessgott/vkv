@@ -142,3 +142,24 @@ changelog:
       order: 400
     - title: Other work
       order: 9999
+
+brews:
+  - name: vkv
+    repository:
+      owner: FalcoSuessgott
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP }}"
+    directory: Formula
+    homepage: "https://falcosuessgott.github.io/vkv/"
+    description: "vkv"
+    install: |
+      bin.install "vkv"
+      bash_output = Utils.safe_popen_read(bin/"vkv", "completion", "bash")
+      (bash_completion/"vkv").write bash_output
+      zsh_output = Utils.safe_popen_read(bin/"vkv", "completion", "zsh")
+      (zsh_completion/"vkv").write zsh_output
+      fish_output = Utils.safe_popen_read(bin/"vkv", "completion", "fish")
+      (fish_completion/"vkv.fish").write fish_output
+    test: |
+      system "#{bin}/vkv version"
