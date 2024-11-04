@@ -49,6 +49,12 @@ func (v *Vault) GetEngineTypeVersion(rootPath string) (string, string, error) {
 			eType = t.(string)
 		}
 
+		// "options" is nil in "generic" type
+		//nolint: goconst
+		if eType == "generic" {
+			return "kv", "1", nil
+		}
+
 		v, ok := data.Data["options"]
 		if ok {
 			//nolint: forcetypeassert
