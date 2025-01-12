@@ -32,7 +32,7 @@ vkv export -p
 ## Token Precedence
 The following token precedence is applied (from highest to lowest):
 
-1. `VKV_TOKEN`
+1. `VAULT_TOKEN`
 2. `VKV_LOGIN_COMMAND`
 3. [Vault Token Helper](https://developer.hashicorp.com/vault/docs/commands/token-helper), where the token will be written to `~/.vault-token`.
 
