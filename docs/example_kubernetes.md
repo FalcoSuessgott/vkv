@@ -69,7 +69,7 @@ spec:
         spec:
           containers:
           - name: vkv
-            image: falcosuessgott/vkv:latest # stick to a version later
+            image: ghcr.io/falcosuessgott/vkv:latest # stick to a version later
             imagePullPolicy: IfNotPresent
             command: ["/bin/sh", "-c"]
             args:

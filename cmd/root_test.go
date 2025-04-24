@@ -66,7 +66,7 @@ func (s *VaultSuite) TestMode() {
 			expected: `e2e/ [type=kv2]
 ├── sub [v=1]
 │   └── user=********
-│
+│   
 └── sub2 [v=1]
     └── key=*****
 `,
