@@ -13,7 +13,6 @@ linters:
     - gochecknoglobals
     - varnamelen
     - funlen
-    - gomnd
     - containedctx
     - ireturn
     - exhaustruct
@@ -30,4 +29,4 @@ linters:
     - tagalign
     - copyloopvar
     - intrange
-    - execinquery
+    - exportloopref
