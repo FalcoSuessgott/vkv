@@ -14,7 +14,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.37.0
-	github.com/testcontainers/testcontainers-go/modules/vault v0.36.0
+	github.com/testcontainers/testcontainers-go/modules/vault v0.37.0
 	github.com/xlab/treeprint v1.2.0
 	gotest.tools/gotestsum v1.12.1
 )
@@ -300,6 +300,6 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
 	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 )
