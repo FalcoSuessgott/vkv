@@ -102,7 +102,7 @@ func getToken() (string, error) {
 
 		if !disableWarn {
 			fmt.Println("[WARN] More than one token source configured (either VAULT_TOKEN, VKV_LOGIN_COMMAND or ~/.vault-token).")
-			fmt.Println("[WARN] See https://falcosuessgott.github.io/vkv/authentication/ for vkv's token precedence logic. Disable these warnings with VKV_DISABLE_WARNING.")
+			fmt.Println("[WARN] See https://falcosuessgott.github.io/vkv/authentication/ for vkv's token precedence logic. Disable this warning with VKV_DISABLE_WARNING.")
 		}
 	}
 
