@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,21 +31,21 @@ func (s *VaultSuite) TestGetCapabilities() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			// enable kv engine
-			require.NoError(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
+			require.NoError(s.Suite.T(), s.client.EnableKV2Engine(context.Background(), tc.rootPath))
 
 			// enable kv engine again, so it erros
-			require.Error(s.Suite.T(), s.client.EnableKV2Engine(tc.rootPath))
+			require.Error(s.Suite.T(), s.client.EnableKV2Engine(context.Background(), tc.rootPath))
 
 			// read secrets- find none, so it errors
-			_, err := s.client.ReadSecrets(tc.rootPath, tc.subPath)
+			_, err := s.client.ReadSecrets(context.Background(), tc.rootPath, tc.subPath)
 			require.Error(s.Suite.T(), err)
 
 			// actual write the secrets
-			if err = s.client.WriteSecrets(tc.rootPath, tc.subPath, tc.s); err != nil {
+			if err = s.client.WriteSecrets(context.Background(), tc.rootPath, tc.subPath, tc.s); err != nil {
 				s.Suite.T().Fail()
 			}
 
-			caps, err := s.client.GetCapabilities(tc.rootPath)
+			caps, err := s.client.GetCapabilities(context.Background(), tc.rootPath)
 			require.NoError(s.Suite.T(), err)
 
 			assert.Equal(s.Suite.T(), tc.expected, caps, tc.name)

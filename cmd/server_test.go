@@ -18,12 +18,12 @@ func (s *VaultSuite) TestServerCommand() {
 		}
 
 		// enable kv engine
-		s.Require().NoError(vaultClient.EnableKV2Engine("export"), "enabling KV engine")
+		s.Require().NoError(vaultClient.EnableKV2Engine(rootContext, "export"), "enabling KV engine")
 
 		// write secrets
 		for k, secrets := range secrets {
 			if m, ok := secrets.(map[string]interface{}); ok {
-				s.Require().NoError(vaultClient.WriteSecrets("export", k, m))
+				s.Require().NoError(vaultClient.WriteSecrets(rootContext, "export", k, m))
 			}
 		}
 

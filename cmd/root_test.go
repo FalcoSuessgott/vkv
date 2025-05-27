@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"log"
 	"runtime"
@@ -66,7 +67,7 @@ func (s *VaultSuite) TestMode() {
 			expected: `e2e/ [type=kv2]
 ├── sub [v=1]
 │   └── user=********
-│
+│   
 └── sub2 [v=1]
     └── key=*****
 `,
@@ -87,12 +88,12 @@ func (s *VaultSuite) TestMode() {
 			writer = b
 
 			// enable kv engine
-			s.Require().NoError(vaultClient.EnableKV2Engine("e2e"), "enabling KV engine")
+			s.Require().NoError(vaultClient.EnableKV2Engine(rootContext, "e2e"), "enabling KV engine")
 
 			// write secrets
 			for k, secrets := range tc.secrets {
 				if m, ok := secrets.(map[string]interface{}); ok {
-					s.Require().NoError(vaultClient.WriteSecrets("e2e", k, m))
+					s.Require().NoError(vaultClient.WriteSecrets(rootContext, "e2e", k, m))
 				}
 			}
 
@@ -117,6 +118,8 @@ func (s *VaultSuite) TestMode() {
 }
 
 func TestVaultSuite(t *testing.T) {
+	rootContext = context.Background()
+
 	// github actions doesn't offer the docker socket, which we need to run this test suite
 	if runtime.GOOS != "windows" {
 		suite.Run(t, new(VaultSuite))

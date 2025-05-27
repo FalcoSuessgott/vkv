@@ -57,7 +57,7 @@ func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, 
 					if p.showVersion {
 						headers = append(headers, "version")
 
-						if v, err := p.vaultClient.ReadSecretVersion(rootPath, subPath); err == nil {
+						if v, err := p.vaultClient.ReadSecretVersion(p.ctx, rootPath, subPath); err == nil {
 							d = append(d, fmt.Sprintf("%v", v)) // version
 						}
 					}
@@ -65,7 +65,7 @@ func (p *Printer) buildMarkdownTable(secrets map[string]interface{}) ([]string, 
 					if p.showMetadata {
 						headers = append(headers, "metadata")
 
-						if v, err := p.vaultClient.ReadSecretMetadata(rootPath, subPath); err == nil {
+						if v, err := p.vaultClient.ReadSecretMetadata(p.ctx, rootPath, subPath); err == nil {
 							m := ""
 
 							md, ok := v.(map[string]interface{})

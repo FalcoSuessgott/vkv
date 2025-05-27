@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"fmt"
 	"path"
 )
@@ -68,7 +69,7 @@ func (v *Vault) GetEngineTypeVersion(rootPath string) (string, string, error) {
 }
 
 // EnableKV2Engine enables the kv2 engine at a specified path.
-func (v *Vault) EnableKV2Engine(rootPath string) error {
+func (v *Vault) EnableKV2Engine(ctx context.Context, rootPath string) error {
 	options := map[string]interface{}{
 		"type": "kv",
 		"options": map[string]interface{}{
@@ -77,7 +78,7 @@ func (v *Vault) EnableKV2Engine(rootPath string) error {
 		},
 	}
 
-	_, err := v.Client.Logical().Write(fmt.Sprintf(mountEnginePath, rootPath), options)
+	_, err := v.Client.Logical().WriteWithContext(ctx, fmt.Sprintf(mountEnginePath, rootPath), options)
 	if err != nil {
 		return err
 	}
@@ -86,7 +87,7 @@ func (v *Vault) EnableKV2Engine(rootPath string) error {
 }
 
 // EnableKV1Engine enables the kv1 engine at a specified path.
-func (v *Vault) EnableKV1Engine(rootPath string) error {
+func (v *Vault) EnableKV1Engine(ctx context.Context, rootPath string) error {
 	options := map[string]interface{}{
 		"type": "kv",
 		"options": map[string]interface{}{
@@ -95,7 +96,7 @@ func (v *Vault) EnableKV1Engine(rootPath string) error {
 		},
 	}
 
-	_, err := v.Client.Logical().Write(fmt.Sprintf(mountEnginePath, rootPath), options)
+	_, err := v.Client.Logical().WriteWithContext(ctx, fmt.Sprintf(mountEnginePath, rootPath), options)
 	if err != nil {
 		return err
 	}
@@ -105,12 +106,12 @@ func (v *Vault) EnableKV1Engine(rootPath string) error {
 
 // EnableKV2EngineErrorIfNotForced enables a KVv2 Engine and errors if
 // already enabled, unless force is set to true.
-func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
+func (v *Vault) EnableKV2EngineErrorIfNotForced(ctx context.Context, force bool, path string) error {
 	// check if engine exists
 	engineType, kvVersion, err := v.GetEngineTypeVersion(path)
 	// engine does not exists, so we enable it and exit
 	if err != nil {
-		if err := v.EnableKV2Engine(path); err != nil {
+		if err := v.EnableKV2Engine(ctx, path); err != nil {
 			return fmt.Errorf("error enabling secret engine \"%s\": %w", path, err)
 		}
 
@@ -141,10 +142,10 @@ func (v *Vault) EnableKV2EngineErrorIfNotForced(force bool, path string) error {
 }
 
 // ListKVSecretEngines returns a list of all visible KV secret engines.
-func (v *Vault) ListKVSecretEngines(ns string) ([]string, error) {
+func (v *Vault) ListKVSecretEngines(ctx context.Context, ns string) ([]string, error) {
 	v.Client.SetNamespace(ns)
 
-	data, err := v.Client.Logical().Read((listSecretEngines))
+	data, err := v.Client.Logical().ReadWithContext(ctx, listSecretEngines)
 	if err != nil {
 		return nil, err
 	}
@@ -172,16 +173,16 @@ func (v *Vault) ListKVSecretEngines(ns string) ([]string, error) {
 }
 
 // ListAllKVSecretEngines returns a list of all visible KV secret engines.
-func (v *Vault) ListAllKVSecretEngines(ns string) (Engines, error) {
+func (v *Vault) ListAllKVSecretEngines(ctx context.Context, ns string) (Engines, error) {
 	res := make(Engines)
 
-	nsList, err := v.ListAllNamespaces(ns)
+	nsList, err := v.ListAllNamespaces(ctx, ns)
 	if err != nil {
 		return nil, err
 	}
 
 	for k, subNS := range nsList {
-		engines, err := v.ListKVSecretEngines(k)
+		engines, err := v.ListKVSecretEngines(ctx, k)
 		if err != nil {
 			return nil, err
 		}
@@ -189,7 +190,7 @@ func (v *Vault) ListAllKVSecretEngines(ns string) (Engines, error) {
 		res[k] = engines
 
 		for _, n := range subNS {
-			engines, err := v.ListKVSecretEngines(path.Join(k, n))
+			engines, err := v.ListKVSecretEngines(ctx, path.Join(k, n))
 			if err != nil {
 				return nil, err
 			}

@@ -1,6 +1,8 @@
 package vault
 
 import (
+	"context"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -65,10 +67,10 @@ func (s *VaultSuite) TestEnableKV2EngineErrorIfNotForced() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			if tc.prepare {
-				s.Require().NoError(s.client.EnableKV2Engine(tc.path))
+				s.Require().NoError(s.client.EnableKV2Engine(context.Background(), tc.path))
 			}
 
-			err := s.client.EnableKV2EngineErrorIfNotForced(tc.force, tc.path)
+			err := s.client.EnableKV2EngineErrorIfNotForced(context.Background(), tc.force, tc.path)
 
 			s.Require().Equal(tc.err, err != nil, tc.name)
 		})
@@ -93,10 +95,10 @@ func (s *VaultSuite) TestListAllKVSecretEngines() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			for _, engine := range tc.engines {
-				require.NoError(s.Suite.T(), s.client.EnableKV2Engine(engine), tc.name)
+				require.NoError(s.Suite.T(), s.client.EnableKV2Engine(context.Background(), engine), tc.name)
 			}
 
-			res, err := s.client.ListAllKVSecretEngines("")
+			res, err := s.client.ListAllKVSecretEngines(context.Background(), "")
 			s.Require().NoError(err, tc.name)
 
 			s.Require().ElementsMatch(tc.expected[""], res[""], tc.name)

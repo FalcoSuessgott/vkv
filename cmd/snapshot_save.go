@@ -35,7 +35,7 @@ func NewSnapshotSaveCmd() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			engines, err := vaultClient.ListAllKVSecretEngines(o.Namespace)
+			engines, err := vaultClient.ListAllKVSecretEngines(rootContext, o.Namespace)
 			if err != nil {
 				return err
 			}
@@ -65,7 +65,7 @@ func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string
 		for _, e := range engines[ns] {
 			enginePath := path.Join(ns, e)
 
-			out, err := v.ListRecursive(enginePath, "", o.SkipErrors)
+			out, err := v.ListRecursive(rootContext, enginePath, "", o.SkipErrors)
 			if err != nil {
 				return err
 			}
@@ -81,6 +81,7 @@ func (o *snapshotSaveOptions) backupKVEngines(v *vault.Vault, engines map[string
 				prt.ShowVersion(false),
 				prt.ShowMetadata(false),
 				prt.WithEnginePath(strings.TrimSuffix(e, utils.Delimiter)),
+				prt.WithContext(rootContext),
 			)
 
 			if err := printer.Out(utils.ToMapStringInterface(out)); err != nil {

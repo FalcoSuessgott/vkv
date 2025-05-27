@@ -88,6 +88,7 @@ func NewImportCmd() *cobra.Command {
 				prt.ShowVersion(true),
 				prt.ShowMetadata(true),
 				prt.WithEnginePath(utils.NormalizePath(rootPath)),
+				prt.WithContext(rootContext),
 			)
 
 			// print preview during dryrun and exit
@@ -102,7 +103,7 @@ func NewImportCmd() *cobra.Command {
 			}
 
 			// enable kv engine, error if already enabled, unless force is used
-			if err := vaultClient.EnableKV2EngineErrorIfNotForced(o.Force, rootPath); err != nil {
+			if err := vaultClient.EnableKV2EngineErrorIfNotForced(rootContext, o.Force, rootPath); err != nil {
 				return err
 			}
 
@@ -223,7 +224,7 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 			newSubPath = path.Join(subPath, newSubPath)
 		}
 
-		if err := vaultClient.WriteSecrets(rootPath, newSubPath, secret); err != nil {
+		if err := vaultClient.WriteSecrets(rootContext, rootPath, newSubPath, secret); err != nil {
 			return fmt.Errorf("error writing secret \"%s\": %w", p, err)
 		}
 
@@ -238,7 +239,7 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 func (o *importOptions) dryRun(rootPath string, secrets map[string]interface{}) error {
 	fmt.Printf("fetching any existing KV secrets from \"%s\" (if any)\n", utils.NormalizePath(rootPath))
 
-	tmp, err := vaultClient.ListRecursive(rootPath, "", true)
+	tmp, err := vaultClient.ListRecursive(rootContext, rootPath, "", true)
 	if err != nil {
 		return fmt.Errorf("error listing secrets from \"%s/\": %w", rootPath, err)
 	}
@@ -292,9 +293,10 @@ func (o *importOptions) printResult(rootPath string) (map[string]interface{}, er
 		prt.ShowMetadata(true),
 		prt.ShowVersion(true),
 		prt.WithEnginePath(utils.NormalizePath(rootPath)),
+		prt.WithContext(rootContext),
 	)
 
-	secrets, err := vaultClient.ListRecursive(rootPath, "", false)
+	secrets, err := vaultClient.ListRecursive(rootContext, rootPath, "", false)
 	if err != nil {
 		return nil, err
 	}

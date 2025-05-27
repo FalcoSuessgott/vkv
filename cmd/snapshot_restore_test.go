@@ -34,7 +34,7 @@ func (s *VaultSuite) TestSnapShotRestoreCommand() {
 
 			s.Require().NoError(cmd.Execute())
 
-			engines, err := vaultClient.ListAllKVSecretEngines("")
+			engines, err := vaultClient.ListAllKVSecretEngines(rootContext, "")
 			s.Require().NoError(err)
 
 			for expNS, expEngines := range tc.expEngines {
@@ -47,7 +47,7 @@ func (s *VaultSuite) TestSnapShotRestoreCommand() {
 						continue
 					}
 
-					secret, err := vaultClient.ListRecursive(path.Join(expNS, engine), "", false)
+					secret, err := vaultClient.ListRecursive(rootContext, path.Join(expNS, engine), "", false)
 					s.Require().NoError(err)
 
 					out, err := fs.ReadFile(path.Join("testdata/vkv-snapshot-export", expNS, strings.TrimSuffix(engine, "/")+".yaml"))

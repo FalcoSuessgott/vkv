@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"fmt"
 	"log"
 )
@@ -30,12 +31,12 @@ type Capability struct {
 }
 
 // GetCapabilities returns the current authenticated tokens capabilities for a given path.
-func (v *Vault) GetCapabilities(path string) (*Capability, error) {
+func (v *Vault) GetCapabilities(ctx context.Context, path string) (*Capability, error) {
 	options := map[string]interface{}{
 		"paths": []string{path},
 	}
 
-	res, err := v.Client.Logical().Write(capabilities, options)
+	res, err := v.Client.Logical().WriteWithContext(ctx, capabilities, options)
 	if err != nil {
 		return nil, err
 	}

@@ -50,3 +50,19 @@ secret/ [desc=key/value secret storage] [type=kv2]
 ```
 
 As described, one can disable these warning by setting `VKV_DISABLE_WARNING` to any value.
+
+## Vault Token Lease Renewal
+Depending on the number of Namespaces, KV mounts and secrets of your Vault and your Token TTL settings the lease of the `VAULT_TOKEN` being used may expire during a `vkv snapshot` operation (reported in [#363](https://github.com/FalcoSuessgott/vkv/issues/363)).
+
+!!! important
+    **To avoid that `vkv` automatically attempts to refresh the lease of the token (ref. [https://developer.hashicorp.com/vault/docs/concepts/lease](https://developer.hashicorp.com/vault/docs/concepts/lease)) being used.**
+    
+    This should only affect users of large enterprise Vaults.
+
+
+Per default `vkv` will attempt to compare every `10s` (change with `VKV_RENEWAL_INTERVAL`) the current token TTL with the original creation TTL and if the current TTL less than half the creation TTL, a lease token renewal for another `30s` (change with `VKV_RENEWAL_INCREMENT`) is performed. `vkv` will error silently to not affect any JSON/YAML output.
+
+You can find the exact implementation [here](https://github.com/FalcoSuessgott/vkv/blob/master/pkg/vault/lease.go).
+
+!!! tip
+    **You can always disable the token lease renewal by exporting `VKV_LEASE_REFRESHER_ENABLED`**

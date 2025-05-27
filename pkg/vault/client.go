@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -17,7 +18,7 @@ type Vault struct {
 }
 
 // NewDefaultClient returns a new vault client wrapper.
-func NewDefaultClient() (*Vault, error) {
+func NewDefaultClient(ctx context.Context) (*Vault, error) {
 	token, err := getToken()
 	if err != nil {
 		return nil, err
@@ -32,7 +33,7 @@ func NewDefaultClient() (*Vault, error) {
 	c.SetToken(token)
 
 	// self lookup current auth for verification
-	if _, err := c.Auth().Token().LookupSelf(); err != nil {
+	if _, err := c.Auth().Token().LookupSelfWithContext(ctx); err != nil {
 		return nil, fmt.Errorf("not authenticated, perhaps not a valid token: %w", err)
 	}
 

@@ -89,7 +89,7 @@ func (o *listNamespaceOptions) Validate() error {
 }
 
 func (o *listNamespaceOptions) listNamespaces(v *vault.Vault) (vault.Namespaces, error) {
-	ns, err := v.ListNamespaces(o.Namespace)
+	ns, err := v.ListNamespaces(rootContext, o.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (o *listNamespaceOptions) listNamespaces(v *vault.Vault) (vault.Namespaces,
 }
 
 func (o *listNamespaceOptions) listAllNamespaces(v *vault.Vault) (vault.Namespaces, error) {
-	ns, err := v.ListAllNamespaces(o.Namespace)
+	ns, err := v.ListAllNamespaces(rootContext, o.Namespace)
 	if err != nil {
 		return nil, err
 	}

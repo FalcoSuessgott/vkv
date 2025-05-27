@@ -1,6 +1,7 @@
 package secret
 
 import (
+	"context"
 	"errors"
 	"io"
 	"log"
@@ -55,6 +56,7 @@ type Option func(*Printer)
 
 // Printer struct that holds all options used for displaying the secrets.
 type Printer struct {
+	ctx            context.Context
 	enginePath     string
 	format         OutputFormat
 	writer         io.Writer
@@ -67,6 +69,14 @@ type Printer struct {
 	valueLength    int
 	template       string
 	vaultClient    *vault.Vault
+}
+
+// WithContext option for passing a custom context.
+// nolint: fatcontext
+func WithContext(ctx context.Context) Option {
+	return func(p *Printer) {
+		p.ctx = ctx
+	}
 }
 
 // CustomValueLength option for trimming down the output of secrets.
