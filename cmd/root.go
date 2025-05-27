@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -114,7 +115,7 @@ func NewRootCmd() *cobra.Command {
 
 // Execute invokes the command.
 func Execute() error {
-	if err := NewRootCmd().Execute(); err != nil {
+	if err := NewRootCmd().ExecuteContext(context.Background()); err != nil {
 		return fmt.Errorf("[ERROR] %w", err)
 	}
 

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 export VAULT_ADDR="http://127.0.0.1:8200"
 export VAULT_SKIP_VERIFY="true"
@@ -12,7 +12,7 @@ vault kv put secret/sub/sub2/demo foo=bar user=user password=password
 vault kv put secret/sub/sub2/demo foo=bar user=user password=password
 vault kv metadata put -mount=secret -custom-metadata=key=value admin
 vault kv metadata put -mount=secret -custom-metadata=key=value -custom-metadata=admin=false sub/sub2/demo
-vault policy write kv assets/kv-policy.hcl
+vault policy write kv-policy ./scripts/policy.hcl
 
 vault secrets enable -path secret_2 -version=2 kv
 vault kv put secret_2/demo foo=bar
