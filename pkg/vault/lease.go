@@ -3,13 +3,18 @@ package vault
 import (
 	"context"
 	"encoding/json"
-	"log/slog"
+	"os"
+	"strconv"
 	"time"
 )
 
 const (
-	renewalInterval  = 10 * time.Second // default renewal interval
-	renewalIncrement = 30
+	defaultRenewalInterval  = 10 * time.Second
+	defaultRenewalIncrement = 30
+
+	envVarRenewalInterval  = "VKV_RENEWAL_INTERVAL"
+	envVarRenewalIncrement = "VKV_RENEWAL_INCREMENT"
+	envVarRefresherEnabled = "VKV_LEASE_REFRESHER_ENABLED"
 )
 
 // LeaseRefresher periodically checks the ttl of the current lease and attempts to renew it if the ttl is less than half of the creation ttl.
@@ -17,64 +22,65 @@ const (
 // this func is supposed to run as a goroutine.
 // nolint: funlen, gocognit, cyclop
 func (v *Vault) LeaseRefresher(ctx context.Context) {
+	if _, ok := os.LookupEnv(envVarRefresherEnabled); ok {
+		return
+	}
+
+	renewalInterval := defaultRenewalInterval
+
+	if v, ok := os.LookupEnv(envVarRenewalInterval); ok {
+		if i, err := strconv.Atoi(v); err == nil {
+			renewalInterval = time.Duration(i) * time.Second
+		}
+	}
+
+	renewalIncrement := defaultRenewalIncrement
+
+	if v, ok := os.LookupEnv(envVarRenewalIncrement); ok {
+		if i, err := strconv.Atoi(v); err == nil {
+			renewalIncrement = i
+		}
+	}
+
 	ticker := time.NewTicker(renewalInterval)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			token, err := v.Client.Auth().Token().LookupSelf()
+			token, err := v.Client.Auth().Token().LookupSelfWithContext(ctx)
 			if err != nil {
-				slog.Error("failed to lookup token", slog.Any("error", err))
 				continue
 			}
 
 			creationTTL, ok := token.Data["creation_ttl"].(json.Number)
 			if !ok {
-				slog.Error("failed to assert creation_ttl type")
-
 				continue
 			}
 
 			ttl, ok := token.Data["ttl"].(json.Number)
 			if !ok {
-				slog.Error("failed to assert ttl type")
-
 				continue
 			}
 
 			creationTTLFloat, err := creationTTL.Float64()
 			if err != nil {
-				slog.Error("failed to parse creation_ttl", slog.Any("error", err))
-
 				continue
 			}
 
 			ttlFloat, err := ttl.Float64()
 			if err != nil {
-				slog.Error("failed to parse ttl", slog.Any("error ", err))
-
 				continue
 			}
 
-			slog.Info("checking token renewal", slog.Float64("creation_ttl", creationTTLFloat), slog.Float64("ttl", ttlFloat))
-
 			//nolint: nestif
 			if ttlFloat < creationTTLFloat/2 {
-				slog.Info("attempting token renewal", slog.Duration("renewal_seconds", renewalInterval))
-
-				if _, err := v.Client.Auth().Token().RenewSelf(renewalIncrement); err != nil {
-					slog.Error("failed to renew token, performing new authentication", slog.Any("error", err))
-				} else {
-					slog.Info("successfully refreshed token")
+				if _, err := v.Client.Auth().Token().RenewSelfWithContext(ctx, renewalIncrement); err != nil {
+					continue
 				}
-			} else {
-				slog.Info("skipping token renewal")
 			}
 
 		case <-ctx.Done():
-			slog.Info("token refresher shutting down")
-
 			return
 		}
 	}

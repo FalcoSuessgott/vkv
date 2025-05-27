@@ -24,7 +24,7 @@ func (p *Printer) printPolicy(secrets map[string]interface{}) error {
 	capMap := make(map[string]*vault.Capability)
 
 	for k := range transformMap {
-		c, err := p.vaultClient.GetCapabilities(k)
+		c, err := p.vaultClient.GetCapabilities(p.ctx, k)
 		if err != nil {
 			return err
 		}

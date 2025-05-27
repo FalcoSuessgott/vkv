@@ -77,7 +77,7 @@ func (o *snapshotRestoreOptions) restoreSecrets(source string) error {
 				fmt.Fprintf(writer, "[%s] restore namespace: \"%s\"\n", nsParent, nsName)
 			}
 
-			if err := vaultClient.CreateNamespaceErrorIfNotForced(nsParent, nsName, true); err != nil {
+			if err := vaultClient.CreateNamespaceErrorIfNotForced(rootContext, nsParent, nsName, true); err != nil {
 				return err
 			}
 		} else { // file == engine
@@ -94,7 +94,7 @@ func (o *snapshotRestoreOptions) restoreSecrets(source string) error {
 			// create engine
 			vaultClient.Client.SetNamespace(ns)
 
-			if err := vaultClient.EnableKV2EngineErrorIfNotForced(true, engine); err != nil {
+			if err := vaultClient.EnableKV2EngineErrorIfNotForced(rootContext, true, engine); err != nil {
 				return err
 			}
 
@@ -130,7 +130,7 @@ func (o *snapshotRestoreOptions) writeSecrets(secrets map[string]interface{}, v 
 			log.Fatalf("cannot convert %T to map[string]interface", secrets)
 		}
 
-		if err := v.WriteSecrets(rootPath, p, secrets); err != nil {
+		if err := v.WriteSecrets(rootContext, rootPath, p, secrets); err != nil {
 			return fmt.Errorf("[%s] error writing secret \"%s\": %w", ns, p, err)
 		}
 

@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -26,13 +27,13 @@ type Secrets map[string]interface{}
 
 // ListRecursive returns secrets to a path recursive.
 // nolint: cyclop
-func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secrets, error) {
+func (v *Vault) ListRecursive(ctx context.Context, rootPath, subPath string, skipErrors bool) (*Secrets, error) {
 	s := make(Secrets)
 
-	keys, err := v.ListKeys(rootPath, subPath)
+	keys, err := v.ListKeys(ctx, rootPath, subPath)
 	if err != nil {
 		// no sub directories in here, but lets check for normal kv pairs then..
-		secrets, err := v.ReadSecrets(rootPath, subPath)
+		secrets, err := v.ReadSecrets(ctx, rootPath, subPath)
 		if !skipErrors && err != nil {
 			return nil, fmt.Errorf("could not read secrets from %s/%s: %w.\n\nYou can skip this error using --skip-errors", rootPath, subPath, err)
 		}
@@ -42,14 +43,14 @@ func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secre
 
 	for _, k := range keys {
 		if strings.HasSuffix(k, utils.Delimiter) {
-			secrets, err := v.ListRecursive(rootPath, path.Join(subPath, k), skipErrors)
+			secrets, err := v.ListRecursive(ctx, rootPath, path.Join(subPath, k), skipErrors)
 			if err != nil {
 				return &s, err
 			}
 
 			(s)[k] = secrets
 		} else {
-			secrets, err := v.ReadSecrets(rootPath, path.Join(subPath, k))
+			secrets, err := v.ReadSecrets(ctx, rootPath, path.Join(subPath, k))
 			if !skipErrors && err != nil {
 				return nil, err
 			}
@@ -67,10 +68,10 @@ func (v *Vault) ListRecursive(rootPath, subPath string, skipErrors bool) (*Secre
 }
 
 // ListKeys returns all keys from vault kv secret path.
-func (v *Vault) ListKeys(rootPath, subPath string) ([]string, error) {
+func (v *Vault) ListKeys(ctx context.Context, rootPath, subPath string) ([]string, error) {
 	apiPath := fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath)
 
-	isV1, err := v.IsKVv1(rootPath)
+	isV1, err := v.IsKVv1(ctx, rootPath)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +80,7 @@ func (v *Vault) ListKeys(rootPath, subPath string) ([]string, error) {
 		apiPath = fmt.Sprintf(kvv1ListSecretsPath, rootPath, subPath)
 	}
 
-	data, err := v.Client.Logical().List(apiPath)
+	data, err := v.Client.Logical().ListWithContext(ctx, apiPath)
 	if err != nil {
 		return nil, err
 	}
@@ -107,8 +108,8 @@ func (v *Vault) ListKeys(rootPath, subPath string) ([]string, error) {
 }
 
 // IsKVv1 returns true if the current path is a KVv1 Engine.
-func (v *Vault) IsKVv1(rootPath string) (bool, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(mountDetailsPath, rootPath))
+func (v *Vault) IsKVv1(ctx context.Context, rootPath string) (bool, error) {
+	data, err := v.Client.Logical().ReadWithContext(ctx, fmt.Sprintf(mountDetailsPath, rootPath))
 	if err != nil {
 		return false, err
 	}
@@ -133,10 +134,10 @@ func (v *Vault) IsKVv1(rootPath string) (bool, error) {
 }
 
 // ReadSecrets returns a map with all secrets from a kv engine path.
-func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, error) {
+func (v *Vault) ReadSecrets(ctx context.Context, rootPath, subPath string) (map[string]interface{}, error) {
 	apiPath := fmt.Sprintf(kvv2ReadWriteSecretsPath, rootPath, subPath)
 
-	isV1, err := v.IsKVv1(rootPath)
+	isV1, err := v.IsKVv1(ctx, rootPath)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +146,7 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 		apiPath = fmt.Sprintf(kvv1ReadWriteSecretsPath, rootPath, subPath)
 	}
 
-	data, err := v.Client.Logical().Read(apiPath)
+	data, err := v.Client.Logical().ReadWithContext(ctx, apiPath)
 	if err != nil {
 		return nil, err
 	}
@@ -168,11 +169,11 @@ func (v *Vault) ReadSecrets(rootPath, subPath string) (map[string]interface{}, e
 }
 
 // WriteSecrets writes kv secrets to a specified path.
-func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interface{}) error {
+func (v *Vault) WriteSecrets(ctx context.Context, rootPath, subPath string, secrets map[string]interface{}) error {
 	apiPath := fmt.Sprintf(kvv2ReadWriteSecretsPath, rootPath, subPath)
 	options := map[string]interface{}{}
 
-	isV1, err := v.IsKVv1(rootPath)
+	isV1, err := v.IsKVv1(ctx, rootPath)
 	if err != nil {
 		return err
 	}
@@ -184,7 +185,7 @@ func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interf
 		options["data"] = secrets
 	}
 
-	_, err = v.Client.Logical().Write(apiPath, options)
+	_, err = v.Client.Logical().WriteWithContext(ctx, apiPath, options)
 	if err != nil {
 		return err
 	}
@@ -193,8 +194,8 @@ func (v *Vault) WriteSecrets(rootPath, subPath string, secrets map[string]interf
 }
 
 // ReadSecretMetadata read the metadata of the secret.
-func (v *Vault) ReadSecretMetadata(rootPath, subPath string) (interface{}, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))
+func (v *Vault) ReadSecretMetadata(ctx context.Context, rootPath, subPath string) (interface{}, error) {
+	data, err := v.Client.Logical().ReadWithContext(ctx, fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))
 	if err != nil {
 		return nil, err
 	}
@@ -211,8 +212,8 @@ func (v *Vault) ReadSecretMetadata(rootPath, subPath string) (interface{}, error
 }
 
 // ReadSecretVersion read the version of the secret.
-func (v *Vault) ReadSecretVersion(rootPath, subPath string) (interface{}, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))
+func (v *Vault) ReadSecretVersion(ctx context.Context, rootPath, subPath string) (interface{}, error) {
+	data, err := v.Client.Logical().ReadWithContext(ctx, fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))
 	if err != nil {
 		return nil, err
 	}
@@ -229,8 +230,8 @@ func (v *Vault) ReadSecretVersion(rootPath, subPath string) (interface{}, error)
 }
 
 // DisableKV2Engine disables the kv2 engine at a specified path.
-func (v *Vault) DisableKV2Engine(rootPath string) error {
-	_, err := v.Client.Logical().Delete(fmt.Sprintf(mountEnginePath, rootPath))
+func (v *Vault) DisableKV2Engine(ctx context.Context, rootPath string) error {
+	_, err := v.Client.Logical().DeleteWithContext(ctx, fmt.Sprintf(mountEnginePath, rootPath))
 	if err != nil {
 		return err
 	}

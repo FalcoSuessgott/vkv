@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"io"
 
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer/engine"
@@ -49,7 +50,7 @@ secret_2/
 			writer = b
 
 			for _, e := range tc.engines[""] {
-				s.Require().NoError(vaultClient.EnableKV2Engine(e), tc.name)
+				s.Require().NoError(vaultClient.EnableKV2Engine(context.Background(), e), tc.name)
 			}
 
 			// run cmd

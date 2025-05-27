@@ -89,7 +89,7 @@ func (o *listEnginesOptions) Validate(cmd *cobra.Command, args []string) error {
 }
 
 func (o *listEnginesOptions) listEngines() (vault.Engines, error) {
-	engines, err := vaultClient.ListKVSecretEngines(o.Namespace)
+	engines, err := vaultClient.ListKVSecretEngines(rootContext, o.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (o *listEnginesOptions) listEngines() (vault.Engines, error) {
 }
 
 func (o *listEnginesOptions) listAllEngines() (vault.Engines, error) {
-	engines, err := vaultClient.ListAllKVSecretEngines(o.Namespace)
+	engines, err := vaultClient.ListAllKVSecretEngines(rootContext, o.Namespace)
 	if err != nil {
 		return nil, err
 	}

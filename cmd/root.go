@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
@@ -30,8 +33,8 @@ var (
 	errInvalidFlagCombination = errors.New("invalid flag combination specified")
 	vaultClient               *vault.Vault
 	writer                    io.Writer
-
-	printer prt.Printer
+	rootContext               context.Context
+	printer                   prt.Printer
 )
 
 // NewRootCmd vkv root command.
@@ -55,12 +58,16 @@ func NewRootCmd() *cobra.Command {
 			}
 
 			// otherwise create a new vault client
-			vc, err := vault.NewDefaultClient()
+			vc, err := vault.NewDefaultClient(rootContext)
 			if err != nil {
 				return err
 			}
 
 			vaultClient = vc
+
+			go func() {
+				vaultClient.LeaseRefresher(rootContext)
+			}()
 
 			return nil
 		},
@@ -115,7 +122,22 @@ func NewRootCmd() *cobra.Command {
 
 // Execute invokes the command.
 func Execute() error {
-	if err := NewRootCmd().ExecuteContext(context.Background()); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	rootContext = ctx
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-done
+
+		log.Println("Received shutdown signal")
+		cancel()
+	}()
+
+	if err := NewRootCmd().ExecuteContext(rootContext); err != nil {
 		return fmt.Errorf("[ERROR] %w", err)
 	}
 

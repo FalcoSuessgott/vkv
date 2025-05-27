@@ -100,13 +100,13 @@ func (p *Printer) buildTreeName(rootPath, subPath string) string {
 	}
 
 	if p.showVersion {
-		if v, err := p.vaultClient.ReadSecretVersion(rootPath, subPath); err == nil {
+		if v, err := p.vaultClient.ReadSecretVersion(p.ctx, rootPath, subPath); err == nil {
 			name = fmt.Sprintf("%s [v=%v]", name, v)
 		}
 	}
 
 	if p.showMetadata {
-		if v, err := p.vaultClient.ReadSecretMetadata(rootPath, subPath); err == nil {
+		if v, err := p.vaultClient.ReadSecretMetadata(p.ctx, rootPath, subPath); err == nil {
 			md := ""
 			metadata, ok := v.(map[string]interface{})
 

@@ -4,10 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"log/slog"
 	"path"
 	"strings"
-	"time"
 
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -69,19 +67,13 @@ func NewExportCmd() *cobra.Command {
 				prt.ShowMetadata(o.ShowMetadata),
 				prt.WithHyperLinks(o.WithHyperLink),
 				prt.WithEnginePath(utils.NormalizePath(enginePath)),
+				prt.WithContext(rootContext),
 			)
 
-			secrets, err := vaultClient.ListRecursive(enginePath, subPath, o.SkipErrors)
+			secrets, err := vaultClient.ListRecursive(rootContext, enginePath, subPath, o.SkipErrors)
 			if err != nil {
 				return err
 			}
-
-			go func() {
-				slog.Info("Starting token refresher")
-				vaultClient.LeaseRefresher(cmd.Context())
-			}()
-
-			time.Sleep(60 * time.Second) // wait for the refresher to start
 
 			p := path.Join(enginePath, subPath)
 			if subPath == "" {

@@ -78,7 +78,7 @@ func (o *serverOptions) buildMap() (map[string]interface{}, error) {
 	rootPath, subPath := utils.HandleEnginePath(o.EnginePath, o.Path)
 
 	// read recursive all secrets
-	s, err := vaultClient.ListRecursive(rootPath, subPath, o.SkipErrors)
+	s, err := vaultClient.ListRecursive(rootContext, rootPath, subPath, o.SkipErrors)
 	if err != nil {
 		return nil, err
 	}
@@ -115,6 +115,7 @@ func (o *serverOptions) serve() error {
 			prt.WithWriter(o.writer),
 			prt.WithEnginePath(enginePath),
 			prt.ToFormat(prt.Export),
+			prt.WithContext(rootContext),
 		}
 
 		if ok {
