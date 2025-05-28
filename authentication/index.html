@@ -539,6 +539,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#vault-token-lease-renewal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vault Token Lease Renewal
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1525,6 +1534,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#vault-token-lease-renewal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vault Token Lease Renewal
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1587,6 +1605,19 @@ This is way you don't have to hardcode and set <code>VAULT_TOKEN</code>, this is
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span>└──<span class="w"> </span><span class="nv">key</span><span class="o">=</span>*****
 </span></code></pre></div>
 <p>As described, one can disable these warning by setting <code>VKV_DISABLE_WARNING</code> to any value.</p>
+<h2 id="vault-token-lease-renewal">Vault Token Lease Renewal<a class="headerlink" href="#vault-token-lease-renewal" title="Permanent link">&para;</a></h2>
+<p>Depending on the number of Namespaces, KV mounts and secrets of your Vault and your Token TTL settings the lease of the <code>VAULT_TOKEN</code> being used may expire during a <code>vkv snapshot</code> operation (reported in <a href="https://github.com/FalcoSuessgott/vkv/issues/363">#363</a>).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>To avoid that <code>vkv</code> automatically attempts to refresh the lease of the token (ref. <a href="https://developer.hashicorp.com/vault/docs/concepts/lease">https://developer.hashicorp.com/vault/docs/concepts/lease</a>) being used.</strong></p>
+<p>This should only affect users of large enterprise Vaults.</p>
+</div>
+<p>Per default <code>vkv</code> will attempt to compare every <code>10s</code> (change with <code>VKV_RENEWAL_INTERVAL</code>) the current token TTL with the original creation TTL and if the current TTL less than half the creation TTL, a lease token renewal for another <code>30s</code> (change with <code>VKV_RENEWAL_INCREMENT</code>) is performed. <code>vkv</code> will error silently to not affect any JSON/YAML output.</p>
+<p>You can find the exact implementation <a href="https://github.com/FalcoSuessgott/vkv/blob/master/pkg/vault/lease.go">here</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>You can always disable the token lease renewal by exporting <code>VKV_LEASE_REFRESHER_ENABLED</code></strong></p>
+</div>
 
 
 
@@ -1607,7 +1638,7 @@ This is way you don't have to hardcode and set <code>VAULT_TOKEN</code>, this is
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="January 12, 2025 03:42:33">January 12, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 27, 2025 11:48:20 UTC">May 27, 2025</span>
   </span>
 
     
