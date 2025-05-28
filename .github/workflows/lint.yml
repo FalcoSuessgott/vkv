@@ -4,7 +4,7 @@ on:
     paths:
       - '**.go'
     branches:
-      - master
+      - main
   pull_request:
 
 permissions:
