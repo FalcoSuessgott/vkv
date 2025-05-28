@@ -66,3 +66,48 @@ You can find the exact implementation [here](https://github.com/FalcoSuessgott/v
 
 !!! tip
     **You can always disable the token lease renewal by exporting `VKV_LEASE_REFRESHER_ENABLED`**
+
+## Token Policy
+The following endpoints are used by vkv:
+
+```hcl
+# required to check if the provides VAULT_TOKEN is valid
+path "/auth/token/lookup-self" {
+    capabilities = ["read"]
+}
+
+# required for vkv`s token lease renewal, fails silently
+path "/auth/token/renew-self" {
+    capabilities = ["create", "update"]
+}
+
+# required for "vkv export" to read a secrets values
+path "<mount>/data/<path>"{           # or "*" to allow every path recursive
+  capabilities = ["read"]
+}
+
+# required for "vkv import" to create a secrets values
+path "<mount>/data/<path>" {          # or "*" to allow every path recursive
+  capabilities = ["create","update"]
+}
+
+# required for "vkv export" to discover all secrets recursively
+path "<mount>/metadata/<path>" {        # or "*" to allow every path recursive
+  capabilities = ["read", "list"]
+}
+
+# required for "vkv snapshot save" to list all KV engines
+path "sys/mounts"{
+  capabilities = ["read"]
+}
+
+# required for "vkv export" to determine the KV version (1 or 2)
+path "sys/mounts/<mount>" {       # or "*" to allow every KV engine
+  capabilities = ["read"]
+}
+
+# required for "vkv snapshot restore" to create/overwrite KV engines when importing but the mount already exists
+path "sys/mounts/<mount>" {       # or "*" to allow every KV engine
+  capabilities = ["create", "delete"]
+}
+```
