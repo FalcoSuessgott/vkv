@@ -539,6 +539,24 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#vault-token-lease-renewal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vault Token Lease Renewal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Token Policy
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1525,6 +1543,24 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#vault-token-lease-renewal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vault Token Lease Renewal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Token Policy
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1587,6 +1623,61 @@ This is way you don't have to hardcode and set <code>VAULT_TOKEN</code>, this is
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span>└──<span class="w"> </span><span class="nv">key</span><span class="o">=</span>*****
 </span></code></pre></div>
 <p>As described, one can disable these warning by setting <code>VKV_DISABLE_WARNING</code> to any value.</p>
+<h2 id="vault-token-lease-renewal">Vault Token Lease Renewal<a class="headerlink" href="#vault-token-lease-renewal" title="Permanent link">&para;</a></h2>
+<p>Depending on the number of Namespaces, KV mounts and secrets of your Vault and your Token TTL settings the lease of the <code>VAULT_TOKEN</code> being used may expire during a <code>vkv snapshot</code> operation (reported in <a href="https://github.com/FalcoSuessgott/vkv/issues/363">#363</a>).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>To avoid that <code>vkv</code> automatically attempts to refresh the lease of the token (ref. <a href="https://developer.hashicorp.com/vault/docs/concepts/lease">https://developer.hashicorp.com/vault/docs/concepts/lease</a>) being used.</strong></p>
+<p>This should only affect users of large enterprise Vaults.</p>
+</div>
+<p>Per default <code>vkv</code> will attempt to compare every <code>10s</code> (change with <code>VKV_RENEWAL_INTERVAL</code>) the current token TTL with the original creation TTL and if the current TTL less than half the creation TTL, a lease token renewal for another <code>30s</code> (change with <code>VKV_RENEWAL_INCREMENT</code>) is performed. <code>vkv</code> will error silently to not affect any JSON/YAML output.</p>
+<p>You can find the exact implementation <a href="https://github.com/FalcoSuessgott/vkv/blob/master/pkg/vault/lease.go">here</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>You can always disable the token lease renewal by exporting <code>VKV_LEASE_REFRESHER_ENABLED</code></strong></p>
+</div>
+<h2 id="token-policy">Token Policy<a class="headerlink" href="#token-policy" title="Permanent link">&para;</a></h2>
+<p>The following endpoints are used by vkv:</p>
+<div class="language-hcl highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># required to check if the provides VAULT_TOKEN is valid</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;/auth/token/lookup-self&quot;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">]</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># required for vkv`s token lease renewal, fails silently</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;/auth/token/renew-self&quot;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;create&quot;, &quot;update&quot;</span><span class="p">]</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># required for &quot;vkv export&quot; to read a secrets values</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;&lt;mount&gt;/data/&lt;path&gt;&quot;{           # or &quot;*&quot;</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">allow</span><span class="w"> </span><span class="err">every</span><span class="w"> </span><span class="err">path</span><span class="w"> </span><span class="err">recursive</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">]</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="p">}</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="c1"># required for &quot;vkv import&quot; to create a secrets values</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;&lt;mount&gt;/data/&lt;path&gt;&quot; {          # or &quot;*&quot;</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">allow</span><span class="w"> </span><span class="err">every</span><span class="w"> </span><span class="err">path</span><span class="w"> </span><span class="err">recursive</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;create&quot;,&quot;update&quot;</span><span class="p">]</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="p">}</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="c1"># required for &quot;vkv export&quot; to discover all secrets recursively</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;&lt;mount&gt;/metadata/&lt;path&gt;&quot; {        # or &quot;*&quot;</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">allow</span><span class="w"> </span><span class="err">every</span><span class="w"> </span><span class="err">path</span><span class="w"> </span><span class="err">recursive</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;read&quot;, &quot;list&quot;</span><span class="p">]</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="p">}</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="c1"># required for &quot;vkv snapshot save&quot; to list all KV engines</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;sys/mounts&quot;</span><span class="p">{</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">]</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="p">}</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="c1"># required for &quot;vkv export&quot; to determine the KV version (1 or 2)</span>
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;sys/mounts/&lt;mount&gt;&quot; {       # or &quot;*&quot;</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">allow</span><span class="w"> </span><span class="err">every</span><span class="w"> </span><span class="err">KV</span><span class="w"> </span><span class="err">engine</span>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">]</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="p">}</span>
+</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>
+</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="c1"># required for &quot;vkv snapshot restore&quot; to create/overwrite KV engines when importing but the mount already exists</span>
+</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="err">path</span><span class="w"> </span><span class="s2">&quot;sys/mounts/&lt;mount&gt;&quot; {       # or &quot;*&quot;</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">allow</span><span class="w"> </span><span class="err">every</span><span class="w"> </span><span class="err">KV</span><span class="w"> </span><span class="err">engine</span>
+</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;create&quot;, &quot;delete&quot;</span><span class="p">]</span>
+</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="p">}</span>
+</span></code></pre></div>
 
 
 
@@ -1607,7 +1698,7 @@ This is way you don't have to hardcode and set <code>VAULT_TOKEN</code>, this is
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="January 12, 2025 03:42:33 UTC">January 12, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 28, 2025 01:19:39 UTC">May 28, 2025</span>
   </span>
 
     
