@@ -19,6 +19,7 @@ type exportOptions struct {
 
 	OnlyKeys       bool `env:"ONLY_KEYS"`
 	OnlyPaths      bool `env:"ONLY_PATHS"`
+	MergePaths     bool `env:"MERGE_PATHS"`
 	ShowValues     bool `env:"SHOW_VALUES"`
 	ShowVersion    bool `env:"SHOW_VERSION" envDefault:"true"`
 	ShowMetadata   bool `env:"SHOW_METADATA" envDefault:"true"`
@@ -57,6 +58,7 @@ func NewExportCmd() *cobra.Command {
 			printer = prt.NewSecretPrinter(
 				prt.OnlyKeys(o.OnlyKeys),
 				prt.OnlyPaths(o.OnlyPaths),
+				prt.MergePaths(o.MergePaths),
 				prt.CustomValueLength(o.MaxValueLength),
 				prt.ShowValues(o.ShowValues),
 				prt.WithTemplate(o.TemplateString, o.TemplateFile),
@@ -100,6 +102,7 @@ func NewExportCmd() *cobra.Command {
 	// Modify
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")
 	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env: VKV_EXPORT_ONLY_PATHS)")
+	cmd.Flags().BoolVar(&o.MergePaths, "merge-paths", o.MergePaths, "merge paths (env: VKV_EXPORT_MERGE_PATHS)")
 	cmd.Flags().BoolVar(&o.ShowVersion, "show-version", o.ShowVersion, "show the secret version (env: VKV_EXPORT_VERSION)")
 	cmd.Flags().BoolVar(&o.ShowMetadata, "show-metadata", o.ShowMetadata, "show the secrets metadata (env: VKV_EXPORT_METADATA)")
 	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_EXPORT_SHOW_VALUES)")
@@ -147,15 +150,19 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 			o.OnlyPaths = false
 			o.ShowValues = true
 			o.MaxValueLength = -1
+			o.MergePaths = false
 		case "markdown":
 			o.outputFormat = prt.Markdown
+			o.MergePaths = false
 		case "base":
 			o.outputFormat = prt.Base
+			o.MergePaths = false
 		case "policy":
 			o.outputFormat = prt.Policy
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.ShowValues = true
+			o.MergePaths = false
 		case "template", "tmpl":
 			o.outputFormat = prt.Template
 			o.OnlyKeys = false

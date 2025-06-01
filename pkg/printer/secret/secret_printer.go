@@ -62,6 +62,7 @@ type Printer struct {
 	writer         io.Writer
 	onlyKeys       bool
 	onlyPaths      bool
+	mergePaths     bool
 	showVersion    bool
 	showValues     bool
 	showMetadata   bool
@@ -106,6 +107,13 @@ func WithHyperLinks(b bool) Option {
 func OnlyPaths(b bool) Option {
 	return func(p *Printer) {
 		p.onlyPaths = b
+	}
+}
+
+// MergePaths flag for only printing kv paths.
+func MergePaths(b bool) Option {
+	return func(p *Printer) {
+		p.mergePaths = b
 	}
 }
 
@@ -216,6 +224,10 @@ func (p *Printer) Out(secrets interface{}) error {
 
 		if p.onlyKeys {
 			secretMap[k] = p.printOnlykeys(utils.ToMapStringInterface(v))
+		}
+
+		if p.mergePaths {
+			secretMap = p.printMergePaths(utils.ToMapStringInterface(v), k)
 		}
 	}
 

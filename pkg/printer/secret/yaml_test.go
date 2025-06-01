@@ -19,7 +19,7 @@ func TestPrintYAML(t *testing.T) {
 		err      bool
 	}{
 		{
-			name:     "test: normal map to yaml",
+			name:     "normal map to yaml",
 			rootPath: "root",
 			s: map[string]interface{}{
 				"secret": map[string]interface{}{
@@ -38,7 +38,7 @@ func TestPrintYAML(t *testing.T) {
 `,
 		},
 		{
-			name:     "test: normal map to yaml only keys",
+			name:     "normal map to yaml only keys",
 			rootPath: "root",
 			s: map[string]interface{}{
 				"secret": map[string]interface{}{
@@ -54,6 +54,24 @@ func TestPrintYAML(t *testing.T) {
   secret:
     key: ""
     user: ""
+`,
+		},
+		{
+			name:     "merge paths",
+			rootPath: "root",
+			s: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"key":  "value",
+					"user": "password",
+				},
+			},
+			opts: []Option{
+				ToFormat(YAML),
+				MergePaths(true),
+			},
+			output: `root/secret:
+  key: value
+  user: password
 `,
 		},
 	}

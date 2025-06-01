@@ -27,7 +27,7 @@ Once you have exported the required environment variables, you can verify your c
 ```bash
 export VAULT_ADDR="http://127.0.0.1:8200"
 export VAULT_TOKEN="root"
-vault status
+> vault status
 Key             Value
 ---             -----
 Seal Type       shamir
@@ -63,7 +63,7 @@ vault kv put -mount=secret db/dev env=dev username=user password=passw0rd-dev
 We can now use `vkv` to list all of our secrets recursively:
 
 ```bash
-vkv export --path secret
+> vkv export --path secret
 secret/ [desc=key/value secret storage] [type=kv2]
 ├── admin [v=1] [key=value]
 │   └── sub=********
@@ -106,7 +106,6 @@ vkv export -p secret --format=$f;
 done
 
 ===> Output Format: base <===
-vkv export --path secret
 secret/ [desc=key/value secret storage] [type=kv2]
 ├── admin [v=1] [key=value]
 │   └── sub=********
@@ -189,7 +188,7 @@ export username='user'
 Most of these formats, offer various commandline flags, such as `--show-secrets`, `--only-paths`, `--only-keys`, `--max-value-length` to modify the output. These flags can also be set through environment variables:
 
 ```bash
-VKV_EXPORT_FORMAT=JSON VKV_EXPORT_SHOW_VALUES=true vkv export -p secret
+> VKV_EXPORT_FORMAT=JSON VKV_EXPORT_SHOW_VALUES=true vkv export -p secret
 {
   "secret/": {
     "admin": {
@@ -208,6 +207,46 @@ VKV_EXPORT_FORMAT=JSON VKV_EXPORT_SHOW_VALUES=true vkv export -p secret
         "username": "user"
       }
     }
+  }
+}
+```
+
+Per default `vkv` splits the secret paths at `/`, if you prefer a non-nested output (for scripting purposes) you can enable `--merge-paths` (only works in `yaml`, `json` or `template` output format):
+
+```bash
+# YAML
+> vkv export -p secret --merge-paths -f=yaml
+secret/admin:
+  sub: password
+secret/demo:
+  foo: bar
+secret/sub/demo:
+  demo: hello world
+  password: s3cre5<
+  user: admin
+secret/sub/sub2/demo:
+  foo: bar
+  password: password
+  user: user
+
+# JSON
+> vkv export -p secret --merge-paths -f=json
+{
+  "secret/admin": {
+    "sub": "password"
+  },
+  "secret/demo": {
+    "foo": "bar"
+  },
+  "secret/sub/demo": {
+    "demo": "hello world",
+    "password": "s3cre5<",
+    "user": "admin"
+  },
+  "secret/sub/sub2/demo": {
+    "foo": "bar",
+    "password": "password",
+    "user": "user"
   }
 }
 ```

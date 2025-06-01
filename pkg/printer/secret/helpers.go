@@ -3,6 +3,8 @@ package secret
 import (
 	"fmt"
 	"strings"
+
+	"github.com/FalcoSuessgott/vkv/pkg/utils"
 )
 
 func (p *Printer) printOnlykeys(secrets map[string]interface{}) map[string]interface{} {
@@ -33,6 +35,14 @@ func (p *Printer) printOnlyPaths(secrets map[string]interface{}) map[string]inte
 	}
 
 	return res
+}
+
+func (p *Printer) printMergePaths(secrets map[string]interface{}, root string) map[string]interface{} {
+	m := make(map[string]interface{})
+
+	utils.FlattenMap(secrets, m, root)
+
+	return m
 }
 
 func (p *Printer) maskValues(secrets map[string]interface{}) map[string]interface{} {
