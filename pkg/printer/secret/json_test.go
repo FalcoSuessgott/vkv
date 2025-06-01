@@ -19,7 +19,7 @@ func TestPrintJSON(t *testing.T) {
 		err      bool
 	}{
 		{
-			name:     "test: normal map to json",
+			name:     "normal map to json",
 			rootPath: "root",
 			s: map[string]interface{}{
 				"secret": map[string]interface{}{
@@ -42,7 +42,7 @@ func TestPrintJSON(t *testing.T) {
 `,
 		},
 		{
-			name:     "test: normal map to json only keys",
+			name:     "normal map to json only keys",
 			rootPath: "root",
 			s: map[string]interface{}{
 				"secret": map[string]interface{}{
@@ -60,6 +60,27 @@ func TestPrintJSON(t *testing.T) {
       "key": "",
       "user": ""
     }
+  }
+}
+`,
+		},
+		{
+			name:     "merge paths",
+			rootPath: "root",
+			s: map[string]interface{}{
+				"secret": map[string]interface{}{
+					"key":  "value",
+					"user": "password",
+				},
+			},
+			opts: []Option{
+				ToFormat(JSON),
+				MergePaths(true),
+			},
+			output: `{
+  "root/secret": {
+    "key": "value",
+    "user": "password"
   }
 }
 `,

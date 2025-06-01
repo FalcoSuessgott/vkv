@@ -56,7 +56,7 @@ Depending on the number of Namespaces, KV mounts and secrets of your Vault and y
 
 !!! important
     **To avoid that `vkv` automatically attempts to refresh the lease of the token (ref. [https://developer.hashicorp.com/vault/docs/concepts/lease](https://developer.hashicorp.com/vault/docs/concepts/lease)) being used.**
-    
+
     This should only affect users of large enterprise Vaults.
 
 
