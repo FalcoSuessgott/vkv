@@ -168,3 +168,43 @@ export SUB_SUB2_DEMO_FOO='bar'
 export SUB_SUB2_DEMO_PASSWORD='password'
 export SUB_SUB2_DEMO_USER='user'
 ```
+
+Per default `vkv` splits the secret paths at `/`, if you prefer a non-nested output (for scripting purposes) you can enable `--merge-paths` (only works in `yaml`, `json` or `template` output format):
+
+```bash
+# YAML
+> vkv export -p secret --merge-paths -f=yaml
+secret/admin:
+  sub: password
+secret/demo:
+  foo: bar
+secret/sub/demo:
+  demo: hello world
+  password: s3cre5<
+  user: admin
+secret/sub/sub2/demo:
+  foo: bar
+  password: password
+  user: user
+
+# JSON
+> vkv export -p secret --merge-paths -f=json
+{
+  "secret/admin": {
+    "sub": "password"
+  },
+  "secret/demo": {
+    "foo": "bar"
+  },
+  "secret/sub/demo": {
+    "demo": "hello world",
+    "password": "s3cre5<",
+    "user": "admin"
+  },
+  "secret/sub/sub2/demo": {
+    "foo": "bar",
+    "password": "password",
+    "user": "user"
+  }
+}
+```

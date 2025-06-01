@@ -2,24 +2,28 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
+	"net"
+	"net/http"
+	"os"
 	"path"
 	"strings"
+	"time"
 
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer/secret"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
 
 type serverOptions struct {
-	Port         string `env:"PORT" envDefault:"0.0.0.0:8080"`
-	Path         string `env:"PATH"`
-	EnginePath   string `env:"ENGINE_PATH"`
-	SkipErrors   bool   `env:"SKIP_ERRORS" envDefault:"false"`
-	LoginCommand string `env:"LoginCommand"`
+	Port       string `env:"PORT" envDefault:"0.0.0.0:8080"`
+	Path       string `env:"PATH"`
+	EnginePath string `env:"ENGINE_PATH"`
+	SkipErrors bool   `env:"SKIP_ERRORS" envDefault:"false"`
 
 	writer *bytes.Buffer
 }
@@ -101,13 +105,52 @@ func (o *serverOptions) buildMap() (map[string]interface{}, error) {
 }
 
 func (o *serverOptions) serve() error {
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
+	server := &http.Server{
+		Addr:              o.Port,
+		Handler:           loggingMiddleware(o.export()),
+		ReadHeaderTimeout: 5 * time.Second,
+		BaseContext:       func(l net.Listener) context.Context { return rootContext },
+	}
 
-	r.GET("/export", func(c *gin.Context) {
-		// get format specified per request via url query param
-		format, ok := c.GetQuery("format")
+	slog.Info("Server started",
+		slog.String("address", server.Addr),
+		slog.String("port", o.Port),
+		slog.String("path", o.Path),
+	)
+
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatal("server failed to start: %w", err)
+		}
+	}()
+
+	<-rootContext.Done()
+
+	slog.Info("Shutdown signal received")
+	slog.Info("Server stopped")
+
+	// Graceful shutdown with timeout
+	shutdownCtx, cancel := context.WithTimeout(rootContext, 3*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		slog.Error("Graceful shutdown failed", "err", err)
+	} else {
+		slog.Info("Server shut down gracefully")
+	}
+
+	return nil
+}
+
+// nolint: cyclop
+func (o *serverOptions) export() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		format := r.URL.Query().Get("format")
 		enginePath, _ := utils.HandleEnginePath(o.EnginePath, o.Path)
+
+		if format == "" {
+			format = "export"
+		}
 
 		opts := []prt.Option{
 			prt.ShowValues(true),
@@ -115,47 +158,68 @@ func (o *serverOptions) serve() error {
 			prt.WithWriter(o.writer),
 			prt.WithEnginePath(enginePath),
 			prt.ToFormat(prt.Export),
+			//nolint: contextcheck
 			prt.WithContext(rootContext),
 		}
 
-		if ok {
-			switch strings.ToLower(format) {
-			case "yaml", "yml":
-				opts = append(opts, prt.ToFormat(prt.YAML))
-			case "json":
-				opts = append(opts, prt.ToFormat(prt.JSON))
-			case "export":
-				opts = append(opts, prt.ToFormat(prt.Export))
-			case "markdown":
-				opts = append(opts, prt.ToFormat(prt.Markdown))
-			case "base":
-				opts = append(opts, prt.ToFormat(prt.Base))
-			case "policy":
-				opts = append(opts, prt.ToFormat(prt.Policy))
-			case "template", "tmpl":
-				opts = append(opts, prt.ToFormat(prt.Template))
-			}
+		switch strings.ToLower(format) {
+		case "yaml", "yml":
+			opts = append(opts, prt.ToFormat(prt.YAML))
+		case "json":
+			opts = append(opts, prt.ToFormat(prt.JSON))
+		case "export":
+			opts = append(opts, prt.ToFormat(prt.Export))
+		case "markdown":
+			opts = append(opts, prt.ToFormat(prt.Markdown))
+		case "base":
+			opts = append(opts, prt.ToFormat(prt.Base))
+		case "policy":
+			opts = append(opts, prt.ToFormat(prt.Policy))
+		case "template", "tmpl":
+			opts = append(opts, prt.ToFormat(prt.Template))
+		default:
+			//nolint: perfsprint
+			http.Error(w, fmt.Sprintf("unsupported format: %s", format), http.StatusBadRequest)
+
+			return
 		}
 
 		printer = prt.NewSecretPrinter(opts...)
 
-		c.Data(200, "text/plain", o.readSecrets())
-	})
+		defer o.writer.Reset()
 
-	return r.Run(o.Port)
+		w.WriteHeader(http.StatusOK)
+		//nolint: errcheck, contextcheck
+		w.Write(func() []byte {
+			m, err := o.buildMap()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if err := printer.Out(m); err != nil {
+				log.Fatal(err)
+			}
+
+			return o.writer.Bytes()
+		}())
+	}
 }
 
-func (o *serverOptions) readSecrets() []byte {
-	o.writer.Reset()
+func loggingMiddleware(next http.Handler) http.Handler {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	m, err := o.buildMap()
-	if err != nil {
-		log.Fatal(err)
-	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 
-	if err := printer.Out(m); err != nil {
-		log.Fatal(err)
-	}
+		next.ServeHTTP(w, r)
 
-	return o.writer.Bytes()
+		duration := time.Since(start)
+
+		logger.Info("HTTP request",
+			slog.String("method", r.Method),
+			slog.String("path", r.URL.Path),
+			slog.Duration("duration", duration),
+			slog.String("remote", r.RemoteAddr),
+		)
+	})
 }
