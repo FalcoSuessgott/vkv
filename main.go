@@ -1,20 +1,24 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"os"
+	"syscall"
 
 	"github.com/FalcoSuessgott/vkv/cmd"
+	"github.com/charmbracelet/fang"
 )
 
 var version string
 
 func main() {
-	cmd.Version = version
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	if err := cmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v.\n", err)
-
+	if err := fang.Execute(ctx, cmd.NewRootCmd(),
+		fang.WithNotifySignal(syscall.SIGINT, syscall.SIGTERM),
+		fang.WithVersion(version),
+	); err != nil {
 		os.Exit(1)
 	}
 }

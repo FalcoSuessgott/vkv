@@ -31,24 +31,24 @@ func (s *VaultSuite) TestGetCapabilities() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			// enable kv engine
-			require.NoError(s.Suite.T(), s.client.EnableKV2Engine(context.Background(), tc.rootPath))
+			require.NoError(s.T(), s.client.EnableKV2Engine(context.Background(), tc.rootPath))
 
 			// enable kv engine again, so it erros
-			require.Error(s.Suite.T(), s.client.EnableKV2Engine(context.Background(), tc.rootPath))
+			require.Error(s.T(), s.client.EnableKV2Engine(context.Background(), tc.rootPath))
 
 			// read secrets- find none, so it errors
 			_, err := s.client.ReadSecrets(context.Background(), tc.rootPath, tc.subPath)
-			require.Error(s.Suite.T(), err)
+			require.Error(s.T(), err)
 
 			// actual write the secrets
 			if err = s.client.WriteSecrets(context.Background(), tc.rootPath, tc.subPath, tc.s); err != nil {
-				s.Suite.T().Fail()
+				s.T().Fail()
 			}
 
 			caps, err := s.client.GetCapabilities(context.Background(), tc.rootPath)
-			require.NoError(s.Suite.T(), err)
+			require.NoError(s.T(), err)
 
-			assert.Equal(s.Suite.T(), tc.expected, caps, tc.name)
+			assert.Equal(s.T(), tc.expected, caps, tc.name)
 		})
 	}
 }

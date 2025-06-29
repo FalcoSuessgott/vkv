@@ -95,7 +95,7 @@ func (s *VaultSuite) TestListAllKVSecretEngines() {
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			for _, engine := range tc.engines {
-				require.NoError(s.Suite.T(), s.client.EnableKV2Engine(context.Background(), engine), tc.name)
+				require.NoError(s.T(), s.client.EnableKV2Engine(context.Background(), engine), tc.name)
 			}
 
 			res, err := s.client.ListAllKVSecretEngines(context.Background(), "")

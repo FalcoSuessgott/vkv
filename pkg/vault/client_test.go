@@ -148,7 +148,7 @@ func (s *VaultSuite) TestNewClient() {
 
 			// set the test case env vars
 			for k, v := range tc.envVars {
-				require.NoError(s.Suite.T(), os.Setenv(k, v), "error settings env var")
+				require.NoError(s.T(), os.Setenv(k, v), "error settings env var")
 			}
 
 			// auth
@@ -156,9 +156,9 @@ func (s *VaultSuite) TestNewClient() {
 
 			// assertions
 			if tc.err {
-				require.Error(s.Suite.T(), err, tc.name)
+				require.Error(s.T(), err, tc.name)
 			} else {
-				require.NoError(s.Suite.T(), err, tc.name)
+				require.NoError(s.T(), err, tc.name)
 			}
 
 			// unsert test case env vars

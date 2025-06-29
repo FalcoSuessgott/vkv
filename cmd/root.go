@@ -3,13 +3,9 @@ package cmd
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
-	"log"
 	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 
 	prt "github.com/FalcoSuessgott/vkv/pkg/printer"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
@@ -33,8 +29,8 @@ var (
 	errInvalidFlagCombination = errors.New("invalid flag combination specified")
 	vaultClient               *vault.Vault
 	writer                    io.Writer
-	rootContext               context.Context
 	printer                   prt.Printer
+	rootContext               context.Context
 )
 
 // NewRootCmd vkv root command.
@@ -43,10 +39,12 @@ var (
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "vkv",
-		Short:         "the swiss army knife when working with Vault KV engines",
+		Short:         "The swiss army knife when working with Vault KV engines",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			rootContext = cmd.Context()
+
 			// skip vault client creation for completion, version, help, docs and manpage generation
 			if (cmd.HasParent() && cmd.Parent().Use == "completion") || cmd.Use == "docs" || cmd.Use == "help" || cmd.Use == "version" || cmd.Use == "man" {
 				return nil
@@ -58,12 +56,13 @@ func NewRootCmd() *cobra.Command {
 			}
 
 			// otherwise create a new vault client
-			vc, err := vault.NewDefaultClient(rootContext)
-			if err != nil {
-				return err
+			if _, ok := os.LookupEnv(envVarVKVMode); ok || cmd.HasParent() {
+				vc, err := vault.NewDefaultClient(rootContext)
+				if err != nil {
+					return err
+				}
+				vaultClient = vc
 			}
-
-			vaultClient = vc
 
 			go func() {
 				vaultClient.LeaseRefresher(rootContext)
@@ -101,10 +100,8 @@ func NewRootCmd() *cobra.Command {
 		NewExportCmd(),
 		NewListCmd(),
 		NewSnapshotCmd(),
-		NewVersionCmd(),
 		NewImportCmd(),
 		NewServerCmd(),
-		NewManCmd(),
 		NewDocCmd(),
 	)
 
@@ -118,28 +115,4 @@ func NewRootCmd() *cobra.Command {
 	)
 
 	return cmd
-}
-
-// Execute invokes the command.
-func Execute() error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	rootContext = ctx
-
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	go func() {
-		<-done
-
-		log.Println("Received shutdown signal")
-		cancel()
-	}()
-
-	if err := NewRootCmd().ExecuteContext(rootContext); err != nil {
-		return fmt.Errorf("[ERROR] %w", err)
-	}
-
-	return nil
 }
