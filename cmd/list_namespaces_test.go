@@ -51,9 +51,9 @@ func (s *VaultSuite) TestListNamespacesCommand() {
 
 				if ns != "" {
 					if nsName != "" {
-						require.NoError(s.Suite.T(), vaultClient.CreateNamespaceErrorIfNotForced(rootContext, nsParent, nsName, false), tc.name)
+						require.NoError(s.T(), vaultClient.CreateNamespaceErrorIfNotForced(rootContext, nsParent, nsName, false), tc.name)
 					} else {
-						require.NoError(s.Suite.T(), vaultClient.CreateNamespaceErrorIfNotForced(rootContext, "", nsParent, false), tc.name)
+						require.NoError(s.T(), vaultClient.CreateNamespaceErrorIfNotForced(rootContext, "", nsParent, false), tc.name)
 					}
 				}
 			}

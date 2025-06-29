@@ -1,3 +1,4 @@
+version: 2
 linters-settings:
   lll:
     line-length: 180
@@ -20,13 +21,9 @@ linters:
     - maintidx
     - mnd
     - dupl
-    - goimports
-    - gci
-    - gofmt
-    - gofumpt
     - revive
     - depguard
     - tagalign
     - copyloopvar
     - intrange
-    - exportloopref
+    - errcheck
