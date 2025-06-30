@@ -674,8 +674,8 @@ github.com/sashamelentyev/interfacebloat v1.1.0 h1:xdRdJp0irL086OyW1H/RTZTr1h/tM
 github.com/sashamelentyev/interfacebloat v1.1.0/go.mod h1:+Y9yU5YdTkrNvoX0xHc84dxiN1iBi9+G8zZIhPVoNjQ=
 github.com/sashamelentyev/usestdlibvars v1.29.0 h1:8J0MoRrw4/NAXtjQqTHrbW9NN+3iMf7Knkq057v4XOQ=
 github.com/sashamelentyev/usestdlibvars v1.29.0/go.mod h1:8PpnjHMk5VdeWlVb4wCdrB8PNbLqZ3wBZTZWkrpZZL8=
-github.com/savioxavier/termlink v1.4.2 h1:PRlvcStluuSKA87KCIqzODknYeQ3XEcgJP6DvAAVl1c=
-github.com/savioxavier/termlink v1.4.2/go.mod h1:5T5ePUlWbxCHIwyF8/Ez1qufOoGM89RCg9NvG+3G3gc=
+github.com/savioxavier/termlink v1.4.3 h1:Gh6vrG7jSn21cRiYdQqFXYcdXfM+Fg14aG487JTfKpA=
+github.com/savioxavier/termlink v1.4.3/go.mod h1:5T5ePUlWbxCHIwyF8/Ez1qufOoGM89RCg9NvG+3G3gc=
 github.com/securego/gosec/v2 v2.22.5 h1:ySws9uwOeE42DsG54v2moaJfh7r08Ev7SAYJuoMDfRA=
 github.com/securego/gosec/v2 v2.22.5/go.mod h1:AWfgrFsVewk5LKobsPWlygCHt8K91boVPyL6GUZG5NY=
 github.com/sergi/go-diff v1.2.0 h1:XU+rvMAioB0UC3q1MFrIQy4Vo5/4VsRDQQXHsEya6xQ=
