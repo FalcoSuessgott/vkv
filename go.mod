@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/charmbracelet/fang v0.2.1-0.20250627192500-0a5c1470cd5d
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
-	github.com/golangci/golangci-lint/v2 v2.2.0
+	github.com/golangci/golangci-lint/v2 v2.2.1
 	github.com/hashicorp/vault/api v1.20.0
 	github.com/juju/ansiterm v1.0.0
 	github.com/savioxavier/termlink v1.4.2
