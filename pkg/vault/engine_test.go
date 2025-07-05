@@ -8,7 +8,7 @@ import (
 
 func (s *VaultSuite) TestGetDescription() {
 	s.Run("description", func() {
-		desc, err := s.client.GetEngineDescription("secret")
+		desc, err := s.client.GetEngineDescription(s.T().Context(), "secret")
 
 		s.Require().NoError(err)
 
@@ -18,7 +18,7 @@ func (s *VaultSuite) TestGetDescription() {
 
 func (s *VaultSuite) TestGetEngineVersionType() {
 	s.Run("description", func() {
-		engineType, version, err := s.client.GetEngineTypeVersion("secret")
+		engineType, version, err := s.client.GetEngineTypeVersion(s.T().Context(), "secret")
 
 		s.Require().NoError(err)
 

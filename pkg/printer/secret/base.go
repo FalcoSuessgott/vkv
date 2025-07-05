@@ -27,13 +27,13 @@ func (p *Printer) printBase(secrets map[string]interface{}) error {
 
 		if p.vaultClient != nil {
 			// append description
-			desc, err := p.vaultClient.GetEngineDescription(p.enginePath)
+			desc, err := p.vaultClient.GetEngineDescription(p.ctx, p.enginePath)
 			if err == nil && desc != "" {
 				baseName = fmt.Sprintf("%s [desc=%s]", baseName, desc)
 			}
 
 			// append type + version
-			engineType, version, err := p.vaultClient.GetEngineTypeVersion(p.enginePath)
+			engineType, version, err := p.vaultClient.GetEngineTypeVersion(p.ctx, p.enginePath)
 			if err == nil {
 				baseName = fmt.Sprintf("%s [type=%s]", baseName, engineType+version)
 			}

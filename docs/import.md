@@ -67,7 +67,7 @@ vkv export -p <source> --show-values -f=yaml | vkv import - -p <destination>
 ```
 
 ### A few notes:
-* `<source>` and `<destination>` dont have to be the root path of a secret engine, you also specify subpaths and copy them another secret engine.
-* `vkv` will error if the enabled secret engine already exist, you can use `--force` to overwrite the destination engine, if the destination path contains a subpath (`root/sub`), `vkv` will then insert the secrets to that specific directory
+* `<source>` and `<destination>` don't have to be the root path of a secret engine, you also specify sub paths and copy them another secret engine.
+* `vkv` will error if the secret engine already exists, you can use `--force` to overwrite the destination engine, if the destination path contains a subpath (`root/sub`), `vkv` will then insert the secrets to that specific directory
 
 **⚠️ `vkv import` can overwrite important secrets, always double check the command by using the dry-run mode (`--dry-run`) first**
