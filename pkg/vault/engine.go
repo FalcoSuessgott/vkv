@@ -15,8 +15,8 @@ const (
 type Engines map[string][]string
 
 // GetEngineDescription returns the description of the engine.
-func (v *Vault) GetEngineDescription(rootPath string) (string, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(mountEnginePath, rootPath))
+func (v *Vault) GetEngineDescription(ctx context.Context, rootPath string) (string, error) {
+	data, err := v.Client.Logical().ReadWithContext(ctx, fmt.Sprintf(mountEnginePath, rootPath))
 	if err != nil {
 		return "", err
 	}
@@ -34,8 +34,8 @@ func (v *Vault) GetEngineDescription(rootPath string) (string, error) {
 	return "", fmt.Errorf("could not get engine description for path: \"%s\"", rootPath)
 }
 
-func (v *Vault) GetEngineTypeVersion(rootPath string) (string, string, error) {
-	data, err := v.Client.Logical().Read(fmt.Sprintf(mountEnginePath, rootPath))
+func (v *Vault) GetEngineTypeVersion(ctx context.Context, rootPath string) (string, string, error) {
+	data, err := v.Client.Logical().ReadWithContext(ctx, fmt.Sprintf(mountEnginePath, rootPath))
 	if err != nil {
 		return "", "", err
 	}
@@ -108,7 +108,7 @@ func (v *Vault) EnableKV1Engine(ctx context.Context, rootPath string) error {
 // already enabled, unless force is set to true.
 func (v *Vault) EnableKV2EngineErrorIfNotForced(ctx context.Context, force bool, path string) error {
 	// check if engine exists
-	engineType, kvVersion, err := v.GetEngineTypeVersion(path)
+	engineType, kvVersion, err := v.GetEngineTypeVersion(ctx, path)
 	// engine does not exists, so we enable it and exit
 	if err != nil {
 		if err := v.EnableKV2Engine(ctx, path); err != nil {
@@ -127,16 +127,6 @@ func (v *Vault) EnableKV2EngineErrorIfNotForced(ctx context.Context, force bool,
 	if err == nil && !force {
 		return fmt.Errorf("a secret engine under \"%s\" is already enabled. Use --force for overwriting", path)
 	}
-
-	// // force flag is used, so we disable the engine
-	// if err := v.DisableKV2Engine(path); err != nil {
-	// 	return fmt.Errorf("error disabling secret engine \"%s\": %w", path, err)
-	// }
-
-	// // enable the engine
-	// if err := v.EnableKV2Engine(path); err != nil {
-	// 	return fmt.Errorf("error enabling secret engine \"%s\": %w", path, err)
-	// }
 
 	return nil
 }

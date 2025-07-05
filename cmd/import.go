@@ -26,6 +26,8 @@ type importOptions struct {
 	ShowValues     bool `env:"SHOW_VALUES"`
 	MaxValueLength int  `env:"MAX_VALUE_LENGTH" envDefault:"12"`
 
+	SkipErrors bool `env:"SKIP_ERRORS" envDefault:"false"`
+
 	input io.Reader
 }
 
@@ -40,7 +42,7 @@ func NewImportCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:           "import",
-		Short:         "import secrets from vkv's json or yaml output",
+		Short:         "import secrets from vkv's export json or yaml output",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PreRunE:       o.validateFlags,
@@ -91,7 +93,7 @@ func NewImportCmd() *cobra.Command {
 				prt.WithContext(rootContext),
 			)
 
-			// print preview during dryrun and exit
+			// print preview during dry run and exit
 			if o.DryRun {
 				// replace the root path in the secrets with the specified path
 				secretsWithNewPath := make(map[string]interface{})
@@ -103,7 +105,7 @@ func NewImportCmd() *cobra.Command {
 			}
 
 			// enable kv engine, error if already enabled, unless force is used
-			if err := vaultClient.EnableKV2EngineErrorIfNotForced(rootContext, o.Force, rootPath); err != nil {
+			if err := vaultClient.EnableKV2EngineErrorIfNotForced(rootContext, o.Force, rootPath); !o.SkipErrors && err != nil {
 				return err
 			}
 
@@ -129,13 +131,14 @@ func NewImportCmd() *cobra.Command {
 	}
 
 	// Input
-	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KVv2 Engine path (env: VKV_IMPORT_PATH)")
+	cmd.Flags().StringVarP(&o.Path, "path", "p", o.Path, "KV engine path (env: VKV_IMPORT_PATH)")
 	cmd.Flags().StringVarP(&o.EnginePath, "engine-path", "e", o.EnginePath, "engine path in case your KV-engine contains special characters such as \"/\", the path (-p) flag will then be appended if specified (\"<engine-path>/<path>\") (env: VKV_IMPORT_PATH)")
-	cmd.Flags().StringVarP(&o.File, "file", "f", o.File, "path to a file containing vkv yaml or json output (env: VKV_IMPORT_FILE)")
+	cmd.Flags().StringVarP(&o.File, "file", "f", o.File, "path to a file containing vkv export json or yaml output (env: VKV_IMPORT_FILE)")
+	cmd.Flags().BoolVar(&o.SkipErrors, "skip-errors", o.SkipErrors, "don't exit on errors (permission denied, ...) (env: VKV_EXPORT_SKIP_ERRORS)")
 
 	// Options
-	cmd.Flags().BoolVar(&o.Force, "force", o.Force, "overwrite existing kv entries (env: VKV_IMPORT_FORCE)")
-	cmd.Flags().BoolVarP(&o.DryRun, "dry-run", "d", o.DryRun, "print resulting KV engine (env: VKV_IMPORT_DRY_RUN)")
+	cmd.Flags().BoolVar(&o.Force, "force", o.Force, "overwrite existing kv secrets (env: VKV_IMPORT_FORCE)")
+	cmd.Flags().BoolVarP(&o.DryRun, "dry-run", "d", o.DryRun, "print resulting KV secrets (env: VKV_IMPORT_DRY_RUN)")
 	cmd.Flags().BoolVarP(&o.Silent, "silent", "s", o.Silent, "do not output secrets (env: VKV_IMPORT_SILENT)")
 	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_IMPORT_SHOW_VALUES)")
 	cmd.Flags().IntVar(&o.MaxValueLength, "max-value-length", o.MaxValueLength, "maximum char length of values. Set to \"-1\" for disabling "+
@@ -224,7 +227,7 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 			newSubPath = path.Join(subPath, newSubPath)
 		}
 
-		if err := vaultClient.WriteSecrets(rootContext, rootPath, newSubPath, secret); err != nil {
+		if err := vaultClient.WriteSecrets(rootContext, rootPath, newSubPath, secret); !o.SkipErrors && err != nil {
 			return fmt.Errorf("error writing secret \"%s\": %w", p, err)
 		}
 
