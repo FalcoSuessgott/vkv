@@ -4,9 +4,31 @@ on:
   pull_request:
 
 jobs:
+  vault-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      vault-versions: ${{ steps.vault-versions.outputs.versions }}
+
+    steps:
+      - name: Fetch latest tags
+        id: vault-versions
+        run: | 
+          echo "versions=$(curl -s "https://api.github.com/repos/hashicorp/vault/tags?per_page=100" \
+          | jq -r '.[].name' \
+          | grep -E '^v?[0-9]+\.[0-9]+\.0$' \
+          | sed 's/^v//' \
+          | head -n 3 \
+          | jq -cRn '[inputs]')" >> "$GITHUB_OUTPUT"
+
+      - name: Last 3 Vault major versions
+        run: echo "${{ steps.vault-versions.outputs.versions }}"
+
   test:
     runs-on: ubuntu-latest
-
+    needs: vault-versions
+    strategy:
+      matrix:
+        version: ${{ fromJson(needs.vault-versions.outputs.vault-versions) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,7 +46,7 @@ jobs:
         run: |
           gotestsum -- -v -race -coverprofile="coverage.out" -covermode=atomic ./...
         env:
-          VAULT_VERSION: latest
+          VAULT_VERSION: ${{ matrix.version }}
           # https://github.com/testcontainers/testcontainers-go/issues/1782
           TESTCONTAINERS_RYUK_DISABLED: true
 

@@ -3,12 +3,16 @@ package testutils
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/vault"
 )
 
 var token = "root"
+
+var VaultVersionEnv = "VAULT_VERSION"
+var VaultVersion ="1.20.0"
 
 // TestContainer vault dev container wrapper.
 type TestContainer struct {
@@ -21,7 +25,11 @@ type TestContainer struct {
 func StartTestContainer(commands ...string) (*TestContainer, error) {
 	ctx := context.Background()
 
-	vaultContainer, err := vault.Run(ctx, "hashicorp/vault:1.16.0",
+	if v, ok := os.LookupEnv(VaultVersionEnv); ok {
+		VaultVersion = v
+	}
+
+	vaultContainer, err := vault.Run(ctx, "hashicorp/vault:" + VaultVersion,
 		vault.WithToken(token),
 		vault.WithInitCommand(commands...),
 	)
