@@ -13,7 +13,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.38.0
-	github.com/testcontainers/testcontainers-go/modules/vault v0.37.0
+	github.com/testcontainers/testcontainers-go/modules/vault v0.38.0
 	github.com/xlab/treeprint v1.2.0
 	gotest.tools/gotestsum v1.12.3
 )
