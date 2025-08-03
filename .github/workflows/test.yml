@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Fetch latest tags
         id: vault-versions
-        run: | 
+        run: |
           echo "versions=$(curl -s "https://api.github.com/repos/hashicorp/vault/tags?per_page=100" \
           | jq -r '.[].name' \
           | grep -E '^v?[0-9]+\.[0-9]+\.0$' \

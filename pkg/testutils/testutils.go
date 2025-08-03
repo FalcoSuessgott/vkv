@@ -11,8 +11,10 @@ import (
 
 var token = "root"
 
-var VaultVersionEnv = "VAULT_VERSION"
-var VaultVersion ="1.20.0"
+var (
+	VaultVersionEnv = "VAULT_VERSION"
+	VaultVersion    = "1.20.0"
+)
 
 // TestContainer vault dev container wrapper.
 type TestContainer struct {
@@ -29,7 +31,7 @@ func StartTestContainer(commands ...string) (*TestContainer, error) {
 		VaultVersion = v
 	}
 
-	vaultContainer, err := vault.Run(ctx, "hashicorp/vault:" + VaultVersion,
+	vaultContainer, err := vault.Run(ctx, "hashicorp/vault:"+VaultVersion,
 		vault.WithToken(token),
 		vault.WithInitCommand(commands...),
 	)

@@ -24,6 +24,7 @@ nav:
     - export.md
     - import.md
     - server.md
+    - mcp.md
     - snapshots.md
     - Advanced Examples:
       - example_diff.md
@@ -45,6 +46,7 @@ nav:
     - cmd/vkv_list.md
     - cmd/vkv_list_engines.md
     - cmd/vkv_list_namespaces.md
+    - cmd/vkv_mcp.md
     - cmd/vkv_snapshot.md
     - cmd/vkv_snapshot_save.md
     - cmd/vkv_snapshot_restore.md
