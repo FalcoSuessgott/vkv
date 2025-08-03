@@ -103,6 +103,7 @@ func NewRootCmd() *cobra.Command {
 		NewImportCmd(),
 		NewServerCmd(),
 		NewDocCmd(),
+		NewMCPCmd(),
 	)
 
 	cobra.OnInitialize(
