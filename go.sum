@@ -153,8 +153,8 @@ github.com/charithe/durationcheck v0.0.10 h1:wgw73BiocdBDQPik+zcEoBG/ob8uyBHf2iy
 github.com/charithe/durationcheck v0.0.10/go.mod h1:bCWXb7gYRysD1CU3C+u4ceO49LoGOY1C1L6uouGNreQ=
 github.com/charmbracelet/colorprofile v0.3.2 h1:9J27WdztfJQVAQKX2WOlSSRB+5gaKqqITmrvb1uTIiI=
 github.com/charmbracelet/colorprofile v0.3.2/go.mod h1:mTD5XzNeWHj8oqHb+S1bssQb7vIHbepiebQ2kPKVKbI=
-github.com/charmbracelet/fang v0.4.2 h1:nWr7Tb82/TTNNGMGG35aTZ1X68loAOQmpb0qxkKXjas=
-github.com/charmbracelet/fang v0.4.2/go.mod h1:wHJKQYO5ReYsxx+yZl+skDtrlKO/4LLEQ6EXsdHhRhg=
+github.com/charmbracelet/fang v0.4.3 h1:qXeMxnL4H6mSKBUhDefHu8NfikFbP/MBNTfqTrXvzmY=
+github.com/charmbracelet/fang v0.4.3/go.mod h1:wHJKQYO5ReYsxx+yZl+skDtrlKO/4LLEQ6EXsdHhRhg=
 github.com/charmbracelet/lipgloss v1.1.0 h1:vYXsiLHVkK7fp74RkV7b2kq9+zDLoEU4MZoFqR/noCY=
 github.com/charmbracelet/lipgloss v1.1.0/go.mod h1:/6Q8FR2o+kj8rz4Dq0zQc3vYf7X+B0binUUBwA0aL30=
 github.com/charmbracelet/lipgloss/v2 v2.0.0-beta1 h1:SOylT6+BQzPHEjn15TIzawBPVD0QmhKXbcb3jY0ZIKU=
