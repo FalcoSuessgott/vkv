@@ -761,8 +761,8 @@ github.com/tenntenn/text/transform v0.0.0-20200319021203-7eef512accb3 h1:f+jULpR
 github.com/tenntenn/text/transform v0.0.0-20200319021203-7eef512accb3/go.mod h1:ON8b8w4BN/kE1EOhwT0o+d62W65a6aPw1nouo9LMgyY=
 github.com/testcontainers/testcontainers-go v0.39.0 h1:uCUJ5tA+fcxbFAB0uP3pIK3EJ2IjjDUHFSZ1H1UxAts=
 github.com/testcontainers/testcontainers-go v0.39.0/go.mod h1:qmHpkG7H5uPf/EvOORKvS6EuDkBUPE3zpVGaH9NL7f8=
-github.com/testcontainers/testcontainers-go/modules/vault v0.38.0 h1:AMmPAvPzZEOL3IgRzQNPycmdwsu+YCToSyro8Czyf9s=
-github.com/testcontainers/testcontainers-go/modules/vault v0.38.0/go.mod h1:7RiFLaWbLmbZRefuM5AiJuQdL9UIZYrhfYSgY4glL7E=
+github.com/testcontainers/testcontainers-go/modules/vault v0.39.0 h1:2FdaAcV6qzjh00LwGei9f6EuxdHGvfZ87zAyK+1b/6Q=
+github.com/testcontainers/testcontainers-go/modules/vault v0.39.0/go.mod h1:noXKEtMDYUMhNL8wPnuRQtMgUzAE2cNYA9M1ZYLv6zk=
 github.com/tetafro/godot v1.5.4 h1:u1ww+gqpRLiIA16yF2PV1CV1n/X3zhyezbNXC3E14Sg=
 github.com/tetafro/godot v1.5.4/go.mod h1:eOkMrVQurDui411nBY2FA05EYH01r14LuWY/NrVDVcU=
 github.com/tidwall/gjson v1.17.1 h1:wlYEnwqAHgzmhNUFfw7Xalt2JzQvsMx2Se4PcoFCT/U=
