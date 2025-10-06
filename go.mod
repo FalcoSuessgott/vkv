@@ -7,7 +7,7 @@ require (
 	github.com/charmbracelet/fang v0.4.3
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/golangci/golangci-lint/v2 v2.5.0
-	github.com/hashicorp/vault/api v1.21.0
+	github.com/hashicorp/vault/api v1.22.0
 	github.com/juju/ansiterm v1.0.0
 	github.com/mark3labs/mcp-go v0.41.1
 	github.com/savioxavier/termlink v1.4.3
