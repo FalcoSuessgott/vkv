@@ -9,7 +9,7 @@ require (
 	github.com/golangci/golangci-lint/v2 v2.5.0
 	github.com/hashicorp/vault/api v1.22.0
 	github.com/juju/ansiterm v1.0.0
-	github.com/mark3labs/mcp-go v0.41.1
+	github.com/mark3labs/mcp-go v0.42.0
 	github.com/savioxavier/termlink v1.4.3
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
