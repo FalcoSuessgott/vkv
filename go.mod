@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/charmbracelet/fang v0.4.3
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
-	github.com/golangci/golangci-lint/v2 v2.7.1
+	github.com/golangci/golangci-lint/v2 v2.7.2
 	github.com/hashicorp/vault/api v1.22.0
 	github.com/juju/ansiterm v1.0.0
 	github.com/mark3labs/mcp-go v0.43.2
@@ -233,7 +233,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
 	github.com/sashamelentyev/interfacebloat v1.1.0 // indirect
 	github.com/sashamelentyev/usestdlibvars v1.29.0 // indirect
-	github.com/securego/gosec/v2 v2.22.10 // indirect
+	github.com/securego/gosec/v2 v2.22.11-0.20251204091113-daccba6b93d7 // indirect
 	github.com/shirou/gopsutil/v4 v4.25.11 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
@@ -311,7 +311,7 @@ require (
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
-	golang.org/x/crypto v0.44.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
 )
