@@ -5,13 +5,32 @@ import (
 	"context"
 	"io"
 	"log"
+	"regexp"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/FalcoSuessgott/vkv/pkg/testutils"
 	"github.com/FalcoSuessgott/vkv/pkg/vault"
 	"github.com/stretchr/testify/suite"
 )
+
+// createdAgoRe matches the relative "(created X ago)" annotation in the base tree.
+var createdAgoRe = regexp.MustCompile(` \(created \d+ \w+ ago\)`)
+
+// normalizeTree strips the volatile "(created X ago)" timestamp and trailing
+// whitespace so tree assertions stay deterministic and robust to the
+// trailing-whitespace pre-commit hook.
+func normalizeTree(s string) string {
+	s = createdAgoRe.ReplaceAllString(s, "")
+
+	lines := strings.Split(s, "\n")
+	for i := range lines {
+		lines[i] = strings.TrimRight(lines[i], " ")
+	}
+
+	return strings.Join(lines, "\n")
+}
 
 type VaultSuite struct {
 	suite.Suite
@@ -67,7 +86,7 @@ func (s *VaultSuite) TestMode() {
 			expected: `e2e/ [type=kv2]
 ├── sub [v=1]
 │   └── user=********
-│   
+│
 └── sub2 [v=1]
     └── key=*****
 `,
@@ -111,7 +130,7 @@ func (s *VaultSuite) TestMode() {
 				s.Require().NoError(err, "no error "+tc.name)
 
 				out, _ := io.ReadAll(b)
-				s.Require().Equal(tc.expected, string(out), tc.name)
+				s.Require().Equal(normalizeTree(tc.expected), normalizeTree(string(out)), tc.name)
 			}
 		})
 	}

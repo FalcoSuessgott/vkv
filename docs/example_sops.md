@@ -36,21 +36,18 @@ an encrypted secrets file looks like this:
 
 
 ```yaml
-secret/:
-    admin:
-        sub: ENC[AES256_GCM,data:fmHQMHCBNIs=,iv:s2q/j2tYvTN+u8KOXKm+Rbt1Y3oFO0fwjYCQy3jBHEU=,tag:+f5t/2LZCkIaAaoYeiY9KA==,type:str]
-    demo:
-        foo: ENC[AES256_GCM,data:kZwT,iv:QkNZwsUZ4lngluUHXae7abYAjAZFbNgJ7GdgM18GlLM=,tag:74aMFxt1pmCCy/rFcD7/rw==,type:str]
-    sub/:
-        demo:
-            demo: ENC[AES256_GCM,data:f1m2veKk4w7i2hc=,iv:PyycH5Z9TEf/9u/nm7XYcnMEBHB+AY4ARAABoV8DQ74=,tag:QsPcwlw3vQNxytrfiZ1lyg==,type:str]
-            password: ENC[AES256_GCM,data:m6DXfI4r,iv:3rLoWDTRfHuGUzJjoOemYv4C89EedK+CKX+9R7QfDZI=,tag:2Ul1wt77XGzina8QyOZMjQ==,type:str]
-            user: ENC[AES256_GCM,data:EYXYIU8=,iv:7ll05h50Nu0Mp+bWuIrJjEsP4KRpH8L1vn3ZvqXlEPc=,tag:zN8Pzmk4QvX1hdlb955KaQ==,type:str]
-        sub2/:
-            demo:
-                foo: ENC[AES256_GCM,data:AnMP,iv:oyaYacdlcnInw57im4ARprWz6wkgKqguiK6IHwdwn4w=,tag:4u0JZJ1jFvevZLDe/tlmzg==,type:str]
-                password: ENC[AES256_GCM,data:Q1zzktiD58Q=,iv:1OZjqPyW0MNiTcll3tXkZ4AQ9CnNqtWzYmSw6PPEYxo=,tag:Z29GfxZnrWJnnzI8dckNHw==,type:str]
-                user: ENC[AES256_GCM,data:a4Ju3Q==,iv:lpMo+/5K3mwqLQSpoAKLaL/Np6KAtoJDFZEAslu6TOY=,tag:BiZ4t7muKQu+AU9JvTNc4w==,type:str]
+admin:
+    sub: ENC[AES256_GCM,data:fmHQMHCBNIs=,iv:s2q/j2tYvTN+u8KOXKm+Rbt1Y3oFO0fwjYCQy3jBHEU=,tag:+f5t/2LZCkIaAaoYeiY9KA==,type:str]
+demo:
+    foo: ENC[AES256_GCM,data:kZwT,iv:QkNZwsUZ4lngluUHXae7abYAjAZFbNgJ7GdgM18GlLM=,tag:74aMFxt1pmCCy/rFcD7/rw==,type:str]
+sub/demo:
+    demo: ENC[AES256_GCM,data:f1m2veKk4w7i2hc=,iv:PyycH5Z9TEf/9u/nm7XYcnMEBHB+AY4ARAABoV8DQ74=,tag:QsPcwlw3vQNxytrfiZ1lyg==,type:str]
+    password: ENC[AES256_GCM,data:m6DXfI4r,iv:3rLoWDTRfHuGUzJjoOemYv4C89EedK+CKX+9R7QfDZI=,tag:2Ul1wt77XGzina8QyOZMjQ==,type:str]
+    user: ENC[AES256_GCM,data:EYXYIU8=,iv:7ll05h50Nu0Mp+bWuIrJjEsP4KRpH8L1vn3ZvqXlEPc=,tag:zN8Pzmk4QvX1hdlb955KaQ==,type:str]
+sub/sub2/demo:
+    foo: ENC[AES256_GCM,data:AnMP,iv:oyaYacdlcnInw57im4ARprWz6wkgKqguiK6IHwdwn4w=,tag:4u0JZJ1jFvevZLDe/tlmzg==,type:str]
+    password: ENC[AES256_GCM,data:Q1zzktiD58Q=,iv:1OZjqPyW0MNiTcll3tXkZ4AQ9CnNqtWzYmSw6PPEYxo=,tag:Z29GfxZnrWJnnzI8dckNHw==,type:str]
+    user: ENC[AES256_GCM,data:a4Ju3Q==,iv:lpMo+/5K3mwqLQSpoAKLaL/Np6KAtoJDFZEAslu6TOY=,tag:BiZ4t7muKQu+AU9JvTNc4w==,type:str]
 sops:
     kms: []
     gcp_kms: []

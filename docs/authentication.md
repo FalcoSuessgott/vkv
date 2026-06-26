@@ -45,7 +45,7 @@ $> vkv export -p secret
 [INFO] Using VAULT_TOKEN.
 
 secret/ [desc=key/value secret storage] [type=kv2]
-└── secret [v=1]
+└── secret [v=1] (created 5 minutes ago)
     └── key=*****
 ```
 

@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/savioxavier/termlink"
@@ -17,25 +18,27 @@ func (p *Printer) printBase(secrets map[string]interface{}) error {
 	m := make(map[string]interface{})
 
 	for _, k := range utils.SortMapKeys(secrets) {
-		baseName := p.enginePath
+		display := p.enginePath
 
 		if p.withHyperLinks {
 			addr := fmt.Sprintf("%s/ui/vault/secrets/%s/kv", p.vaultClient.Client.Address(), p.enginePath)
 
-			baseName = termlink.Link(p.enginePath, addr, false)
+			display = termlink.Link(p.enginePath, addr, false)
 		}
+
+		baseName := boldStyle(display)
 
 		if p.vaultClient != nil {
 			// append description
 			desc, err := p.vaultClient.GetEngineDescription(p.ctx, p.enginePath)
 			if err == nil && desc != "" {
-				baseName = fmt.Sprintf("%s [desc=%s]", baseName, desc)
+				baseName = fmt.Sprintf("%s %s", baseName, annotationStyle(fmt.Sprintf("[desc=%s]", desc)))
 			}
 
 			// append type + version
 			engineType, version, err := p.vaultClient.GetEngineTypeVersion(p.ctx, p.enginePath)
 			if err == nil {
-				baseName = fmt.Sprintf("%s [type=%s]", baseName, engineType+version)
+				baseName = fmt.Sprintf("%s %s", baseName, annotationStyle(fmt.Sprintf("[type=%s]", engineType+version)))
 			}
 		}
 
@@ -99,9 +102,21 @@ func (p *Printer) buildTreeName(rootPath, subPath string) string {
 		name = termlink.Link(name, addr, false)
 	}
 
+	// path elements are shown in bold
+	name = boldStyle(name)
+
 	if p.showVersion {
 		if v, err := p.vaultClient.ReadSecretVersion(p.ctx, rootPath, subPath); err == nil {
-			name = fmt.Sprintf("%s [v=%v]", name, v)
+			name = fmt.Sprintf("%s %s", name, versionStyle(fmt.Sprintf("[v=%v]", v)))
+		}
+
+		if t, err := p.vaultClient.ReadCurrentVersionCreatedTime(p.ctx, rootPath, subPath); err == nil && !t.IsZero() {
+			now := p.now
+			if now.IsZero() {
+				now = time.Now()
+			}
+
+			name = fmt.Sprintf("%s %s", name, versionStyle(fmt.Sprintf("(created %s)", humanizeTimeAgo(t, now))))
 		}
 	}
 
@@ -115,7 +130,7 @@ func (p *Printer) buildTreeName(rootPath, subPath string) string {
 					md = fmt.Sprintf("%s %s=%v", md, k, v)
 				}
 
-				name = fmt.Sprintf("%s [%v]", name, strings.TrimPrefix(md, " "))
+				name = fmt.Sprintf("%s %s", name, annotationStyle(fmt.Sprintf("[%v]", strings.TrimPrefix(md, " "))))
 			}
 		}
 	}

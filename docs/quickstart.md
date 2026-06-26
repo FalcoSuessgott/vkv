@@ -107,57 +107,51 @@ done
 
 ===> Output Format: base <===
 secret/ [desc=key/value secret storage] [type=kv2]
-├── admin [v=1] [key=value]
+├── admin [v=1] (created 5 minutes ago) [key=value]
 │   └── sub=********
-├── demo [v=1]
+├── demo [v=1] (created 5 minutes ago)
 │   └── foo=***
 └── sub
-    ├── demo [v=1]
+    ├── demo [v=1] (created 5 minutes ago)
     │   ├── demo=***********
-    │   ├── password=******
+    │   ├── password=*******
     │   └── user=*****
     └── sub2
-        └── demo [v=2] [admin=false key=value]
-            ├── admin=***
+        └── demo [v=2] (created 5 minutes ago) [admin=false key=value]
             ├── foo=***
             ├── password=********
             └── user=****
 
 ===> Output Format: yaml <===
-secret/:
-  admin:
-    password: '********'
-    username: '****'
-  db/:
-    dev:
-      env: '***'
-      password: '************'
-      username: '****'
-    prod:
-      env: '****'
-      password: '*************'
-      username: '****'
+# note: yaml/json always show real values and use flat, full-path keys
+admin:
+  password: passw0rd
+  username: user
+db/dev:
+  env: dev
+  password: passw0rd-dev
+  username: user
+db/prod:
+  env: prod
+  password: passw0rd-prod
+  username: user
 
 
 ===> Output Format: json <===
 {
-  "secret/": {
-    "admin": {
-      "password": "********",
-      "username": "****"
-    },
-    "db/": {
-      "dev": {
-        "env": "***",
-        "password": "************",
-        "username": "****"
-      },
-      "prod": {
-        "env": "****",
-        "password": "*************",
-        "username": "****"
-      }
-    }
+  "admin": {
+    "password": "passw0rd",
+    "username": "user"
+  },
+  "db/dev": {
+    "env": "dev",
+    "password": "passw0rd-dev",
+    "username": "user"
+  },
+  "db/prod": {
+    "env": "prod",
+    "password": "passw0rd-prod",
+    "username": "user"
   }
 }
 
@@ -188,68 +182,26 @@ export username='user'
 Most of these formats, offer various commandline flags, such as `--show-secrets`, `--only-paths`, `--only-keys`, `--max-value-length` to modify the output. These flags can also be set through environment variables:
 
 ```bash
-> VKV_EXPORT_FORMAT=JSON VKV_EXPORT_SHOW_VALUES=true vkv export -p secret
+> VKV_EXPORT_FORMAT=json vkv export -p secret
 {
-  "secret/": {
-    "admin": {
-      "password": "passw0rd",
-      "username": "user"
-    },
-    "db/": {
-      "dev": {
-        "env": "dev",
-        "password": "passw0rd-dev",
-        "username": "user"
-      },
-      "prod": {
-        "env": "prod",
-        "password": "passw0rd-prod",
-        "username": "user"
-      }
-    }
+  "admin": {
+    "password": "passw0rd",
+    "username": "user"
+  },
+  "db/dev": {
+    "env": "dev",
+    "password": "passw0rd-dev",
+    "username": "user"
+  },
+  "db/prod": {
+    "env": "prod",
+    "password": "passw0rd-prod",
+    "username": "user"
   }
 }
 ```
 
-Per default `vkv` splits the secret paths at `/`, if you prefer a non-nested output (for scripting purposes) you can enable `--merge-paths` (only works in `yaml`, `json` or `template` output format):
-
-```bash
-# YAML
-> vkv export -p secret --merge-paths -f=yaml
-secret/admin:
-  sub: password
-secret/demo:
-  foo: bar
-secret/sub/demo:
-  demo: hello world
-  password: s3cre5<
-  user: admin
-secret/sub/sub2/demo:
-  foo: bar
-  password: password
-  user: user
-
-# JSON
-> vkv export -p secret --merge-paths -f=json
-{
-  "secret/admin": {
-    "sub": "password"
-  },
-  "secret/demo": {
-    "foo": "bar"
-  },
-  "secret/sub/demo": {
-    "demo": "hello world",
-    "password": "s3cre5<",
-    "user": "admin"
-  },
-  "secret/sub/sub2/demo": {
-    "foo": "bar",
-    "password": "password",
-    "user": "user"
-  }
-}
-```
+The `yaml` and `json` formats already use flat, non-nested paths. To export **all versions** of every secret instead of just the latest, add `--all-versions` (see the [export docs](export.md#all-versions)).
 
 ## Import secrets using `vkv`
 Meanwhile `vkv export` can be used to store secrets, `vkv import` is used to import secrets from a `vkv export` command (either `yaml` or `json` format is accepted).

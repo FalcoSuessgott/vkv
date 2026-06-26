@@ -202,11 +202,10 @@ func (s *VaultSuite) TestImportCommand() {
   secret2:
     new: key
 `,
-			expected: `yaml/:
-  secret:
-    user: password
-  secret2:
-    new: key
+			expected: `secret:
+  user: password
+secret2:
+  new: key
 `,
 		},
 		{
@@ -223,13 +222,10 @@ func (s *VaultSuite) TestImportCommand() {
       foo:
         new: key
 `,
-			expected: `yaml/:
-  secret:
-    user: password
-  secret2/:
-    sub/:
-      foo:
-        new: key
+			expected: `secret:
+  user: password
+secret2/sub/foo:
+  new: key
 `,
 		},
 		{
@@ -244,12 +240,10 @@ func (s *VaultSuite) TestImportCommand() {
   secret:
     user: password
 `,
-			expected: `yaml/:
-  secret:
-    user: password
-  secret2/:
-    secret:
-      user: password
+			expected: `secret:
+  user: password
+secret2/secret:
+  user: password
 `,
 		},
 		{
@@ -260,9 +254,8 @@ func (s *VaultSuite) TestImportCommand() {
   secret:
     user: password
 `,
-			expected: `yaml/:
-  secret:
-    user: password
+			expected: `secret:
+  user: password
 `,
 		},
 		{
@@ -277,9 +270,8 @@ func (s *VaultSuite) TestImportCommand() {
   secret:
     new: key
 `,
-			expected: `yaml/:
-  secret:
-    new: key
+			expected: `secret:
+  new: key
 `,
 		},
 	}
