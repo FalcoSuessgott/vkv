@@ -5,6 +5,7 @@ go 1.24.4
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/charmbracelet/fang v0.4.3
+	github.com/fatih/color v1.18.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/golangci/golangci-lint/v2 v2.8.0
 	github.com/hashicorp/vault/api v1.22.0
@@ -93,7 +94,6 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/ebitengine/purego v0.9.1 // indirect
 	github.com/ettle/strcase v0.2.0 // indirect
-	github.com/fatih/color v1.18.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/firefart/nonamedreturns v1.0.6 // indirect

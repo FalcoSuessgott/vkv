@@ -95,13 +95,7 @@ func NewImportCmd() *cobra.Command {
 
 			// print preview during dry run and exit
 			if o.DryRun {
-				// replace the root path in the secrets with the specified path
-				secretsWithNewPath := make(map[string]interface{})
-				for _, v := range secrets {
-					secretsWithNewPath = utils.UnflattenMap(utils.NormalizePath(path.Join(rootPath, subPath)), utils.ToMapStringInterface(v), o.EnginePath)
-				}
-
-				return o.dryRun(rootPath, secretsWithNewPath)
+				return o.dryRun(rootPath, o.rerootSecrets(rootPath, subPath, secrets))
 			}
 
 			// enable kv engine, error if already enabled, unless force is used
@@ -212,6 +206,13 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 	transformedMap := make(map[string]interface{})
 	utils.FlattenMap(secrets, transformedMap, "")
 
+	// nested (legacy) exports are rooted at the engine path (e.g. "secret/"); flat
+	// exports have no such root. Only strip an engine-like root from the paths.
+	rootPrefix := ""
+	if root, err := utils.GetRootElement(secrets); err == nil && strings.HasSuffix(root, utils.Delimiter) {
+		rootPrefix = root
+	}
+
 	for p, m := range transformedMap {
 		secret, ok := m.(map[string]interface{})
 		if !ok {
@@ -219,8 +220,7 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 		}
 
 		// replace original path with the new engine path
-		t, _ := utils.GetRootElement(secrets)
-		newSubPath := strings.TrimPrefix(p, t)
+		newSubPath := strings.TrimPrefix(p, rootPrefix)
 
 		// unless a subpath has been specified by the user
 		if subPath != "" {
@@ -237,6 +237,28 @@ func (o *importOptions) writeSecrets(rootPath, subPath string, secrets map[strin
 	fmt.Fprintln(writer, "successfully imported all secrets")
 
 	return nil
+}
+
+// rerootSecrets rebuilds a nested map of the parsed secrets rooted under the
+// target rootPath/subPath, handling both flat and legacy nested (engine-rooted) input.
+func (o *importOptions) rerootSecrets(rootPath, subPath string, secrets map[string]interface{}) map[string]interface{} {
+	flat := make(map[string]interface{})
+	utils.FlattenMap(secrets, flat, "")
+
+	rootPrefix := ""
+	if root, err := utils.GetRootElement(secrets); err == nil && strings.HasSuffix(root, utils.Delimiter) {
+		rootPrefix = root
+	}
+
+	result := make(map[string]interface{})
+
+	for p, m := range flat {
+		sub := strings.TrimPrefix(p, rootPrefix)
+		full := utils.NormalizePath(path.Join(rootPath, subPath, sub))
+		result = utils.DeepMergeMaps(result, utils.UnflattenMap(full, utils.ToMapStringInterface(m), o.EnginePath))
+	}
+
+	return result
 }
 
 func (o *importOptions) dryRun(rootPath string, secrets map[string]interface{}) error {

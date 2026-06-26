@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/FalcoSuessgott/vkv/pkg/fs"
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
@@ -70,6 +71,8 @@ type Printer struct {
 	valueLength    int
 	template       string
 	vaultClient    *vault.Vault
+	// now is the reference time for relative timestamps; defaults to time.Now() when zero.
+	now time.Time
 }
 
 // WithContext option for passing a custom context.
@@ -211,6 +214,19 @@ func Update(p *Printer, opts ...Option) {
 // Out prints out the secrets according all configured options.
 // nolint: cyclop
 func (p *Printer) Out(secrets interface{}) error {
+	// all-versions secrets bypass the standard map processing, since their
+	// type carries per-version data that a JSON round-trip would mangle
+	if vs, ok := secrets.(vault.VersionedSecrets); ok {
+		switch p.format {
+		case JSON:
+			return p.printJSONAllVersions(vs)
+		case YAML:
+			return p.printYAMLAllVersions(vs)
+		default:
+			return p.printBaseAllVersions(vs)
+		}
+	}
+
 	secretMap := utils.ToMapStringInterface(secrets)
 
 	for k, v := range secretMap {

@@ -20,6 +20,7 @@ type exportOptions struct {
 	OnlyKeys       bool `env:"ONLY_KEYS"`
 	OnlyPaths      bool `env:"ONLY_PATHS"`
 	MergePaths     bool `env:"MERGE_PATHS"`
+	AllVersions    bool `env:"ALL_VERSIONS" envDefault:"false"`
 	ShowValues     bool `env:"SHOW_VALUES"`
 	ShowVersion    bool `env:"SHOW_VERSION" envDefault:"true"`
 	ShowMetadata   bool `env:"SHOW_METADATA" envDefault:"true"`
@@ -72,9 +73,27 @@ func NewExportCmd() *cobra.Command {
 				prt.WithContext(rootContext),
 			)
 
+			if o.AllVersions {
+				vs, err := vaultClient.ListRecursiveAllVersions(rootContext, enginePath, subPath, o.SkipErrors)
+				if err != nil {
+					return err
+				}
+
+				return printer.Out(vs)
+			}
+
 			secrets, err := vaultClient.ListRecursive(rootContext, enginePath, subPath, o.SkipErrors)
 			if err != nil {
 				return err
+			}
+
+			// yaml/json use flat, full-path keys (no engine root) for consistency
+			// with --all-versions and to keep them re-importable
+			if o.outputFormat == prt.YAML || o.outputFormat == prt.JSON {
+				flat := make(map[string]interface{})
+				utils.FlattenMap(utils.ToMapStringInterface(secrets), flat, subPath)
+
+				return printer.Out(flat)
 			}
 
 			p := path.Join(enginePath, subPath)
@@ -103,6 +122,7 @@ func NewExportCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")
 	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env: VKV_EXPORT_ONLY_PATHS)")
 	cmd.Flags().BoolVar(&o.MergePaths, "merge-paths", o.MergePaths, "merge paths (env: VKV_EXPORT_MERGE_PATHS)")
+	cmd.Flags().BoolVar(&o.AllVersions, "all-versions", o.AllVersions, "show all versions of each KVv2 secret in the tree (base format only) (env: VKV_EXPORT_ALL_VERSIONS)")
 	cmd.Flags().BoolVar(&o.ShowVersion, "show-version", o.ShowVersion, "show the secret version (env: VKV_EXPORT_VERSION)")
 	cmd.Flags().BoolVar(&o.ShowMetadata, "show-metadata", o.ShowMetadata, "show the secrets metadata (env: VKV_EXPORT_METADATA)")
 	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_EXPORT_SHOW_VALUES)")
@@ -123,6 +143,16 @@ func NewExportCmd() *cobra.Command {
 	return cmd
 }
 
+// isAllVersionsFormat reports whether the format supports --all-versions.
+func isAllVersionsFormat(format string) bool {
+	switch strings.ToLower(format) {
+	case "", "base", "json", "yaml", "yml":
+		return true
+	default:
+		return false
+	}
+}
+
 // nolint: cyclop, goconst
 func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 	switch {
@@ -130,6 +160,10 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 		return errInvalidFlagCombination
 	case o.EnginePath == "" && o.Path == "":
 		return errors.New("no KV-paths given. Either --engine-path/-e or --path/-p needs to be specified")
+	case o.AllVersions && !isAllVersionsFormat(o.FormatString):
+		return fmt.Errorf("%w: --all-versions only supports the \"base\", \"json\" and \"yaml\" output formats", errInvalidFlagCombination)
+	case o.AllVersions && (o.MergePaths || o.OnlyPaths):
+		return fmt.Errorf("%w: --all-versions cannot be combined with --merge-paths or --only-paths", errInvalidFlagCombination)
 	case true:
 		switch strings.ToLower(o.FormatString) {
 		case "yaml", "yml":
