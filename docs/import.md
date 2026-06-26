@@ -39,17 +39,17 @@ successfully imported all secrets
 result:
 
 copy/ [type=kv2]
-├── admin [v=1]
+├── admin [v=1] (created 5 seconds ago)
 │   └── sub=********
-├── demo [v=1]
+├── demo [v=1] (created 5 seconds ago)
 │   └── foo=***
 └── sub
-    ├── demo [v=1]
+    ├── demo [v=1] (created 5 seconds ago)
     │   ├── demo=***********
     │   ├── password=*******
     │   └── user=*****
     └── sub2
-        └── demo [v=1]
+        └── demo [v=1] (created 5 seconds ago)
             ├── foo=***
             ├── password=********
             └── user=****

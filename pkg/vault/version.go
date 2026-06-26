@@ -34,6 +34,31 @@ type VersionedSecret struct {
 // VersionedSecrets maps a secret subPath to its versioned secret.
 type VersionedSecrets map[string]*VersionedSecret
 
+// ReadCurrentVersionCreatedTime returns the creation time of a secret's current (latest) version.
+func (v *Vault) ReadCurrentVersionCreatedTime(ctx context.Context, rootPath, subPath string) (time.Time, error) {
+	data, err := v.Client.Logical().ReadWithContext(ctx, fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	if data == nil || data.Data == nil {
+		return time.Time{}, fmt.Errorf("could not read secret %s metadata", path.Join(rootPath, subPath))
+	}
+
+	// prefer the current version's created_time, fall back to the secret's updated_time
+	if cur, ok := data.Data["current_version"]; ok {
+		if versions, ok := data.Data["versions"].(map[string]interface{}); ok {
+			if m, ok := versions[fmt.Sprintf("%v", cur)].(map[string]interface{}); ok {
+				if t := parseVaultTime(m["created_time"]); !t.IsZero() {
+					return t, nil
+				}
+			}
+		}
+	}
+
+	return parseVaultTime(data.Data["updated_time"]), nil
+}
+
 // ReadAllVersions returns all versions of a single KVv2 secret, newest first.
 func (v *Vault) ReadAllVersions(ctx context.Context, rootPath, subPath string) (*VersionedSecret, error) {
 	metadata, err := v.Client.Logical().ReadWithContext(ctx, fmt.Sprintf(kvv2ListSecretsPath, rootPath, subPath))

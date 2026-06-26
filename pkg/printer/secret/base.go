@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/FalcoSuessgott/vkv/pkg/utils"
 	"github.com/savioxavier/termlink"
@@ -107,6 +108,15 @@ func (p *Printer) buildTreeName(rootPath, subPath string) string {
 	if p.showVersion {
 		if v, err := p.vaultClient.ReadSecretVersion(p.ctx, rootPath, subPath); err == nil {
 			name = fmt.Sprintf("%s %s", name, versionStyle(fmt.Sprintf("[v=%v]", v)))
+		}
+
+		if t, err := p.vaultClient.ReadCurrentVersionCreatedTime(p.ctx, rootPath, subPath); err == nil && !t.IsZero() {
+			now := p.now
+			if now.IsZero() {
+				now = time.Now()
+			}
+
+			name = fmt.Sprintf("%s %s", name, versionStyle(fmt.Sprintf("(created %s)", humanizeTimeAgo(t, now))))
 		}
 	}
 

@@ -107,18 +107,17 @@ done
 
 ===> Output Format: base <===
 secret/ [desc=key/value secret storage] [type=kv2]
-├── admin [v=1] [key=value]
+├── admin [v=1] (created 5 minutes ago) [key=value]
 │   └── sub=********
-├── demo [v=1]
+├── demo [v=1] (created 5 minutes ago)
 │   └── foo=***
 └── sub
-    ├── demo [v=1]
+    ├── demo [v=1] (created 5 minutes ago)
     │   ├── demo=***********
-    │   ├── password=******
+    │   ├── password=*******
     │   └── user=*****
     └── sub2
-        └── demo [v=2] [admin=false key=value]
-            ├── admin=***
+        └── demo [v=2] (created 5 minutes ago) [admin=false key=value]
             ├── foo=***
             ├── password=********
             └── user=****

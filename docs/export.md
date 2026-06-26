@@ -20,25 +20,29 @@ See the [CLI Reference](https://falcosuessgott.github.io/vkv/cmd/vkv_export/) fo
     In conjunction with a `-e` you can specify a sub-path by using -p: `-e=kv/prod -p=db`.
 
 ## base
+Each secret shows its current version (`[v=N]`), when that version was created (`(created X ago)`) and any custom metadata (`[key=value]`):
+
 ```bash
 > vkv export -p secret -f=base
 secret/ [desc=key/value secret storage] [type=kv2]
-├── admin [v=1] [key=value]
+├── admin [v=1] (created 5 minutes ago) [key=value]
 │   └── sub=********
-├── demo [v=1]
+├── demo [v=1] (created 5 minutes ago)
 │   └── foo=***
 └── sub
-    ├── demo [v=1]
+    ├── demo [v=1] (created 5 minutes ago)
     │   ├── demo=***********
-    │   ├── password=******
+    │   ├── password=*******
     │   └── user=*****
     └── sub2
-        └── demo [v=2] [admin=false key=value]
-            ├── admin=***
+        └── demo [v=2] (created 5 minutes ago) [admin=false key=value]
             ├── foo=***
             ├── password=********
             └── user=****
 ```
+
+!!! info
+    In a terminal, path elements are shown in **bold** and the version/age annotation in cyan. Colors are disabled automatically when the output is piped or redirected. Use `--show-version=false` to hide the `[v=N] (created X ago)` annotation.
 
 ## yaml
 !!! info
