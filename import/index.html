@@ -1826,7 +1826,7 @@
 
 <h1 id="import">Import<a class="headerlink" href="#import" title="Permanent link">&para;</a></h1>
 <p><code>vkv import</code> tries to determine the path from the input, if that is not possible you can specify on using <code>--path|--engine-path</code>.</p>
-<p><code>vkv import</code> accepts <code>vkv</code>s YAML or JSON output (<code>vkv export -f=yaml|json</code>) either by invoking <code>vkv import -</code> (for STDIN) or by specifying a file (<code>--file</code>).</p>
+<p><code>vkv import</code> accepts <code>vkv</code>s YAML or JSON output (<code>vkv export -f=yaml|json</code>) either by invoking <code>vkv import -</code> (for STDIN) or by specifying a file (<code>--file</code>). Both the current flat format and the legacy nested format are supported.</p>
 <p><code>vkv</code> will create the specified path if the engine does not exist yet and will error if it does, unless <code>--force</code> is specified.</p>
 <p>See the <a href="https://github.com/FalcoSuessgott/vkv/cmd/vkv_import/">CLI Reference</a> for more details on the supported flags and env vars.</p>
 <div class="admonition warning">
@@ -1860,27 +1860,30 @@ In conjunction with a <code>-e</code> you can specify a sub-path by using -p: <c
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>result:
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>copy/<span class="w"> </span><span class="o">[</span><span class="nv">type</span><span class="o">=</span>kv2<span class="o">]</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├──<span class="w"> </span>admin<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├──<span class="w"> </span>admin<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">(</span>created<span class="w"> </span><span class="m">5</span><span class="w"> </span>seconds<span class="w"> </span>ago<span class="o">)</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">sub</span><span class="o">=</span>********
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">(</span>created<span class="w"> </span><span class="m">5</span><span class="w"> </span>seconds<span class="w"> </span>ago<span class="o">)</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>└──<span class="w"> </span>sub
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span>├──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">(</span>created<span class="w"> </span><span class="m">5</span><span class="w"> </span>seconds<span class="w"> </span>ago<span class="o">)</span>
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">demo</span><span class="o">=</span>***********
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>******
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>*******
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>*****
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span>└──<span class="w"> </span>sub2
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span>└──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">2</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="nv">admin</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span>value<span class="o">]</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">admin</span><span class="o">=</span>***
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>********
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">            </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>****
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span>└──<span class="w"> </span>demo<span class="w"> </span><span class="o">[</span><span class="nv">v</span><span class="o">=</span><span class="m">1</span><span class="o">]</span><span class="w"> </span><span class="o">(</span>created<span class="w"> </span><span class="m">5</span><span class="w"> </span>seconds<span class="w"> </span>ago<span class="o">)</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>***
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">            </span>├──<span class="w"> </span><span class="nv">password</span><span class="o">=</span>********
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">            </span>└──<span class="w"> </span><span class="nv">user</span><span class="o">=</span>****
 </span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>vkv import</code> writes secret data only — it does not restore secret versions or custom metadata. To capture the full version history, use <code>vkv export --all-versions</code> or <a href="../snapshots/">snapshots</a>.</p>
+</div>
 <h2 id="reading-secrets-from-stdin">Reading secrets from STDIN<a class="headerlink" href="#reading-secrets-from-stdin" title="Permanent link">&para;</a></h2>
 <p>The <code>-</code> in <code>vkv import -</code>, tells <code>vkv</code> do read data via STDIN. The idea of <code>vkv import -</code> is, in order to copy/mirror KV-v2 secrets or complete engines across different Vault Servers or Namespaces, you can simply pipe
 <code>vkv</code>s output into the <code>vkv import</code> command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># dont forget to use --show-values, otherwise the secrets will be uploaded masked.</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-p<span class="w"> </span>&lt;source&gt;<span class="w"> </span>--show-values<span class="w"> </span>-f<span class="o">=</span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>vkv<span class="w"> </span>import<span class="w"> </span>-<span class="w"> </span>-p<span class="w"> </span>&lt;destination&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># yaml/json always export real (unmasked) values, so the secrets are copied intact.</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>vkv<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-p<span class="w"> </span>&lt;source&gt;<span class="w"> </span>-f<span class="o">=</span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>vkv<span class="w"> </span>import<span class="w"> </span>-<span class="w"> </span>-p<span class="w"> </span>&lt;destination&gt;
 </span></code></pre></div>
 <h3 id="a-few-notes">A few notes:<a class="headerlink" href="#a-few-notes" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1908,7 +1911,7 @@ In conjunction with a <code>-e</code> you can specify a sub-path by using -p: <c
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 5, 2025 03:17:57 UTC">July 5, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 26, 2026 12:49:29 UTC">June 26, 2026</span>
   </span>
 
     
@@ -1924,7 +1927,6 @@ In conjunction with a <code>-e</code> you can specify a sub-path by using -p: <c
     </span>
     <nav>
       
-        <a href="mailto:31119472+alekslebedev@users.noreply.github.com">Aleksandr Lebedev</a>, 
         <a href="mailto:tommorelly@gmail.com">Tom Morelly</a>, 
         <a href="mailto:tom-morelly@gmx.de">Tom Morelly</a>, 
         <a href="mailto:tom.morelly@clearroute.io">Tom Morelly</a>
