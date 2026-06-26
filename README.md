@@ -10,6 +10,8 @@
 
 `vkv` is a little CLI tool written in Go, which enables you to list, compare, import, document, backup & encrypt secrets from a [HashiCorp Vault KV engine](https://developer.hashicorp.com/vault/docs/secrets/kv):
 
+![img](./docs/assets/example.png)
+
 <img src="docs/assets/demo.gif" alt="drawing"/>
 
 

@@ -8,6 +8,7 @@
 <img src="https://img.shields.io/github/v/release/FalcoSuessgott/vkv" alt="drawing"/>
 </div>
 
+![img](assets/example.png)
 ![gif](assets/demo.gif)
 
 
