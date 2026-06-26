@@ -2,7 +2,7 @@
 
 `vkv import` tries to determine the path from the input, if that is not possible you can specify on using `--path|--engine-path`.
 
-`vkv import` accepts `vkv`s YAML or JSON output (`vkv export -f=yaml|json`) either by invoking `vkv import -` (for STDIN) or by specifying a file (`--file`).
+`vkv import` accepts `vkv`s YAML or JSON output (`vkv export -f=yaml|json`) either by invoking `vkv import -` (for STDIN) or by specifying a file (`--file`). Both the current flat format and the legacy nested format are supported.
 
 `vkv` will create the specified path if the engine does not exist yet and will error if it does, unless `--force` is specified.
 
@@ -39,22 +39,24 @@ successfully imported all secrets
 result:
 
 copy/ [type=kv2]
-├── admin [v=1] [key=value]
+├── admin [v=1]
 │   └── sub=********
 ├── demo [v=1]
 │   └── foo=***
 └── sub
     ├── demo [v=1]
     │   ├── demo=***********
-    │   ├── password=******
+    │   ├── password=*******
     │   └── user=*****
     └── sub2
-        └── demo [v=2] [admin=false key=value]
-            ├── admin=***
+        └── demo [v=1]
             ├── foo=***
             ├── password=********
             └── user=****
 ```
+
+!!! note
+    `vkv import` writes secret data only — it does not restore secret versions or custom metadata. To capture the full version history, use `vkv export --all-versions` or [snapshots](snapshots.md).
 
 ## Reading secrets from STDIN
 
@@ -62,8 +64,8 @@ The `-` in `vkv import -`, tells `vkv` do read data via STDIN. The idea of `vkv 
 `vkv`s output into the `vkv import` command:
 
 ```bash
-# dont forget to use --show-values, otherwise the secrets will be uploaded masked.
-vkv export -p <source> --show-values -f=yaml | vkv import - -p <destination>
+# yaml/json always export real (unmasked) values, so the secrets are copied intact.
+vkv export -p <source> -f=yaml | vkv import - -p <destination>
 ```
 
 ### A few notes:

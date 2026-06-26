@@ -122,7 +122,7 @@ func NewExportCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&o.OnlyKeys, "only-keys", o.OnlyKeys, "show only keys (env: VKV_EXPORT_ONLY_KEYS)")
 	cmd.Flags().BoolVar(&o.OnlyPaths, "only-paths", o.OnlyPaths, "show only paths (env: VKV_EXPORT_ONLY_PATHS)")
 	cmd.Flags().BoolVar(&o.MergePaths, "merge-paths", o.MergePaths, "merge paths (env: VKV_EXPORT_MERGE_PATHS)")
-	cmd.Flags().BoolVar(&o.AllVersions, "all-versions", o.AllVersions, "show all versions of each KVv2 secret in the tree (base format only) (env: VKV_EXPORT_ALL_VERSIONS)")
+	cmd.Flags().BoolVar(&o.AllVersions, "all-versions", o.AllVersions, "export all versions of each KVv2 secret (base, json and yaml formats) (env: VKV_EXPORT_ALL_VERSIONS)")
 	cmd.Flags().BoolVar(&o.ShowVersion, "show-version", o.ShowVersion, "show the secret version (env: VKV_EXPORT_VERSION)")
 	cmd.Flags().BoolVar(&o.ShowMetadata, "show-metadata", o.ShowMetadata, "show the secrets metadata (env: VKV_EXPORT_METADATA)")
 	cmd.Flags().BoolVar(&o.ShowValues, "show-values", o.ShowValues, "don't mask values (env: VKV_EXPORT_SHOW_VALUES)")
@@ -172,12 +172,16 @@ func (o *exportOptions) validateFlags(cmd *cobra.Command, args []string) error {
 			o.OnlyPaths = false
 			o.MaxValueLength = -1
 			o.ShowValues = true
+			// yaml/json are already emitted with flat, full-path keys
+			o.MergePaths = false
 		case "json":
 			o.outputFormat = prt.JSON
 			o.OnlyKeys = false
 			o.OnlyPaths = false
 			o.MaxValueLength = -1
 			o.ShowValues = true
+			// yaml/json are already emitted with flat, full-path keys
+			o.MergePaths = false
 		case "export":
 			o.outputFormat = prt.Export
 			o.OnlyKeys = false

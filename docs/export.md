@@ -41,52 +41,115 @@ secret/ [desc=key/value secret storage] [type=kv2]
 ```
 
 ## yaml
+!!! info
+    `yaml` and `json` always export **real values** (no masking) using **flat, full secret-path keys**. This keeps the output easy to consume programmatically and lets it be piped straight back into [`vkv import`](import.md).
+
 ```bash
 > vkv export -p secret -f=yaml
-secret/:
-  admin:
-    sub: '********'
-  demo:
-    foo: '***'
-  sub/:
-    demo:
-      demo: '***********'
-      password: '******'
-      user: '*****'
-    sub2/:
-      demo:
-        admin: '***'
-        foo: '***'
-        password: '********'
-        user: '****'
+admin:
+  sub: password
+demo:
+  foo: bar
+sub/demo:
+  demo: hello world
+  password: s3cre5<
+  user: admin
+sub/sub2/demo:
+  foo: bar
+  password: password
+  user: user
 ```
 
 ## json
 ```bash
 > vkv export -p secret -f=json
 {
-  "secret/": {
-    "admin": {
-      "sub": "********"
+  "admin": {
+    "sub": "password"
+  },
+  "demo": {
+    "foo": "bar"
+  },
+  "sub/demo": {
+    "demo": "hello world",
+    "password": "s3cre5<",
+    "user": "admin"
+  },
+  "sub/sub2/demo": {
+    "foo": "bar",
+    "password": "password",
+    "user": "user"
+  }
+}
+```
+
+## all-versions
+The `--all-versions` flag exports **every version** of each KVv2 secret instead of only the latest one. It is supported by the `base`, `yaml` and `json` formats.
+
+In the `base` (tree) format each version is shown with its creation time (and `deleted`/`destroyed` status), the key/value pairs it contained, and any custom metadata next to the secret name:
+
+```bash
+> vkv export -p secret --all-versions
+secret/ [kv2] (key/value secret storage)
+├── admin {key=value}
+│   └── [Version 1 created 4 minutes ago]
+│       └── sub=********
+├── demo
+│   └── [Version 1 created 4 minutes ago]
+│       └── foo=***
+└── sub
+    ├── demo
+    │   └── [Version 1 created 4 minutes ago]
+    │       ├── demo=***********
+    │       ├── password=*******
+    │       └── user=*****
+    └── sub2
+        └── demo {admin=false key=value}
+            ├── [Version 2 created 4 minutes ago]
+            │   ├── foo=***
+            │   ├── password=********
+            │   └── user=****
+            └── [Version 1 created 4 minutes ago]
+                ├── foo=***
+                ├── password=********
+                └── user=****
+```
+
+!!! info
+    In a terminal, path elements are shown in **bold**, version headers in cyan and metadata dimmed. Colors are automatically disabled when the output is piped or redirected.
+
+The `yaml` and `json` formats emit the full version history per secret, including timestamps, `destroyed`/`deletion_time` status and custom metadata:
+
+```bash
+> vkv export -p secret/sub/sub2 --all-versions -f=json
+{
+  "sub/sub2/demo": {
+    "custom_metadata": {
+      "admin": "false",
+      "key": "value"
     },
-    "demo": {
-      "foo": "***"
-    },
-    "sub/": {
-      "demo": {
-        "demo": "***********",
-        "password": "******",
-        "user": "*****"
+    "versions": [
+      {
+        "version": 2,
+        "created_time": "2024-05-28T05:57:52Z",
+        "destroyed": false,
+        "data": {
+          "foo": "bar",
+          "password": "password",
+          "user": "user"
+        }
       },
-      "sub2/": {
-        "demo": {
-          "admin": "***",
-          "foo": "***",
-          "password": "********",
-          "user": "****"
+      {
+        "version": 1,
+        "created_time": "2024-05-28T04:47:54Z",
+        "destroyed": false,
+        "data": {
+          "foo": "bar",
+          "password": "password",
+          "user": "user"
         }
       }
-    }
+    ]
   }
 }
 ```
@@ -169,42 +232,19 @@ export SUB_SUB2_DEMO_PASSWORD='password'
 export SUB_SUB2_DEMO_USER='user'
 ```
 
-Per default `vkv` splits the secret paths at `/`, if you prefer a non-nested output (for scripting purposes) you can enable `--merge-paths` (only works in `yaml`, `json` or `template` output format):
+The `yaml` and `json` formats already emit flat, non-nested paths (see above). For the `template` format the secrets are passed to the template nested by default; enable `--merge-paths` to receive them as flat, full-path keys instead:
+
+```jinja
+# merged.tmpl
+{{- range $path, $secrets := . }}
+{{ $path }}: {{ $secrets }}
+{{- end }}
+```
 
 ```bash
-# YAML
-> vkv export -p secret --merge-paths -f=yaml
-secret/admin:
-  sub: password
-secret/demo:
-  foo: bar
-secret/sub/demo:
-  demo: hello world
-  password: s3cre5<
-  user: admin
-secret/sub/sub2/demo:
-  foo: bar
-  password: password
-  user: user
-
-# JSON
-> vkv export -p secret --merge-paths -f=json
-{
-  "secret/admin": {
-    "sub": "password"
-  },
-  "secret/demo": {
-    "foo": "bar"
-  },
-  "secret/sub/demo": {
-    "demo": "hello world",
-    "password": "s3cre5<",
-    "user": "admin"
-  },
-  "secret/sub/sub2/demo": {
-    "foo": "bar",
-    "password": "password",
-    "user": "user"
-  }
-}
+> vkv export -p secret --merge-paths -f=template --template-file=merged.tmpl
+secret/admin: map[sub:password]
+secret/demo: map[foo:bar]
+secret/sub/demo: map[demo:hello world password:s3cre5< user:admin]
+secret/sub/sub2/demo: map[foo:bar password:password user:user]
 ```
