@@ -1771,7 +1771,7 @@
 <h1 id="fzf">fzf<a class="headerlink" href="#fzf" title="Permanent link">&para;</a></h1>
 <p>using <code>vault secrets list</code> and a little bit of <code>jq</code>-logic, we can get a list of all KV-engines visible for the token.</p>
 <p>If we pipe this into <code>fzf</code> we can get a handy little  preview-app:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>vkv<span class="w"> </span>list<span class="w"> </span>engines<span class="w"> </span>--all<span class="w"> </span>--include-ns-prefix<span class="w"> </span><span class="p">|</span><span class="w"> </span>fzf<span class="w"> </span>--preview<span class="w"> </span><span class="s1">&#39;vkv export -e ${}&#39;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>vkv<span class="w"> </span>list<span class="w"> </span>engines<span class="w"> </span>--all<span class="w"> </span>--include-ns-prefix<span class="w"> </span><span class="p">|</span><span class="w"> </span>fzf<span class="w"> </span>--preview<span class="w"> </span><span class="s1">'vkv export -e ${}'</span>
 </span></code></pre></div>
 <h2 id="demo">Demo<a class="headerlink" href="#demo" title="Permanent link">&para;</a></h2>
 <p><img alt="gif" src="../assets/fzf.gif" /></p>
