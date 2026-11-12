@@ -128,6 +128,9 @@ func (v *Vault) IsKVv1(ctx context.Context, rootPath string) (bool, error) {
 		if opts["version"].(string) == "1" {
 			return true, nil
 		}
+	} else {
+		// When options is nil, assume it's a V1 engine
+		return true, nil
 	}
 
 	return false, nil
